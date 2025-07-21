@@ -148,6 +148,15 @@ Parameters:
     Default: ''
     Description: 'Applicative environment variable file checksum'
 
+  ConsumedQueueMessagePerMinuteValidator:
+    Type: Number
+    Default: 0
+    Description: Weight to assign to queue number of visible messages metric (Validator task)
+
+  AlbSecurityGroup:
+    Type: String
+    Description: 'Application load balancer security group'
+
   EnhancedWebSecurityEnabled:
     Type: String
     Default: false
@@ -178,6 +187,10 @@ Parameters:
   TimelinesCounterTableArn:
     Type: String
     Description: ARN Dynamo Name used by application to access the key-value store of CounterTable
+
+  PaperNotificationFailedDynamoTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
 
   ActionDynamoTableName:
     Type: String
@@ -347,10 +360,47 @@ Parameters:
     Type: String
     Description: 'External channel base url'
 
+  F24DeliveryPushUser:
+    Type: String
+    Description: 'pn-delivery-push clientId for communication with pn-f24'
+
+  PnCronAnalyzer:
+    Type: String
+    Default: '-'
+    Description: Cron for which you send the metric to CloudWatch
+
+  PagoPaNotificationFee:
+    Type: String
+    Description: 'PagoPa notification fee per le notifiche create PRIMA della v2.1. Per le successive, il default viene impostato da pn-delivery e arriva nella notifica.'
+    Default: '100'
+
+  PagoPaNotificationVat:
+    Type: String
+    Description: 'PagoPa notification vat per le notifiche create PRIMA della v2.1. Per le successive, il default viene impostato da pn-delivery e arriva nella notifica.'
+    Default: '22'
+
   # Log group parameters
   EcsValidatorLogGroup:
     Type: String
     Description: 'Ecs log group name (Validator task)'
+
+  WireTapLogActivation:
+    Type: String
+    Default: false
+    Description: Activation of wire logs
+    AllowedValues:
+      - true
+      - false
+
+  WebhookFeatureFlags:
+    Type: CommaDelimitedList
+    Description: List containing in order StartReadStream, StopReadStream, StartWriteBusinessTimestamp, StopWriteBusinessTimestamp
+    Default: '1999-01-01T00:00:00Z,2099-02-01T00:00:00Z,2099-01-01T00:00:00Z,2099-02-01T00:00:00Z'
+
+  pfNewWorkflowFeatureFlag:
+    Type: CommaDelimitedList
+    Description: List containing in order pfNewWorkflowStart, pfNewWorkflowStop
+    Default: '2099-01-01T00:00:00Z,2099-02-01T00:00:00Z'
 
 Resources:
 
@@ -400,34 +450,30 @@ Resources:
         ContainerEnvEntry15: !Sub 'PN_DELIVERYPUSH_ACTIONDAO_TABLENAME=${ActionDynamoTableName}'
         ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_FUTUREACTIONDAO_TABLENAME=${FutureActionDynamoTableName}'
         ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_LASTPOLLFORFUTUREACTIONDAO_LOCKTABLENAME=${PnDeliveryPushShedLockDynamoTableName}'
-        ContainerEnvEntry18: 'SPRING_CLOUD_FUNCTION_DEFINITION_LIST=pnDeliveryNewNotificationEventConsumer;pnDeliveryPushValidationActionsInboundConsumer;pnSafeStorageEventInboundConsumer;pnAddressManagerEventInboundConsumer;pnF24EventInboundConsumer'
-        ContainerEnvEntry19: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
-        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
-        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
-        ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSH_TOPICS_NATIONALREGISTRIESEVENTS=${NationalRegistries2DeliveryPushQueueName}'
-        ContainerEnvEntry24: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
-        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
-        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_TIMELINECOUNTERDAO_TABLENAME=${TimelinesCounterTableName}'
-        ContainerEnvEntry27: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
-        ContainerEnvEntry28: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry29: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
-        ContainerEnvEntry30: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
-        ContainerEnvEntry31: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
-        ContainerEnvEntry32: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
-        ContainerEnvEntry33: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
-        ContainerEnvEntry34: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
-        ContainerEnvEntry35: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry36: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry37: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTART=${SelectedEnv}', { SelectedEnv: !Select [ 0, !Ref pfNewWorkflowFeatureFlag ]} ]
-        ContainerEnvEntry38: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTOP=${SelectedEnv}', { SelectedEnv: !Select [ 1, !Ref pfNewWorkflowFeatureFlag ]} ]
-        ContainerEnvEntry39: !Sub ['PN_DELIVERYPUSH_STARTWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 2, !Ref WebhookFeatureFlags ]} ]
-        ContainerEnvEntry40: !Sub ['PN_DELIVERYPUSH_STOPWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 3, !Ref WebhookFeatureFlags ]} ]
-        ContainerEnvEntry41: !Sub 'PN_DELIVERYPUSH_ENDACTIONIMPLWITHDAOTIMESTAMP=${ActionLambdasEnabledEnd}'
-        ContainerEnvEntry42: !Sub 'PN_DELIVERYPUSH_ACTIONTTLDAYS=${ActionTtlDays}'
-        ContainerEnvEntry43: !Sub 'PN_DELIVERYPUSH_EMDINTEGRATIONBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry44: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry45: !Sub 'PN_DELIVERYPUSH_STARTACTIONIMPLWITHDAOTIMESTAMP=${ActionLambdasEnabledStart}'
+        ContainerEnvEntry18: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
+        ContainerEnvEntry19: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
+        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
+        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_TOPICS_NATIONALREGISTRIESEVENTS=${NationalRegistries2DeliveryPushQueueName}'
+        ContainerEnvEntry23: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
+        ContainerEnvEntry24: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
+        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TIMELINECOUNTERDAO_TABLENAME=${TimelinesCounterTableName}'
+        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
+        ContainerEnvEntry27: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry28: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
+        ContainerEnvEntry29: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry30: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry31: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
+        ContainerEnvEntry32: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
+        ContainerEnvEntry33: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
+        ContainerEnvEntry34: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry35: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry36: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTART=${SelectedEnv}', { SelectedEnv: !Select [ 0, !Ref pfNewWorkflowFeatureFlag ]} ]
+        ContainerEnvEntry37: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTOP=${SelectedEnv}', { SelectedEnv: !Select [ 1, !Ref pfNewWorkflowFeatureFlag ]} ]
+        ContainerEnvEntry38: !Sub ['PN_DELIVERYPUSH_STARTWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 2, !Ref WebhookFeatureFlags ]} ]
+        ContainerEnvEntry39: !Sub ['PN_DELIVERYPUSH_STOPWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 3, !Ref WebhookFeatureFlags ]} ]
+        ContainerEnvEntry40: !Sub 'PN_DELIVERYPUSH_EMDINTEGRATIONBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry41: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSH_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -438,13 +484,8 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadbalancerRulePriority:
-          Fn::Transform:
-            Name: GenerateLBPriorityIdMacro
-            Parameters:
-              msNumber: !Ref MicroserviceNumber
-              index: 1
-        TaskRoleManagedPolicyArn: !Ref DeliveryPushMicroserviceTaskManagedPolicy
+        LoadBalancerRulePriority: !Ref MicroserviceNumber
+        TaskRoleManagedPolicyArn: !Ref DeliveryPushValidatorMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
@@ -462,27 +503,21 @@ Resources:
         AlarmArns: !Join
           - ','
           - - !GetAtt DeliveryPushValidatorMicroservice.Outputs.FatalLogsMetricAlarmArn
-            - !Ref DeliveryPushInputsQueueAlarmARN
-            - !Ref DeliveryPushInputsQueueAgeAlarmARN
             - !Ref DeliveryPushValidationInputsQueueAlarmARN
             - !Ref DeliveryPushValidationInputsQueueAgeAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
             - !Ref ScheduledValidationActionsQueueAlarmARN
             - !Ref ScheduledValidationActionsQueueAgeAlarmARN
-            - !Ref NationalRegistries2DeliveryPushQueueAlarmARN
-            - !Ref NationalRegistries2DeliveryPushQueueAgeAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
             - !Ref F24ToDeliveryPushQueueAlarmARN
             - !Ref F24ToDeliveryPushQueueAgeAlarmARN
         QueueArns: !Join
           - ','
-          - - !Ref DeliveryPushInputsQueueARN
-            - !Ref DeliveryPushValidationInputsQueueARN
-            - !Ref ScheduledValidationActionsQueueARN
+          - - !Ref DeliveryPushValidationInputsQueueARN
             - !Ref SafeStorageToDeliveryPushQueueARN
-            - !Ref NationalRegistries2DeliveryPushQueueARN
+            - !Ref ScheduledValidationActionsQueueARN
             - !Ref AddressManagerToDeliveryPushQueueARN
             - !Ref F24ToDeliveryPushQueueARN
         LogGroupsNames: !Join
@@ -599,37 +634,17 @@ Resources:
               - sqs:SendMessage
               - sqs:SendMessageBatch
             Resource:
-              - !Ref DeliveryPushInputsQueueARN
               - !Ref DeliveryPushValidationInputsQueueARN
               - !Ref ScheduledValidationActionsQueueARN
               - !Ref SafeStorageToDeliveryPushQueueARN
-              - !Ref NationalRegistries2DeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
               - !Ref F24ToDeliveryPushQueueARN
-          - Effect: Allow
-            Action:
-              - 'dynamodb:GetItem'
-              - 'dynamodb:Query'
-              - 'dynamodb:PutItem'
-            Resource:
-              - !Sub "${TimelinesDynamoTableArn}"
-              - !Sub "${ActionDynamoTableArn}"
-          - Effect: Allow
-            Action:
-              - dynamodb:GetItem
-              - dynamodb:PutItem
-              - dynamodb:DeleteItem
-              - dynamodb:UpdateItem
-            Resource:
-              - !Sub "${TimelinesCounterTableArn}"
           - Effect: Allow
             Action:
               - 'ssm:GetParameter'
               - 'ssm:GetParameters'
             Resource:
-              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaMVP'
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
-              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/radd-experimentation-zip-*'
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
@@ -638,7 +653,4 @@ Resources:
               - 'dynamodb:DeleteItem'
               - 'dynamodb:UpdateItem'
             Resource:
-              - !Sub "${PaperNotificationFailedDynamoTableArn}"
-              - !Sub "${FutureActionDynamoTableArn}"
-              - !Sub "${PnDeliveryPushShedLockDynamoTableArn}"
               - !Sub "${DocumentCreationRequestTableArn}"
