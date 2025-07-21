@@ -113,7 +113,7 @@ Parameters:
     Type: Number
     Default: 2
 
-  AutoscalingThresholdWorkflow:
+  AutoscalingThresholdValidator:
     Default: 70
     Type: String
 
@@ -148,10 +148,214 @@ Parameters:
     Default: ''
     Description: 'Applicative environment variable file checksum'
 
+  EnhancedWebSecurityEnabled:
+    Type: String
+    Default: false
+    Description: Enable additional WAF Web rules
+    AllowedValues:
+      - true
+      - false
+  DocumentCreationRequestTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
+
+  DocumentCreationRequestTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
+
+  TimelinesDynamoTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing timelines'
+
+  TimelinesDynamoTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing timelines'
+
+  TimelinesCounterTableName:
+    Type: String
+    Description: Name of dynamodb used by application to access the key-value store of CounterTable
+
+  TimelinesCounterTableArn:
+    Type: String
+    Description: ARN Dynamo Name used by application to access the key-value store of CounterTable
+
+  ActionDynamoTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing'
+
+  ActionDynamoTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing'
+
+  FutureActionDynamoTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing'
+
+  FutureActionDynamoTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing'
+
+  PnDeliveryPushShedLockDynamoTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing'
+
+  PnDeliveryPushShedLockDynamoTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing'
+
+  ScheduledValidationActionsQueueName:
+    Type: String
+    Description: 'Send and pull ready-to-do actions th this queue'
+
+  ScheduledValidationActionsQueueARN:
+    Type: String
+    Description: 'Send and pull ready-to-do actions th this queue'
+
+  SafeStorageToDeliveryPushQueueName:
+    Type: String
+    Description: 'SafeStorage-to-delivery-push queue Name'
+
+  SafeStorageToDeliveryPushQueueARN:
+    Type: String
+    Description: 'SafeStorage-to-delivery-push queue ARN'
+
+  SafeStorageToDeliveryPushQueueAlarmARN:
+    Type: String
+    Description: SafeStorage-to-delivery-push queue alarm ARN
+
+  SafeStorageToDeliveryPushQueueAgeAlarmARN:
+    Type: String
+    Description: SafeStorage-to-delivery-push queue age alarm ARN
+
+  AddressManagerToDeliveryPushQueueName:
+    Type: String
+    Description: 'AddressManager-to-delivery-push queue Name'
+
+  F24ToDeliveryPushQueueName:
+    Type: String
+    Description: F24-to-delivery-push Queue Name
+
+  F24ToDeliveryPushQueueARN:
+    Type: String
+    Description: F24-to-delivery-push queue ARN
+
+  F24ToDeliveryPushQueueAlarmARN:
+    Type: String
+    Description: F24-to-delivery-push queue alarm ARN
+
+  F24ToDeliveryPushQueueAgeAlarmARN:
+    Type: String
+    Description: F24-to-delivery-push queue age alarm ARN
+
+  AddressManagerToDeliveryPushQueueARN:
+    Type: String
+    Description: AddressManager-to-delivery-push queue ARN
+
+  AddressManagerToDeliveryPushQueueAlarmARN:
+    Type: String
+    Description: AddressManager-to-delivery-push queue alarm ARN
+
+  AddressManagerToDeliveryPushQueueAgeAlarmARN:
+    Type: String
+    Description: AddressManager-to-delivery-push queue age alarm ARN
+
+  ScheduledActionsQueueAlarmARN:
+    Type: String
+    Description: delivery push actions done queue dlq alarm ARN
+
+  ScheduledActionsQueueAgeAlarmARN:
+    Type: String
+    Description: delivery push actions done queue age alarm ARN
+
+  ScheduledValidationActionsQueueAlarmARN:
+    Type: String
+    Description: delivery push validation actions queue dlq alarm ARN
+
+  ScheduledValidationActionsQueueAgeAlarmARN:
+    Type: String
+    Description: delivery push validation actions queue age alarm ARN
+
+  DeliveryPushInputsQueueName:
+    Type: String
+    Description: 'Queue to pull for inputs event'
+
+  DeliveryPushInputsQueueARN:
+    Type: String
+    Description: 'Queue to pull for inputs event'
+
+  DeliveryPushInputsQueueAlarmARN:
+    Type: String
+    Description: 'pn-delivery-push input queue alarm ARN'
+
+  DeliveryPushInputsQueueAgeAlarmARN:
+    Type: String
+    Description: pn-delivery-push input queue age alarm ARN
+
+  DeliveryPushValidationInputsQueueName:
+    Type: String
+    Description: DeliveryPushValidationInputsQueue queue name
+
+  DeliveryPushValidationInputsQueueARN:
+    Type: String
+    Description: DeliveryPushValidationInputsQueue queue ARN
+
+  DeliveryPushValidationInputsQueueAlarmARN:
+    Type: String
+    Description: DeliveryPushValidationInputsQueue alarm ARN
+
+  DeliveryPushValidationInputsQueueAgeAlarmARN:
+    Type: String
+    Description: DeliveryPushValidationInputsQueue age alarm ARN
+
+  ExternalChannelsOutputsQueueName:
+    Type: String
+    Description: 'Pull external-channel messages from this Queue'
+
+  ExternalChannelsOutputsQueueARN:
+    Type: String
+    Description: 'Pull external-channel messages from this Queue'
+
+  ScheduledActionsQueueName:
+    Type: String
+    Description: 'Send and pull ready-to-do actions th this queue'
+
+  ScheduledActionsQueueARN:
+    Type: String
+    Description: 'Send and pull ready-to-do actions th this queue'
+
+  NationalRegistries2DeliveryPushQueueName:
+    Type: String
+    Description: 'National Registries to delivery-push queue name'
+
+  NationalRegistries2DeliveryPushQueueARN:
+    Type: String
+    Description: 'National Registries to delivery-push queue ARN'
+
+  NationalRegistries2DeliveryPushQueueAlarmARN:
+    Type: String
+    Description: 'National Registries to delivery-push queue dlq alarm'
+
+  NationalRegistries2DeliveryPushQueueAgeAlarmARN:
+    Type: String
+    Description: 'National Registries to delivery-push queue age alarm'
+
+  SandboxSafeStorageBaseUrl:
+    Type: String
+    Description: 'Safe storage base url'
+
+  ExternalChannelBaseUrl:
+    Type: String
+    Description: 'External channel base url'
+
+  # Log group parameters
+  EcsValidatorLogGroup:
+    Type: String
+    Description: 'Ecs log group name (Validator task)'
+
 Resources:
 
-  # PN-TemplateBeMs microservice
-  DeliveryPushValidatorServiceMicroservice:
+  # PN-Delivery-push validator microservice
+  DeliveryPushValidatorMicroservice:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/ecs-service.yaml"
@@ -171,14 +375,270 @@ Resources:
         AutoscalingDataPointN: !Ref AutoscalingDataPointValidatorN
         AutoscalingDataPointM: !Ref AutoscalingDataPointValidatorM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
+        ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_TOPICS_NEWNOTIFICATIONS=${DeliveryPushInputsQueueName}'
+        ContainerEnvEntry3: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry4: !Sub 'PN_DELIVERYPUSH_TOPICS_FROMEXTERNALCHANNEL=${ExternalChannelsOutputsQueueName}'
+        ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_TOPICS_SCHEDULEDACTIONS=${ScheduledActionsQueueName}'
+        ContainerEnvEntry6:
+          Fn::If:
+            - UseExternalChannelMock
+            - !Sub 'PN_DELIVERYPUSH_EXTERNALCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+            - !Sub 'PN_DELIVERYPUSH_EXTERNALCHANNELBASEURL=${ExternalChannelBaseUrl}'
+        ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_USERATTRIBUTESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry8: !Sub 'PN_DELIVERYPUSH_SAFESTORAGEBASEURL=${SandboxSafeStorageBaseUrl}'
+        ContainerEnvEntry9: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_MANDATEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry12: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
+        ContainerEnvEntry13: !Sub 'PN_DELIVERYPUSH_TIMELINEDAO_TABLENAME=${TimelinesDynamoTableName}'
+        ContainerEnvEntry14: !Sub 'PN_DELIVERYPUSH_FAILEDNOTIFICATIONDAO_TABLENAME=${PaperNotificationFailedDynamoTableName}'
+        ContainerEnvEntry15: !Sub 'PN_DELIVERYPUSH_ACTIONDAO_TABLENAME=${ActionDynamoTableName}'
+        ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_FUTUREACTIONDAO_TABLENAME=${FutureActionDynamoTableName}'
+        ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_LASTPOLLFORFUTUREACTIONDAO_LOCKTABLENAME=${PnDeliveryPushShedLockDynamoTableName}'
+        ContainerEnvEntry18: 'SPRING_CLOUD_FUNCTION_DEFINITION_LIST=pnDeliveryNewNotificationEventConsumer;pnDeliveryPushValidationActionsInboundConsumer;pnSafeStorageEventInboundConsumer;pnAddressManagerEventInboundConsumer;pnF24EventInboundConsumer'
+        ContainerEnvEntry19: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
+        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
+        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
+        ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSH_TOPICS_NATIONALREGISTRIESEVENTS=${NationalRegistries2DeliveryPushQueueName}'
+        ContainerEnvEntry24: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
+        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
+        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_TIMELINECOUNTERDAO_TABLENAME=${TimelinesCounterTableName}'
+        ContainerEnvEntry27: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
+        ContainerEnvEntry28: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry29: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
+        ContainerEnvEntry30: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry31: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry32: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
+        ContainerEnvEntry33: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
+        ContainerEnvEntry34: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
+        ContainerEnvEntry35: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry36: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry37: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTART=${SelectedEnv}', { SelectedEnv: !Select [ 0, !Ref pfNewWorkflowFeatureFlag ]} ]
+        ContainerEnvEntry38: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTOP=${SelectedEnv}', { SelectedEnv: !Select [ 1, !Ref pfNewWorkflowFeatureFlag ]} ]
+        ContainerEnvEntry39: !Sub ['PN_DELIVERYPUSH_STARTWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 2, !Ref WebhookFeatureFlags ]} ]
+        ContainerEnvEntry40: !Sub ['PN_DELIVERYPUSH_STOPWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 3, !Ref WebhookFeatureFlags ]} ]
+        ContainerEnvEntry41: !Sub 'PN_DELIVERYPUSH_ENDACTIONIMPLWITHDAOTIMESTAMP=${ActionLambdasEnabledEnd}'
+        ContainerEnvEntry42: !Sub 'PN_DELIVERYPUSH_ACTIONTTLDAYS=${ActionTtlDays}'
+        ContainerEnvEntry43: !Sub 'PN_DELIVERYPUSH_EMDINTEGRATIONBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry44: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry45: !Sub 'PN_DELIVERYPUSH_STARTACTIONIMPLWITHDAOTIMESTAMP=${ActionLambdasEnabledStart}'
+        ContainerSecret1: !Sub 'PN_DELIVERYPUSH_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
+        MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
         JavaToolOptions: '-Dreactor.netty.ioWorkerCount=50'
-        MappedPaths: '/pn-delivery-push-validator-service-not-available'
+        MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Join [ ',', !Ref SubnetsIds ]
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadBalancerRulePriority: !Ref MicroserviceNumber
+        LoadbalancerRulePriority:
+          Fn::Transform:
+            Name: GenerateLBPriorityIdMacro
+            Parameters:
+              msNumber: !Ref MicroserviceNumber
+              index: 1
+        TaskRoleManagedPolicyArn: !Ref DeliveryPushMicroserviceTaskManagedPolicy
+        AlbSecurityGroup: !Ref AlbSecurityGroup
+        EcsLogGroup: !Ref EcsValidatorLogGroup
+        LogAlarmStrategyV1: !Ref LogAlarmStrategy
+
+  ## Dashboard
+  DeliveryPushValidatorMicroserviceCloudWatchDashboard:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/microservice-cloudwatch-dashboard.yaml"
+      Parameters:
+        DashboardName: !Sub "${ProjectName}-delivery-push-validator-service"
+        DynamoDBTableNames: !Join
+          - ','
+          - !Ref DocumentCreationRequestTableName
+        AlarmArns: !Join
+          - ','
+          - - !GetAtt DeliveryPushValidatorMicroservice.Outputs.FatalLogsMetricAlarmArn
+            - !Ref DeliveryPushInputsQueueAlarmARN
+            - !Ref DeliveryPushInputsQueueAgeAlarmARN
+            - !Ref DeliveryPushValidationInputsQueueAlarmARN
+            - !Ref DeliveryPushValidationInputsQueueAgeAlarmARN
+            - !Ref SafeStorageToDeliveryPushQueueAlarmARN
+            - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
+            - !Ref ScheduledValidationActionsQueueAlarmARN
+            - !Ref ScheduledValidationActionsQueueAgeAlarmARN
+            - !Ref NationalRegistries2DeliveryPushQueueAlarmARN
+            - !Ref NationalRegistries2DeliveryPushQueueAgeAlarmARN
+            - !Ref AddressManagerToDeliveryPushQueueAlarmARN
+            - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
+            - !Ref F24ToDeliveryPushQueueAlarmARN
+            - !Ref F24ToDeliveryPushQueueAgeAlarmARN
+        QueueArns: !Join
+          - ','
+          - - !Ref DeliveryPushInputsQueueARN
+            - !Ref DeliveryPushValidationInputsQueueARN
+            - !Ref ScheduledValidationActionsQueueARN
+            - !Ref SafeStorageToDeliveryPushQueueARN
+            - !Ref NationalRegistries2DeliveryPushQueueARN
+            - !Ref AddressManagerToDeliveryPushQueueARN
+            - !Ref F24ToDeliveryPushQueueARN
+        LogGroupsNames: !Join
+          - ','
+          - - !Sub '/aws/ecs/${ProjectName}-delivery-push-validator'
+
+  #### Alarm for custom metric Autoscaling
+  AlarmCustomAutoscalingValidator:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName: !Sub "${ProjectName}-delivery-push-validator-autoscaling-custom-validator"
+      AlarmDescription: "Trigger scaling based on custom metric"
+      DatapointsToAlarm: !Ref AutoscalingDataPointValidatorN
+      ComparisonOperator: "GreaterThanOrEqualToThreshold"
+      Metrics:
+        - Id: m1
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "DeliveryPushValidationInputsQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m2
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "ScheduledValidationActionsQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m3
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "SafeStorageToDeliveryPushQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m4
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "AddressManagerToDeliveryPushQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m5
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "F24ToDeliveryPushQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m6
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: TargetGroup
+                  Value: !GetAtt DeliveryPushValidatorMicroservice.Outputs.TargetGroupName
+                - Name: LoadBalancer
+                  Value: !Ref ApplicationLoadBalancerMetricsDimensionName
+              Namespace: "AWS/ApplicationELB"
+              MetricName: "HealthyHostCount"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: code
+          Expression: !Sub "IF(m6==0, 101, (100*(m1+m2+m3+m4+m5)) / (${ConsumedQueueMessagePerMinuteValidator} * m6) )"
+          Label: !Sub "${ProjectName}-delivery-push-queue-validator-custom-metric"
+          ReturnData: False
+        - Id: e1
+          Expression: "code"
+          Label: !Sub "${ProjectName}-delivery-push-autoscale-validator-custom-metric"
+      EvaluationPeriods: !Ref AutoscalingDataPointValidatorM
+      Threshold: 60
+      AlarmActions:
+        - !GetAtt DeliveryPushValidatorMicroservice.Outputs.ScaleUpPolicy
+      OKActions:
+        - !GetAtt DeliveryPushValidatorMicroservice.Outputs.ScaleDownPolicy
+
+  # Grant operational rights to PN-Delivery-push-validator microservice
+  DeliveryPushValidatorMicroserviceTaskManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sqs:ChangeMessageVisibility
+              - sqs:ChangeMessageVisibilityBatch
+              - sqs:DeleteMessage
+              - sqs:DeleteMessageBatch
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:ReceiveMessage
+              - sqs:SendMessage
+              - sqs:SendMessageBatch
+            Resource:
+              - !Ref DeliveryPushInputsQueueARN
+              - !Ref DeliveryPushValidationInputsQueueARN
+              - !Ref ScheduledValidationActionsQueueARN
+              - !Ref SafeStorageToDeliveryPushQueueARN
+              - !Ref NationalRegistries2DeliveryPushQueueARN
+              - !Ref AddressManagerToDeliveryPushQueueARN
+              - !Ref F24ToDeliveryPushQueueARN
+          - Effect: Allow
+            Action:
+              - 'dynamodb:GetItem'
+              - 'dynamodb:Query'
+              - 'dynamodb:PutItem'
+            Resource:
+              - !Sub "${TimelinesDynamoTableArn}"
+              - !Sub "${ActionDynamoTableArn}"
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              - dynamodb:UpdateItem
+            Resource:
+              - !Sub "${TimelinesCounterTableArn}"
+          - Effect: Allow
+            Action:
+              - 'ssm:GetParameter'
+              - 'ssm:GetParameters'
+            Resource:
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaMVP'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/radd-experimentation-zip-*'
+          - Effect: Allow
+            Action:
+              - 'dynamodb:GetItem'
+              - 'dynamodb:Query'
+              - 'dynamodb:PutItem'
+              - 'dynamodb:DeleteItem'
+              - 'dynamodb:UpdateItem'
+            Resource:
+              - !Sub "${PaperNotificationFailedDynamoTableArn}"
+              - !Sub "${FutureActionDynamoTableArn}"
+              - !Sub "${PnDeliveryPushShedLockDynamoTableArn}"
+              - !Sub "${DocumentCreationRequestTableArn}"
