@@ -157,13 +157,6 @@ Parameters:
     Type: String
     Description: 'Application load balancer security group'
 
-  EnhancedWebSecurityEnabled:
-    Type: String
-    Default: false
-    Description: Enable additional WAF Web rules
-    AllowedValues:
-      - true
-      - false
   DocumentCreationRequestTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
