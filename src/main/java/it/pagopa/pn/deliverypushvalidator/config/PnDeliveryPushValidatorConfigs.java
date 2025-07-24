@@ -4,9 +4,11 @@ import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Data
+@Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
 @Import({SharedAutoConfiguration.class})
 public class PnDeliveryPushValidatorConfigs {
