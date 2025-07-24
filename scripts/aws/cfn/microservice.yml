@@ -153,6 +153,11 @@ Parameters:
     Default: 0
     Description: Weight to assign to queue number of visible messages metric (Validator task)
 
+  ApplicationLoadBalancerMetricsDimensionName:
+    Type: String
+    Default: ''
+    Description: Application load balancer dimension name
+
   AlbSecurityGroup:
     Type: String
     Description: 'Application load balancer security group'
@@ -165,49 +170,9 @@ Parameters:
     Type: String
     Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
 
-  TimelinesDynamoTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing timelines'
-
-  TimelinesDynamoTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing timelines'
-
-  TimelinesCounterTableName:
-    Type: String
-    Description: Name of dynamodb used by application to access the key-value store of CounterTable
-
-  TimelinesCounterTableArn:
-    Type: String
-    Description: ARN Dynamo Name used by application to access the key-value store of CounterTable
-
   PaperNotificationFailedDynamoTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
-
-  ActionDynamoTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing'
-
-  ActionDynamoTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing'
-
-  FutureActionDynamoTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing'
-
-  FutureActionDynamoTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing'
-
-  PnDeliveryPushShedLockDynamoTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing'
-
-  PnDeliveryPushShedLockDynamoTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing'
 
   ScheduledValidationActionsQueueName:
     Type: String
@@ -265,14 +230,6 @@ Parameters:
     Type: String
     Description: AddressManager-to-delivery-push queue age alarm ARN
 
-  ScheduledActionsQueueAlarmARN:
-    Type: String
-    Description: delivery push actions done queue dlq alarm ARN
-
-  ScheduledActionsQueueAgeAlarmARN:
-    Type: String
-    Description: delivery push actions done queue age alarm ARN
-
   ScheduledValidationActionsQueueAlarmARN:
     Type: String
     Description: delivery push validation actions queue dlq alarm ARN
@@ -280,22 +237,6 @@ Parameters:
   ScheduledValidationActionsQueueAgeAlarmARN:
     Type: String
     Description: delivery push validation actions queue age alarm ARN
-
-  DeliveryPushInputsQueueName:
-    Type: String
-    Description: 'Queue to pull for inputs event'
-
-  DeliveryPushInputsQueueARN:
-    Type: String
-    Description: 'Queue to pull for inputs event'
-
-  DeliveryPushInputsQueueAlarmARN:
-    Type: String
-    Description: 'pn-delivery-push input queue alarm ARN'
-
-  DeliveryPushInputsQueueAgeAlarmARN:
-    Type: String
-    Description: pn-delivery-push input queue age alarm ARN
 
   DeliveryPushValidationInputsQueueName:
     Type: String
@@ -312,38 +253,6 @@ Parameters:
   DeliveryPushValidationInputsQueueAgeAlarmARN:
     Type: String
     Description: DeliveryPushValidationInputsQueue age alarm ARN
-
-  ExternalChannelsOutputsQueueName:
-    Type: String
-    Description: 'Pull external-channel messages from this Queue'
-
-  ExternalChannelsOutputsQueueARN:
-    Type: String
-    Description: 'Pull external-channel messages from this Queue'
-
-  ScheduledActionsQueueName:
-    Type: String
-    Description: 'Send and pull ready-to-do actions th this queue'
-
-  ScheduledActionsQueueARN:
-    Type: String
-    Description: 'Send and pull ready-to-do actions th this queue'
-
-  NationalRegistries2DeliveryPushQueueName:
-    Type: String
-    Description: 'National Registries to delivery-push queue name'
-
-  NationalRegistries2DeliveryPushQueueARN:
-    Type: String
-    Description: 'National Registries to delivery-push queue ARN'
-
-  NationalRegistries2DeliveryPushQueueAlarmARN:
-    Type: String
-    Description: 'National Registries to delivery-push queue dlq alarm'
-
-  NationalRegistries2DeliveryPushQueueAgeAlarmARN:
-    Type: String
-    Description: 'National Registries to delivery-push queue age alarm'
 
   SandboxSafeStorageBaseUrl:
     Type: String
@@ -385,16 +294,6 @@ Parameters:
       - true
       - false
 
-  WebhookFeatureFlags:
-    Type: CommaDelimitedList
-    Description: List containing in order StartReadStream, StopReadStream, StartWriteBusinessTimestamp, StopWriteBusinessTimestamp
-    Default: '1999-01-01T00:00:00Z,2099-02-01T00:00:00Z,2099-01-01T00:00:00Z,2099-02-01T00:00:00Z'
-
-  pfNewWorkflowFeatureFlag:
-    Type: CommaDelimitedList
-    Description: List containing in order pfNewWorkflowStart, pfNewWorkflowStop
-    Default: '2099-01-01T00:00:00Z,2099-02-01T00:00:00Z'
-
 Resources:
 
   # PN-Delivery-push validator microservice
@@ -423,50 +322,36 @@ Resources:
         WireTapLogActivation: !Ref WireTapLogActivation
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
-        ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_TOPICS_NEWNOTIFICATIONS=${DeliveryPushInputsQueueName}'
-        ContainerEnvEntry3: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry4: !Sub 'PN_DELIVERYPUSH_TOPICS_FROMEXTERNALCHANNEL=${ExternalChannelsOutputsQueueName}'
-        ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_TOPICS_SCHEDULEDACTIONS=${ScheduledActionsQueueName}'
-        ContainerEnvEntry6:
+        ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry3:
           Fn::If:
             - UseExternalChannelMock
             - !Sub 'PN_DELIVERYPUSH_EXTERNALCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
             - !Sub 'PN_DELIVERYPUSH_EXTERNALCHANNELBASEURL=${ExternalChannelBaseUrl}'
-        ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_USERATTRIBUTESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry8: !Sub 'PN_DELIVERYPUSH_SAFESTORAGEBASEURL=${SandboxSafeStorageBaseUrl}'
-        ContainerEnvEntry9: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_MANDATEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry12: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
-        ContainerEnvEntry13: !Sub 'PN_DELIVERYPUSH_TIMELINEDAO_TABLENAME=${TimelinesDynamoTableName}'
-        ContainerEnvEntry14: !Sub 'PN_DELIVERYPUSH_FAILEDNOTIFICATIONDAO_TABLENAME=${PaperNotificationFailedDynamoTableName}'
-        ContainerEnvEntry15: !Sub 'PN_DELIVERYPUSH_ACTIONDAO_TABLENAME=${ActionDynamoTableName}'
-        ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_FUTUREACTIONDAO_TABLENAME=${FutureActionDynamoTableName}'
-        ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_LASTPOLLFORFUTUREACTIONDAO_LOCKTABLENAME=${PnDeliveryPushShedLockDynamoTableName}'
-        ContainerEnvEntry18: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
-        ContainerEnvEntry19: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
-        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
-        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_TOPICS_NATIONALREGISTRIESEVENTS=${NationalRegistries2DeliveryPushQueueName}'
-        ContainerEnvEntry23: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
-        ContainerEnvEntry24: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
-        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TIMELINECOUNTERDAO_TABLENAME=${TimelinesCounterTableName}'
-        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
-        ContainerEnvEntry27: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry28: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
-        ContainerEnvEntry29: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
-        ContainerEnvEntry30: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
-        ContainerEnvEntry31: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
-        ContainerEnvEntry32: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
-        ContainerEnvEntry33: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
-        ContainerEnvEntry34: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry35: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry36: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTART=${SelectedEnv}', { SelectedEnv: !Select [ 0, !Ref pfNewWorkflowFeatureFlag ]} ]
-        ContainerEnvEntry37: !Sub ['PN_DELIVERYPUSH_PFNEWWORKFLOWSTOP=${SelectedEnv}', { SelectedEnv: !Select [ 1, !Ref pfNewWorkflowFeatureFlag ]} ]
-        ContainerEnvEntry38: !Sub ['PN_DELIVERYPUSH_STARTWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 2, !Ref WebhookFeatureFlags ]} ]
-        ContainerEnvEntry39: !Sub ['PN_DELIVERYPUSH_STOPWRITEBUSINESSTIMESTAMP=${SelectedEnv}', { SelectedEnv: !Select [ 3, !Ref WebhookFeatureFlags ]} ]
-        ContainerEnvEntry40: !Sub 'PN_DELIVERYPUSH_EMDINTEGRATIONBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry41: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry4: !Sub 'PN_DELIVERYPUSH_USERATTRIBUTESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_SAFESTORAGEBASEURL=${SandboxSafeStorageBaseUrl}'
+        ContainerEnvEntry6: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_MANDATEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry8: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry9: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
+        ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_FAILEDNOTIFICATIONDAO_TABLENAME=${PaperNotificationFailedDynamoTableName}'
+        ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
+        ContainerEnvEntry12: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
+        ContainerEnvEntry13: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry14: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
+        ContainerEnvEntry15: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
+        ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
+        ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
+        ContainerEnvEntry18: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry19: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
+        ContainerEnvEntry20: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry21: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
+        ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
+        ContainerEnvEntry24: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
+        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry27: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSH_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -641,9 +526,6 @@ Resources:
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
-              - 'dynamodb:Query'
               - 'dynamodb:PutItem'
-              - 'dynamodb:DeleteItem'
-              - 'dynamodb:UpdateItem'
             Resource:
               - !Sub "${DocumentCreationRequestTableArn}"
