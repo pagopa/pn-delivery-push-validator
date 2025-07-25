@@ -7,8 +7,8 @@
 		<version>2.1.2-SPRINGBOOT3</version>
 		<relativePath />
 	</parent>
-	<artifactId>pn-template-push-validator</artifactId>
-	<version>2.17.0-SPRINGBOOT3</version>
+	<artifactId>pn-delivery-push-validator</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>pn-delivery-push-validator</name>
 	<description>PN Microservice to manage validaton process</description>
 	<scm>
