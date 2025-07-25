@@ -262,11 +262,6 @@ Parameters:
     Type: String
     Description: 'pn-delivery-push clientId for communication with pn-f24'
 
-  PnCronAnalyzer:
-    Type: String
-    Default: '-'
-    Description: Cron for which you send the metric to CloudWatch
-
   PagoPaNotificationFee:
     Type: String
     Description: 'PagoPa notification fee per le notifiche create PRIMA della v2.1. Per le successive, il default viene impostato da pn-delivery e arriva nella notifica.'
@@ -281,15 +276,7 @@ Parameters:
   EcsValidatorLogGroup:
     Type: String
     Description: 'Ecs log group name (Validator task)'
-
-  WireTapLogActivation:
-    Type: String
-    Default: false
-    Description: Activation of wire logs
-    AllowedValues:
-      - true
-      - false
-  
+    
   LogAlarmStrategy:
     Type: String
     Default: 'FATAL'
@@ -317,7 +304,6 @@ Resources:
         AutoscalingDataPointN: !Ref AutoscalingDataPointValidatorN
         AutoscalingDataPointM: !Ref AutoscalingDataPointValidatorM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
-        WireTapLogActivation: !Ref WireTapLogActivation
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
