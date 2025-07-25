@@ -113,7 +113,7 @@ Parameters:
     Type: Number
     Default: 2
 
-  AutoscalingThresholdWorkflow:
+  AutoscalingThresholdValidator:
     Default: 70
     Type: String
   
@@ -173,6 +173,14 @@ Parameters:
     Type: String
     Default: ''
     Description: 'Applicative environment variable file checksum'
+  # --- Dynamo Table ---
+  DocumentCreationRequestTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
+  
+  DocumentCreationRequestTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
 
   ConsumedQueueMessagePerMinuteValidator:
     Type: Number
@@ -187,15 +195,11 @@ Parameters:
   AlbSecurityGroup:
     Type: String
     Description: 'Application load balancer security group'
-
-  DocumentCreationRequestTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
-
-  DocumentCreationRequestTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
-
+  
+  
+  
+  
+  
   PaperNotificationFailedDynamoTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
@@ -323,13 +327,16 @@ Resources:
         HealthyThresholdCount: !Ref HealthyThresholdCount
         UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
         AutoscalingStrategy: CUSTOM
-        AutoscalingThreshold: !Ref AutoscalingThresholdWorkflow
+        AutoscalingThreshold: !Ref AutoscalingThresholdValidator
         AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
         MinTasksNumber: !Ref MinTasksNumberValidator
         MaxTasksNumber: !Ref MaxTasksNumberValidator
         AutoscalingDataPointN: !Ref AutoscalingDataPointValidatorN
         AutoscalingDataPointM: !Ref AutoscalingDataPointValidatorM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
         ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
@@ -533,6 +540,9 @@ Resources:
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
+              - 'dynamodb:Query'
               - 'dynamodb:PutItem'
+              - 'dynamodb:DeleteItem'
+              - 'dynamodb:UpdateItem'
             Resource:
               - !Sub "${DocumentCreationRequestTableArn}"

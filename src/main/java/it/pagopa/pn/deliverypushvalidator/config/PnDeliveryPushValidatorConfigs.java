@@ -7,13 +7,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-@Data
 @Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
+@Data
 @Import({SharedAutoConfiguration.class})
 public class PnDeliveryPushValidatorConfigs {
 
+    private DocumentCreationRequestDao documentCreationRequestDao;
     private Topics topics;
+    private boolean safeStorageFileNotFoundRetry;
 
     @Data
     public static class Topics {
@@ -24,8 +26,14 @@ public class PnDeliveryPushValidatorConfigs {
         private String f24Events;
     }
 
+    @Data
+    public static class DocumentCreationRequestDao {
+        private String tableName;
+    }
+
     @PostConstruct
     public void init() {
         System.out.println(this);
     }
+
 }

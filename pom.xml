@@ -71,18 +71,6 @@
 			<version>1.6.7</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-junit-jupiter</artifactId>
-			<version> 5.14.0</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -102,9 +90,22 @@
 			<scope>test</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-junit-jupiter</artifactId>
+			<version> 5.14.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -114,10 +115,10 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!--LOCALSTACK/TESTCONTAINERS-->
 		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-junit-jupiter</artifactId>
-			<version> 5.14.0</version>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>localstack</artifactId>
 			<scope>test</scope>
 		</dependency>
 
