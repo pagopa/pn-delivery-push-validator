@@ -35,6 +35,9 @@
     "F24ToDeliveryPushQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-DLQ-HasMessage",
     "F24ToDeliveryPushQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-HasOldMessage",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
-    "EcsValidatorLogGroup": "/aws/ecs/pn-delivery-push-validator"
+    "EcsValidatorLogGroup": "/aws/ecs/pn-delivery-push-validator",
+    "PnCronAnalyzer": "* */1 * * * *",
+    "WireTapLogActivation": "false",
+    "MountEfs": "false"
   }
 }
