@@ -1,0 +1,29 @@
+package it.pagopa.pn.deliverypushvalidator.utils;
+
+
+import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.AarTemplateChooseStrategy;
+import it.pagopa.pn.deliverypushvalidator.dto.paperchannel.SendAttachmentMode;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
+
+import java.time.Instant;
+
+@Builder
+@Getter
+@EqualsAndHashCode
+@ToString
+public class PnSendMode implements Comparable<PnSendMode>{
+    private Instant startConfigurationTime;
+    private SendAttachmentMode analogSendAttachmentMode;
+    private SendAttachmentMode simpleRegisteredLetterSendAttachmentMode;
+    private SendAttachmentMode digitalSendAttachmentMode;
+    private AarTemplateChooseStrategy aarTemplateTypeChooseStrategy;
+
+    @Override
+    public int compareTo(@NotNull PnSendMode o) {
+        return startConfigurationTime.compareTo(o.getStartConfigurationTime());
+    }
+}

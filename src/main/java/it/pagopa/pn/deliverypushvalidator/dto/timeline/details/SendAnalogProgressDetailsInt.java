@@ -1,0 +1,42 @@
+package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
+
+
+import it.pagopa.pn.deliverypushvalidator.dto.externalchannel.AttachmentDetailsInt;
+import lombok.*;
+
+import java.time.Instant;
+import java.util.List;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+@EqualsAndHashCode
+@ToString
+public class SendAnalogProgressDetailsInt implements RecipientRelatedTimelineElementDetails, ElementTimestampTimelineElementDetails {
+    private int recIndex;
+    private Instant notificationDate;
+    private String deliveryFailureCause;
+    private String deliveryDetailCode;
+    private List<AttachmentDetailsInt> attachments;
+    private String sendRequestId;
+    private String registeredLetterCode;
+    private ServiceLevelInt serviceLevel;
+    
+    public String toLog() {
+        return String.format(
+                "recIndex=%d notificationDate=%s deliveryFailureCause=%s deliveryDetailCode=%s attachments=%s",
+                recIndex,
+                notificationDate,
+                deliveryFailureCause,
+                deliveryDetailCode,
+                attachments
+        );
+    }
+
+    @Override
+    public Instant getElementTimestamp() {
+        return notificationDate;
+    }
+}
