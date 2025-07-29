@@ -1,4 +1,4 @@
-package it.pagopa.pn.deliverypushvalidator.middleware.queue.utils;
+package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.utils;
 
 import it.pagopa.pn.commons.utils.MDCUtils;
 import org.junit.jupiter.api.Test;
