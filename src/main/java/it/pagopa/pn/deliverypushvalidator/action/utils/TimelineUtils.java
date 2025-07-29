@@ -238,18 +238,6 @@ public class TimelineUtils {
         return buildTimeline(notification, TimelineElementCategoryInt.SEND_DIGITAL_PROGRESS, elementId, details, timelineBuilder);
     }
 
-    public TimelineElementInternal buildProbableDateSchedulingAnalogTimelineElement(Integer recIndex, NotificationInt notification,
-                                                                                    String eventId, Instant schedulingAnalogDate) {
-        log.debug("buildProbableDateSchedulingAnalogTimelineElement - IUN={} and id={}", notification.getIun(), recIndex);
-
-        ProbableDateAnalogWorkflowDetailsInt details = ProbableDateAnalogWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .schedulingAnalogDate(schedulingAnalogDate)
-                .build();
-
-        return buildTimeline(notification, TimelineElementCategoryInt.PROBABLE_SCHEDULING_ANALOG_DATE, eventId, details);
-    }
-
     public TimelineElementInternal buildSendCourtesyMessageTimelineElement(Integer recIndex, NotificationInt notification, CourtesyDigitalAddressInt address,
                                                                            Instant sendDate, String eventId, IoSendMessageResultInt ioSendMessageResult) {
         log.debug("buildSendCourtesyMessageTimelineElement - IUN={} and id={}", notification.getIun(), recIndex);
@@ -353,125 +341,6 @@ public class TimelineUtils {
 
         return buildTimeline(notification, TimelineElementCategoryInt.PREPARE_ANALOG_DOMICILE_FAILURE, elementId, details, timelineBuilder);
     }
-
-    public TimelineElementInternal buildSuccessDigitalWorkflowTimelineElement(NotificationInt notification, Integer recIndex, LegalDigitalAddressInt address,
-                                                                              String legalFactId) {
-        log.debug("buildSuccessDigitalWorkflowTimelineElement - IUN={} and id={}", notification.getIun(), recIndex);
-
-        String elementId = TimelineEventId.DIGITAL_SUCCESS_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-
-        DigitalSuccessWorkflowDetailsInt details = DigitalSuccessWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .digitalAddress(address)
-                .build();
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(singleLegalFactId(legalFactId, LegalFactCategoryInt.DIGITAL_DELIVERY));
-
-        return buildTimeline(notification, TimelineElementCategoryInt.DIGITAL_SUCCESS_WORKFLOW, elementId,
-                details, timelineBuilder);
-    }
-
-    public TimelineElementInternal buildFailureDigitalWorkflowTimelineElement(NotificationInt notification,
-                                                                              Integer recIndex,
-                                                                              String legalFactId) {
-        log.debug("buildFailureDigitalWorkflowTimelineElement - IUN={} and id={}", notification.getIun(), recIndex);
-
-        String elementId = TimelineEventId.DIGITAL_FAILURE_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-
-        DigitalFailureWorkflowDetailsInt details = DigitalFailureWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .build();
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(singleLegalFactId(legalFactId, LegalFactCategoryInt.DIGITAL_DELIVERY));
-
-        return buildTimeline(notification, TimelineElementCategoryInt.DIGITAL_FAILURE_WORKFLOW, elementId, details, timelineBuilder);
-    }
-
-
-    public TimelineElementInternal buildSuccessAnalogWorkflowTimelineElement(NotificationInt notification, Integer recIndex, PhysicalAddressInt address) {
-        log.debug("buildSuccessAnalogWorkflowTimelineElement - iun={} and id={}", notification.getIun(), recIndex);
-
-        String elementId = TimelineEventId.ANALOG_SUCCESS_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-
-        AnalogSuccessWorkflowDetailsInt details = AnalogSuccessWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .physicalAddress(address)
-                .build();
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(Collections.emptyList());
-
-        return buildTimeline(notification, TimelineElementCategoryInt.ANALOG_SUCCESS_WORKFLOW, elementId,
-                details, timelineBuilder);
-    }
-
-    public TimelineElementInternal buildAnalogWorkflowRecipientDeceasedTimelineElement(
-            NotificationInt notification,
-            Integer recIndex,
-            Instant notificationDate,
-            PhysicalAddressInt address,
-            Integer notificationCost,
-            Boolean addNotificationCost
-    ) {
-
-        log.debug("buildAnalogWorkflowRecipientDeceasedTimelineElement - iun={} and id={}", notification.getIun(), recIndex);
-
-        String elementId = TimelineEventId.ANALOG_WORKFLOW_RECIPIENT_DECEASED.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-
-        AnalogWorfklowRecipientDeceasedDetailsInt details = AnalogWorfklowRecipientDeceasedDetailsInt.builder()
-                .recIndex(recIndex)
-                .physicalAddress(address)
-                .notificationDate(notificationDate)
-                .build();
-
-        if (Boolean.TRUE.equals(addNotificationCost)) {
-            details.setNotificationCost(notificationCost);
-        }
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(Collections.emptyList());
-
-        return buildTimeline(notification, TimelineElementCategoryInt.ANALOG_WORKFLOW_RECIPIENT_DECEASED, elementId, details, timelineBuilder);
-    }
-
-    public TimelineElementInternal buildFailureAnalogWorkflowTimelineElement(NotificationInt notification, Integer recIndex, String generatedAarUrl) {
-        log.debug("buildFailureAnalogWorkflowTimelineElement - iun={} and id={}", notification.getIun(), recIndex);
-
-        String elementId = TimelineEventId.ANALOG_FAILURE_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-        AnalogFailureWorkflowDetailsInt details = AnalogFailureWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .generatedAarUrl(generatedAarUrl)
-                .build();
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(Collections.emptyList());
-
-        return buildTimeline(notification, TimelineElementCategoryInt.ANALOG_FAILURE_WORKFLOW, elementId,
-                details, timelineBuilder);
-    }
-
 
     public TimelineElementInternal buildPublicRegistryResponseCallTimelineElement(NotificationInt notification, Integer recIndex, NationalRegistriesResponse response) {
         log.debug("buildPublicRegistryResponseCallTimelineElement - iun={} and id={}", notification.getIun(), recIndex);
@@ -603,45 +472,6 @@ public class TimelineUtils {
         return buildTimeline(notification, TimelineElementCategoryInt.COMPLETELY_UNREACHABLE, elementId,
                 details, timelineBuilder);
     }
-
-    public TimelineElementInternal buildScheduleDigitalWorkflowTimeline(NotificationInt notification, Integer recIndex, DigitalAddressInfoSentAttempt lastAttemptInfo, Instant schedulingDate) {
-        log.debug("buildScheduledActionTimeline - iun={} and id={}", notification.getIun(), recIndex);
-        String elementId = TimelineEventId.SCHEDULE_DIGITAL_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .source(lastAttemptInfo.getDigitalAddressSource())
-                        .sentAttemptMade(lastAttemptInfo.getSentAttemptMade())
-                        .build());
-
-        ScheduleDigitalWorkflowDetailsInt details = ScheduleDigitalWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .lastAttemptDate(lastAttemptInfo.getLastAttemptDate())
-                .digitalAddress(lastAttemptInfo.getDigitalAddress())
-                .digitalAddressSource(lastAttemptInfo.getDigitalAddressSource())
-                .sentAttemptMade(lastAttemptInfo.getSentAttemptMade())
-                .schedulingDate(schedulingDate)
-                .build();
-
-        return buildTimeline(notification, TimelineElementCategoryInt.SCHEDULE_DIGITAL_WORKFLOW, elementId, details);
-    }
-
-    public TimelineElementInternal buildScheduleAnalogWorkflowTimeline(NotificationInt notification, Integer recIndex, Instant schedulingDate) {
-        log.debug("buildScheduleAnalogWorkflowTimeline - iun={} and id={}", notification.getIun(), recIndex);
-        String elementId = TimelineEventId.SCHEDULE_ANALOG_WORKFLOW.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .recIndex(recIndex)
-                        .build());
-
-        ScheduleAnalogWorkflowDetailsInt details = ScheduleAnalogWorkflowDetailsInt.builder()
-                .recIndex(recIndex)
-                .schedulingDate(schedulingDate)
-                .build();
-
-        return buildTimeline(notification, TimelineElementCategoryInt.SCHEDULE_ANALOG_WORKFLOW, elementId, details);
-    }
-
 
     public TimelineElementInternal buildRefinementTimelineElement(NotificationInt notification, Integer recIndex, Integer notificationCost, Boolean addNotificationCost, Instant refinementDate) {
         log.debug("buildRefinementTimelineElement - iun={} and id={}", notification.getIun(), recIndex);
@@ -946,26 +776,6 @@ public class TimelineUtils {
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_CANCELLATION_REQUEST, elementId, details);
     }
 
-    public TimelineElementInternal buildCancelledTimelineElement(NotificationInt notification, String legalFactId) {
-        log.debug("buildCancelRequestTimelineElement - IUN={}", notification.getIun());
-
-        List<Integer> notRefined = notRefinedRecipientIndexes(notification);
-        String elementId = NOTIFICATION_CANCELLED.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .build());
-
-        NotificationCancelledDetailsInt details = NotificationCancelledDetailsInt.builder().
-                notificationCost(notificationProcessCostService.getSendFee() * notRefined.size()).
-                notRefinedRecipientIndexes(notRefined).
-                build();
-
-        TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(singleLegalFactId(legalFactId, LegalFactCategoryInt.NOTIFICATION_CANCELLED));
-
-        return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_CANCELLED, elementId, details, timelineBuilder);
-    }
-
     public TimelineElementInternal buildGeneratedF24TimelineElement(NotificationInt notification, int recipientIndex, List<String> f24Attachments) {
         log.debug("buildGeneratedF24TimelineElement - IUN={} and id={}", notification.getIun(), recipientIndex);
 
@@ -1160,43 +970,6 @@ public class TimelineUtils {
 
 
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_RADD_RETRIEVED, elementId, details);
-    }
-
-
-    private List<Integer> notRefinedRecipientIndexes(NotificationInt notification) {
-        log.debug("notRefinedRecipient - iun={} ", notification.getIun());
-        List<Integer> notRefinedRecipientList = new ArrayList<>();
-        int totRecipients = notification.getRecipients().size();
-        for (int recIndex = 0; recIndex < totRecipients; recIndex++) {
-            int notificationCost = 0;
-            Optional<TimelineElementInternal> notificationOpt = getNotificationView(notification.getIun(), recIndex);
-            if (notificationOpt.isPresent()) {
-                NotificationViewedDetailsInt viewedDetailsInt = ((NotificationViewedDetailsInt) notificationOpt.get().getDetails());
-                notificationCost = Optional.ofNullable(viewedDetailsInt.getNotificationCost()).orElse(0);
-            }
-            //If there is no notificationCost on View we check the Refinement
-            if (notificationCost == 0) {
-                notificationOpt = getNotificationRefinement(notification.getIun(), recIndex);
-                if (notificationOpt.isPresent()) {
-                    RefinementDetailsInt refinementDetailsInt = ((RefinementDetailsInt) notificationOpt.get().getDetails());
-                    notificationCost = Optional.ofNullable(refinementDetailsInt.getNotificationCost()).orElse(0);
-                }
-            }
-            //If there is no notificationCost on Refinement we check the Deceased
-            if (notificationCost == 0) {
-                notificationOpt = getNotificationRecipientDeceased(notification.getIun(), recIndex);
-                if (notificationOpt.isPresent()) {
-                    AnalogWorfklowRecipientDeceasedDetailsInt recipientDeceasedDetailsInt = ((AnalogWorfklowRecipientDeceasedDetailsInt) notificationOpt.get().getDetails());
-                    notificationCost = Optional.ofNullable(recipientDeceasedDetailsInt.getNotificationCost()).orElse(0);
-                }
-            }
-
-            if (notificationCost == 0) {
-                notRefinedRecipientList.add(recIndex);
-            }
-        }
-
-        return notRefinedRecipientList;
     }
 
     private Optional<TimelineElementInternal> getNotificationView(String iun, Integer recIndex) {
