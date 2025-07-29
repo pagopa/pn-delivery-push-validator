@@ -10,13 +10,18 @@ import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileTagEnumInt;
+import it.pagopa.pn.deliverypushvalidator.dto.paperchannel.NotificationChannelType;
+import it.pagopa.pn.deliverypushvalidator.dto.paperchannel.SendAttachmentMode;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.AarGenerationDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.GeneratedF24DetailsInt;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.pnsafestorage.model.UpdateFileMetadataRequest;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
 import it.pagopa.pn.deliverypushvalidator.service.SafeStorageService;
 import it.pagopa.pn.deliverypushvalidator.service.utils.FileUtils;
+import it.pagopa.pn.deliverypushvalidator.utils.PnSendMode;
+import it.pagopa.pn.deliverypushvalidator.utils.PnSendModeUtils;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_ATTACHMENTCHANGESTATUSFAILED;
-import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_TIMELINEEVENTNOTFOUND;
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.*;
 
 @Component
 @CustomLog
@@ -47,6 +50,7 @@ public class AttachmentUtils {
     private final SafeStorageService safeStorageService;
     private final PnDeliveryPushValidatorConfigs pnDeliveryPushConfigs;
     private final NotificationProcessCostService notificationProcessCostService;
+    private final PnSendModeUtils pnSendModeUtils;
     private final AarUtils aarUtils;
     private final NotificationUtils notificationUtils;
     private final TimelineUtils timelineUtils;
@@ -68,6 +72,42 @@ public class AttachmentUtils {
         return Mono.just(getAllAttachment(notification))
                 .flatMapIterable( x -> x )
                 .flatMap( doc -> this.changeAttachmentRetention(doc, retentionUntilDays));
+    }
+
+    /**
+     * Recupera gli allegati della notifica, in base al tipo di invio
+     *
+     * @param notification notifica
+     * @param recIndex indice destinatario
+     * @return lista id allegati
+     */
+    @NotNull
+    public List<String> retrieveAttachments(NotificationInt notification, Integer recIndex, SendAttachmentMode sendAttachmentMode, F24ResolutionMode resolveF24Mode, List<String> replacedF24AttachmentUrls, Boolean formatWithDocTag)  {
+        log.info("retrieveAttachments iun={} recIndex={} sendAttachmentMode={} resolveF24Mode={} replacedF24AttachmentUrls={}", notification.getIun(), recIndex, sendAttachmentMode, resolveF24Mode, replacedF24AttachmentUrls);
+        AarGenerationDetailsInt aarGenerationDetails = aarUtils.getAarGenerationDetails(notification, recIndex);
+
+        List<String> attachments = new ArrayList<>();
+
+        String aarUrl = aarGenerationDetails.getGeneratedAarUrl();
+
+        attachments.add(0, formatWithDocTag(aarUrl, FileTagEnumInt.AAR, formatWithDocTag));
+        // nel caso in cui NON sia simple registered letter, devo allegare anche gli atti
+
+        NotificationRecipientInt notificationRecipientInt = notificationUtils.getRecipientFromIndex(notification, recIndex);
+
+        List<String> res = switch (sendAttachmentMode) {
+            case AAR -> attachments;
+            case AAR_DOCUMENTS -> {
+                attachments.addAll(getNotificationAttachments(notification, formatWithDocTag));
+                yield attachments;
+            }
+            case AAR_DOCUMENTS_PAYMENTS -> {
+                attachments.addAll(getNotificationAttachmentsAndPayments(notification, notificationRecipientInt, recIndex, resolveF24Mode, replacedF24AttachmentUrls, formatWithDocTag));
+                yield attachments;
+            }
+        };
+        log.info("retrieveAttachments iun={} recIndex={} attachmentsToSend={}", notification.getIun(), recIndex, res);
+        return res;
     }
 
     private void forEachAttachment(NotificationInt notification, Consumer<NotificationDocumentInt> callback, boolean includeF24Metadata)
@@ -98,7 +138,7 @@ public class AttachmentUtils {
         List<NotificationDocumentInt> notificationDocuments = new ArrayList<>(notification.getDocuments());
 
         notification.getRecipients().forEach( recipient -> addAllRecipientPaymentsToAttachmentList(notificationDocuments, recipient));
-        
+
         return notificationDocuments;
     }
 
@@ -132,7 +172,7 @@ public class AttachmentUtils {
                 final String errorDetail = "Validation failed, different sha256 expected=" + attachment.getDigests().getSha256()
                         + " actual=" + fd.getChecksum();
                 log.logCheckingOutcome(VALIDATE_ATTACHMENT_PROCESS, false, errorDetail);
-                
+
                 throw new PnValidationNotMatchingShaException(errorDetail);
             }
 
@@ -185,10 +225,10 @@ public class AttachmentUtils {
     private Mono<FileDownloadResponseInt> handleGoneError(PnFileGoneException ex) {
         log.logCheckingOutcome(VALIDATE_ATTACHMENT_PROCESS, false, "handleGoneError:"+ex.getMessage());
         return Mono.error(
-            new PnValidationFileGoneException(
-                ex.getMessage(),
-                ex.getCause()
-            )
+                new PnValidationFileGoneException(
+                        ex.getMessage(),
+                        ex.getCause()
+                )
         );
     }
 
@@ -201,7 +241,7 @@ public class AttachmentUtils {
                 updateFileMetadata(ref.getKey(), ATTACHED_STATUS, null)
                         .doOnSuccess( res -> log.info( "changeAttachmentStatusToAttached changed status for attachment with key={}", ref.getKey()))
         ).block();
-        
+
     }
 
     private Mono<Void> changeAttachmentRetention(NotificationDocumentInt attachment, int retentionUntilDays) {
@@ -274,12 +314,12 @@ public class AttachmentUtils {
 
     @NotNull
     private List<String> getNotificationF24PaymentsUrl(
-                                               NotificationInt notification,
-                                               NotificationRecipientInt recipient,
-                                               Integer recIndex,
-                                               F24ResolutionMode resolveF24Mode,
-                                               List<String> replacedF24AttachmentUrls,
-                                               Boolean formatWithDocTag
+            NotificationInt notification,
+            NotificationRecipientInt recipient,
+            Integer recIndex,
+            F24ResolutionMode resolveF24Mode,
+            List<String> replacedF24AttachmentUrls,
+            Boolean formatWithDocTag
     ) {
         List<F24Int> f24Payments = recipient.getPayments().stream()
                 .map(NotificationPaymentInfoInt::getF24)
@@ -298,7 +338,7 @@ public class AttachmentUtils {
             case RESOLVE_WITH_TIMELINE ->
                     getGenerateF24FromTimeline(notification, recIndex);
             case RESOLVE_WITH_REPLACED_LIST ->
-                    //non viene inclusa la URL degli F24 ma aggiunta l'eventuale lista di pdf prodotti agli attachments
+                //non viene inclusa la URL degli F24 ma aggiunta l'eventuale lista di pdf prodotti agli attachments
                     replacedF24AttachmentUrls != null ? replacedF24AttachmentUrls : List.of();
         };
     }
@@ -312,7 +352,7 @@ public class AttachmentUtils {
         boolean f24PaymentsRequireCost = f24Payments.stream().anyMatch(F24Int::getApplyCost);
         Integer cost = null;
         Integer vat = null;
-        
+
         // Se almeno uno dei pagamenti F24 ha applyCost = true, devo calcolare il costo della notifica e valorizzare il campo vat se presente
         if(f24PaymentsRequireCost) {
             cost = retrieveCost(notification, recIndex);
@@ -333,7 +373,7 @@ public class AttachmentUtils {
 
     private Integer retrieveCost(NotificationInt notificationInt, int recipientIdx) {
         return notificationProcessCostService.notificationProcessCostF24(
-                notificationInt.getIun(),
+                        notificationInt.getIun(),
                         recipientIdx,
                         notificationInt.getNotificationFeePolicy(),
                         notificationInt.getPaFee(),
@@ -366,8 +406,24 @@ public class AttachmentUtils {
 
         if (cost != null && cost > 0) f24Uri.queryParam("cost", cost);
         if (vat != null) f24Uri.queryParam("vat", vat);
-        
+
         return f24Uri.toUriString();
+    }
+
+    public SendAttachmentMode retrieveSendAttachmentMode(NotificationInt notification, NotificationChannelType notificationChannelType) {
+        PnSendMode pnSendMode = pnSendModeUtils.getPnSendMode(notification.getSentAt());
+
+        if(pnSendMode != null){
+            return switch (notificationChannelType) {
+                case ANALOG_NOTIFICATION -> pnSendMode.getAnalogSendAttachmentMode();
+                case SIMPLE_REGISTERED_LETTER -> pnSendMode.getSimpleRegisteredLetterSendAttachmentMode();
+                case DIGITAL_NOTIFICATION -> pnSendMode.getDigitalSendAttachmentMode();
+            };
+        }else {
+            String msg = String.format("There isn't correct Send Analog configuration date=%s - iun=%s sentAt", notification.getSentAt(),  notification.getIun());
+            log.error(msg);
+            throw new PnInternalException(msg, ERROR_CODE_DELIVERYPUSH_CONFIGURATION_NOT_FOUND);
+        }
     }
 
     public Boolean getAarWithRadd(NotificationInt notification, Integer recIndex) {
