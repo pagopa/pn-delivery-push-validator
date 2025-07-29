@@ -56,6 +56,7 @@ public class PnDeliveryPushValidatorConfigs {
     private Webapp webapp;
     private boolean additionalLangsEnabled;
     private ErrorCorrectionLevel errorCorrectionLevelQrCode;
+    private String technicalRefusalCostMode;
 
     @Data
     public static class Topics {
