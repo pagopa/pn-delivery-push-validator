@@ -33,8 +33,8 @@ import static org.mockserver.model.HttpResponse.response;
 
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push.address-manager-base-url=http://localhost:9998",
-        "pn.delivery-push.address-manager-api-key=testApiKey"
+        "pn.delivery-push-validator.address-manager-base-url=http://localhost:9998",
+        "pn.delivery-push-validator.address-manager-api-key=testApiKey"
 })
 
 @ExtendWith(SpringExtension.class)

@@ -76,6 +76,7 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         AddressValidator.class,
         AddressManagerServiceImpl.class,
         AddressManagerClientMock.class,
+        NationalRegistriesClientMock.class,
         NormalizeAddressHandler.class,
         AddressManagerResponseHandler.class,
         CommonTestConfiguration.SpringTestConfiguration.class,

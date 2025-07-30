@@ -1,18 +1,14 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
-import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.CheckTaxIdOK;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesRequestBody;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.RecipientAddressRequestBody;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.nationalregistries.NationalRegistriesClient;
-import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 
 public class NationalRegistriesClientMock implements NationalRegistriesClient {
@@ -23,30 +19,10 @@ public class NationalRegistriesClientMock implements NationalRegistriesClient {
     public static final String EXCEPTION = "EXCEPTION";
     public static final String PHYS_ADDR_NOT_FOUND = "NOT_FOUND";
     public static final String PHYS_ADDR_ERROR = "ERROR";
-    private ConcurrentMap<String, LegalDigitalAddressInt> digitalAddressResponse;
-    private ConcurrentMap<String, LegalDigitalAddressInt> digitalAddressResponseSecondCycle;
-    private final TimelineService timelineService;
 
-
-    public NationalRegistriesClientMock(
-            TimelineService timelineService
-    ) {
-        this.timelineService = timelineService;
-    }
 
     public void clear() {
-        this.digitalAddressResponse = new ConcurrentHashMap<>();
-        this.digitalAddressResponseSecondCycle = new ConcurrentHashMap<>();
         this.getNationalRegistriesCalledTimes = 0;
-    }
-
-    public void addDigital(String key, LegalDigitalAddressInt value) {
-        this.digitalAddressResponse.put(key,value);
-        this.digitalAddressResponseSecondCycle.put(key,value);
-    }
-
-    public void addDigitalSecondCycle(String key, LegalDigitalAddressInt value) {
-        this.digitalAddressResponseSecondCycle.put(key,value);
     }
 
     @Override

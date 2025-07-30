@@ -25,7 +25,7 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push.data-vault-base-url=http://localhost:9998",
+        "pn.delivery-push-validator.data-vault-base-url=http://localhost:9998",
 //        "spring.cloud.stream.default.consumer.autoStartup=false"
 })
 class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {

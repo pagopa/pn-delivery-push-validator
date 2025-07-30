@@ -27,8 +27,8 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push.safe-storage-base-url=http://localhost:9998",
-        "pn.delivery-push.safe-storage-cx-id=pn-delivery-push"
+        "pn.delivery-push-validator.safe-storage-base-url=http://localhost:9998",
+        "pn.delivery-push-validator.safe-storage-cx-id=pn-delivery-push"
 })
 class PnSafeStorageClientImplImplTestIT extends MockAWSObjectsTest {
     @Autowired
@@ -51,12 +51,12 @@ class PnSafeStorageClientImplImplTestIT extends MockAWSObjectsTest {
     }
 
     @Test
-    void createFile() throws JsonProcessingException {
+    void createFile() throws com.fasterxml.jackson.core.JsonProcessingException {
         //Given
         String fileKey ="fileKey";
         String path = "/safe-storage/v1/files";
 
-        ObjectMapper mapper = new ObjectMapper();
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
 
         FileCreationWithContentRequest fileCreationRequest = new FileCreationWithContentRequest();
         fileCreationRequest.setStatus("SAVED");
@@ -67,6 +67,7 @@ class PnSafeStorageClientImplImplTestIT extends MockAWSObjectsTest {
         fileCreationRequestExpected.setStatus("SAVED");
         fileCreationRequestExpected.setDocumentType("PN_AAR");
         fileCreationRequestExpected.setContentType("application/pdf");
+        fileCreationRequestExpected.setChecksumValue("testSha");
 
         String requestJson = mapper.writeValueAsString(fileCreationRequestExpected);
 

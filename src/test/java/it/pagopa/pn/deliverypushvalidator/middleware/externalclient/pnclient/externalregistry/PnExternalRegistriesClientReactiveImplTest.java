@@ -28,7 +28,7 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push.external-registry-base-url=http://localhost:9998",
+        "pn.delivery-push-validator.external-registry-base-url=http://localhost:9998",
 })
 class PnExternalRegistriesClientReactiveImplTest extends MockAWSObjectsTest {
     @Autowired

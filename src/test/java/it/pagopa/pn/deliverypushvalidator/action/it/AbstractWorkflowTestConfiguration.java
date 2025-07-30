@@ -5,12 +5,10 @@ import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
-import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.legalfact.CustomInstantWriter;
 import it.pagopa.pn.deliverypushvalidator.legalfact.LegalFactGenerator;
 import it.pagopa.pn.deliverypushvalidator.legalfact.LegalFactGeneratorTemplates;
 import it.pagopa.pn.deliverypushvalidator.legalfact.PhysicalAddressWriter;
-import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.externalregistry.PnExternalRegistriesClientReactive;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.safestorage.PnSafeStorageClient;
@@ -60,7 +58,7 @@ public class AbstractWorkflowTestConfiguration {
     }
 
     @Bean
-    public PnDataVaultClientReactive testPnDataVaultClient() {
+    public PnDataVaultClientReactiveMock testPnDataVaultClient() {
         return new PnDataVaultClientReactiveMock();
     }
 

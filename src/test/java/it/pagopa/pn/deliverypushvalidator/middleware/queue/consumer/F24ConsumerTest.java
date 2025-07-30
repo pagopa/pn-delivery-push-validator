@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
 import it.pagopa.pn.api.dto.events.*;
-import it.pagopa.pn.deliverypushvalidator.LocalStackTestConfig;
 import it.pagopa.pn.deliverypushvalidator.MockActionPoolTest;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.middleware.LocalStackTestConfig;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.F24ResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
@@ -69,8 +69,6 @@ class F24ConsumerTest extends MockActionPoolTest {
         Mockito.verify(f24Service,Mockito.never()).handleF24PrepareResponse(any(),any());
         Mockito.verify(schedulerService,Mockito.never()).scheduleEvent(any(),any(),any());
     }
-
-
 
     @Test
     void handlePrepareResponseReceivedOK() {

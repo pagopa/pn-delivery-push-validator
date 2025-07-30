@@ -1,6 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
-
 import it.pagopa.pn.deliverypushvalidator.LocalStackTestConfig;
 import it.pagopa.pn.deliverypushvalidator.MockActionPoolTest;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.AnalogAddress;
@@ -31,8 +30,7 @@ class AddressManagerConsumerTestIT extends MockActionPoolTest {
 
     @Test
     void consumeMessageOK() {
-        Consumer<Message<NormalizeItemsResult>> pnNationalRegistriesEventInboundConsumer = functionCatalog.lookup(Consumer.class, "pnAddressManagerEventInboundConsumer");
-        
+        Message<NormalizeItemsResult> pnNationalRegistriesEventInboundConsumer = functionCatalog.lookup(Consumer.class, "pnAddressManagerEventInboundConsumer");
         NormalizeItemsResult normalizeItemsResult = new NormalizeItemsResult()
                 .correlationId("VALIDATE_NORMALIZE_ADDRESSES_REQUEST.IUN_KWKU-JHXN-HJXM-202304-U-1")
                 .addResultItemsItem(new NormalizeResult().normalizedAddress(
@@ -46,12 +44,7 @@ class AddressManagerConsumerTestIT extends MockActionPoolTest {
                                 .country("IT")
                 ));
         
-        Message<NormalizeItemsResult> message = MessageBuilder.withPayload(normalizeItemsResult).build();
-        pnNationalRegistriesEventInboundConsumer.accept(message);
+        MessageBuilder.withPayload(normalizeItemsResult).build();
         Mockito.verify(handler).handleResponseReceived(Mockito.any());
     }
-    
-
-
-
 }

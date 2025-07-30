@@ -6,15 +6,16 @@ import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.f24.PnF24Client;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.F24ResponseHandler;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
+
 import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.setMdc;
 
-@Data
 @Slf4j
 @RequiredArgsConstructor
+@Configuration
 public class F24Consumer {
     private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
     private F24ResponseHandler handler;
