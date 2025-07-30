@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+
 @Data
 @Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
@@ -14,6 +15,13 @@ import org.springframework.context.annotation.Import;
 public class PnDeliveryPushValidatorConfigs {
 
     private Topics topics;
+    private DocumentCreationRequestDao documentCreationRequestDao;
+    private boolean safeStorageFileNotFoundRetry;
+
+    @Data
+    public static class DocumentCreationRequestDao {
+        private String tableName;
+    }
 
     @Data
     public static class Topics {
