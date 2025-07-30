@@ -1,14 +1,13 @@
 {
   "Parameters": {
-    "EnhancedWebSecurityEnabled": "true",
-    "MinTasksNumber": "1",
-    "MaxTasksNumber": "1",
     "AutoscalingThreshold": "650",
     "CpuValueValidator": "2048",
     "MemoryAmountValidator": "4GB",
     "MinTasksNumberValidator": "1",
     "MaxTasksNumberValidator": "1",
     "AutoscalingThresholdValidator": "650",
+    "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
+    "DocumentCreationRequestTableArn": "arn:aws:dynamodb:eu-south-1:830192246553:table/pn-DocumentCreationRequestTable"
     "WireTapLogActivation": "false",
     "PnCronAnalyzer": "-",
     "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",

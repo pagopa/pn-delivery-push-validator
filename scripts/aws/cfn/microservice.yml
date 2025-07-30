@@ -147,6 +147,15 @@ Parameters:
     Type: String
     Default: ''
     Description: 'Applicative environment variable file checksum'
+  
+  # --- Dynamo Table ---
+  DocumentCreationRequestTableName:
+    Type: String
+    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
+  
+  DocumentCreationRequestTableArn:
+    Type: String
+    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
 
   ConsumedQueueMessagePerMinuteValidator:
     Type: Number
@@ -161,15 +170,11 @@ Parameters:
   AlbSecurityGroup:
     Type: String
     Description: 'Application load balancer security group'
-
-  DocumentCreationRequestTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
-
-  DocumentCreationRequestTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
-
+  
+  
+  
+  
+  
   PaperNotificationFailedDynamoTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
@@ -258,9 +263,18 @@ Parameters:
     Type: String
     Description: 'Safe storage base url'
 
+  ExternalChannelBaseUrl:
+    Type: String
+    Description: 'External channel base url'
+
   F24DeliveryPushUser:
     Type: String
     Description: 'pn-delivery-push clientId for communication with pn-f24'
+
+  PnCronAnalyzer:
+    Type: String
+    Default: '-'
+    Description: Cron for which you send the metric to CloudWatch
 
   PagoPaNotificationFee:
     Type: String
@@ -341,10 +355,10 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadBalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref DeliveryPushValidatorMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
+        LoadBalancerRulePriority: !Ref MicroserviceNumber
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
 
   ## Dashboard
@@ -505,6 +519,9 @@ Resources:
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
+              - 'dynamodb:Query'
               - 'dynamodb:PutItem'
+              - 'dynamodb:DeleteItem'
+              - 'dynamodb:UpdateItem'
             Resource:
               - !Sub "${DocumentCreationRequestTableArn}"
