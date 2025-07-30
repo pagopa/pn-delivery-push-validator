@@ -2,7 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.utils;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;

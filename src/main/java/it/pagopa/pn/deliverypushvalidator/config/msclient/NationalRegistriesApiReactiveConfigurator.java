@@ -4,9 +4,9 @@ import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 
 
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.ApiClient;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.api.AddressApi;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.api.AgenziaEntrateApi;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.ApiClient;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.api.AddressApi;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.api.AgenziaEntrateApi;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

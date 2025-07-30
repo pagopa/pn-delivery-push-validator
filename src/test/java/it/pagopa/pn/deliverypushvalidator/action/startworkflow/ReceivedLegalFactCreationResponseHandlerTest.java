@@ -2,9 +2,9 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationSenderInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationService;

@@ -4,7 +4,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateCostPhaseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.NotificationCostResponseInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.NotificationCostResponseInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationCostResponse;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.externalregistry_reactive.model.PaymentsInfoForRecipient;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.externalregistry_reactive.model.UpdateNotificationCostRequest;

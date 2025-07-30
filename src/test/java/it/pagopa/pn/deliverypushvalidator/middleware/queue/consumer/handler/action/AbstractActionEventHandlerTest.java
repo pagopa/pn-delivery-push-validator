@@ -27,7 +27,7 @@ class AbstractActionEventHandlerTest {
     private AbstractActionEventHandler handler = new AbstractActionEventHandler(timelineUtils) {
         @Override
         public SupportedEventType getSupportedEventType() {
-            return SupportedEventType.START_RECIPIENT_WORKFLOW;
+            return SupportedEventType.NOTIFICATION_VALIDATION;
         }
 
         @Override
@@ -67,6 +67,6 @@ class AbstractActionEventHandlerTest {
 
     @Test
     void getSupportedEventType_returnsCorrectEventType() {
-        assertEquals(SupportedEventType.START_RECIPIENT_WORKFLOW, handler.getSupportedEventType());
+        assertEquals(SupportedEventType.NOTIFICATION_VALIDATION, handler.getSupportedEventType());
     }
 }

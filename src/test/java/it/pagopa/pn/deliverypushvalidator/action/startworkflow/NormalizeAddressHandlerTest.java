@@ -5,14 +5,15 @@ import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationPaymentInfoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationpaid.NotificationPaidInt;
-import it.pagopa.pn.deliverypushvalidator.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ class NormalizeAddressHandlerTest {
         NotificationRecipientInt notificationRecipientInt =
                 new NotificationRecipientInt("","","",new LegalDigitalAddressInt(),
                         new PhysicalAddressInt("","","","","","","","",""),
-                        Arrays.asList(new NotificationPaymentInfoInt()), NotificationPaidInt.RecipientTypeInt.PF);
+                        Arrays.asList(new NotificationPaymentInfoInt()), RecipientTypeInt.PF);
         Mockito.when(notificationUtils.getRecipientFromIndex(Mockito.any(),Mockito.anyInt())).thenReturn(notificationRecipientInt);
 
         Mockito.when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.empty());

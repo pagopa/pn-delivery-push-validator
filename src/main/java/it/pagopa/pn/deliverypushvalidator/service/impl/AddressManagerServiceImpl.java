@@ -3,7 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.service.impl;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.AcceptedResponse;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.AnalogAddress;

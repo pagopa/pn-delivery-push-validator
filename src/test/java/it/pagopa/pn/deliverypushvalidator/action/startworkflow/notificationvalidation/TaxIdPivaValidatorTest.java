@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.nationalregistries.CheckTaxIdOKInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationTaxIdNotValidException;
-import it.pagopa.pn.deliverypushvalidator.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.NationalRegistriesService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

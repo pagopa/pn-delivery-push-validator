@@ -2,7 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 import it.pagopa.pn.commons.utils.DateFormatUtils;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.jetbrains.annotations.NotNull;
 

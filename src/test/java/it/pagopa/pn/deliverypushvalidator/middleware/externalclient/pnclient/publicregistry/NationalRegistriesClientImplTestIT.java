@@ -47,20 +47,6 @@ class NationalRegistriesClientImplTestIT extends MockAWSObjectsTest {
         mockServer.stop();
     }
 
-    @Test
-    void sendRequestForGetDigitalAddressTest() {
-
-        new MockServerClient("localhost", 9999)
-                .when(request()
-                        .withMethod("POST")
-                        .withPath("/national-registries-private/{recipient-type}/addresses".replace("{recipient-type}", "PF"))
-                        .withHeader(PN_NATIONAL_REGISTRIES_CX_ID, PN_NATIONAL_REGISTRIES_CX_ID_VALUE))
-                .respond(response()
-                        .withContentType(MediaType.APPLICATION_JSON)
-                        .withStatusCode(200));
-
-        Assertions.assertDoesNotThrow(
-                () -> nationalRegistriesClient.sendRequestForGetDigitalAddress("001", "PF", "002", Instant.now()));
-    }
+    // TODO: Scrivere test per i metodi checkTaxId e sendRequestForGetPhysicalAddresses
 
 }

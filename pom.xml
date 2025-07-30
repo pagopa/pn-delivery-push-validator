@@ -198,6 +198,7 @@
 							<importMappings>
 								<importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping>
 							</importMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<swaggerAnnotations>false</swaggerAnnotations>
@@ -234,6 +235,7 @@
 							<typeMappings>
 								<typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
 							</typeMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<swaggerAnnotations>false</swaggerAnnotations>
@@ -268,6 +270,7 @@
 							<typeMappings>
 								<typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
 							</typeMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<swaggerAnnotations>false</swaggerAnnotations>
@@ -277,7 +280,6 @@
 								<annotationLibrary>none</annotationLibrary>
 								<documentationProvider>source</documentationProvider>
 								<openApiNullable>false</openApiNullable>
-								<!-- <containerDefaultToNull>true</containerDefaultToNull> Genera modelli con Liste e Map con default a null -->
 								<skipDefaultInterface>false</skipDefaultInterface>
 								<useTags>true</useTags>
 							</configOptions>
@@ -338,6 +340,7 @@
 							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<typeMappings><typeMapping>OffsetDateTime=Instant</typeMapping></typeMappings>
 							<importMappings><importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping></importMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<swaggerAnnotations>false</swaggerAnnotations>
@@ -483,9 +486,9 @@
 							<generateApiDocumentation>false</generateApiDocumentation>
 							<generateApiTests>false</generateApiTests>
 							<generateModelTests>false</generateModelTests>
-							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<typeMappings><typeMapping>OffsetDateTime=Instant</typeMapping></typeMappings>
 							<importMappings><importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping></importMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<swaggerAnnotations>false</swaggerAnnotations>
@@ -500,8 +503,8 @@
 								<skipDefaultInterface>false</skipDefaultInterface>
 								<useTags>true</useTags>
 							</configOptions>
-							<apiPackage>${project.groupId}.deliverypushworkflow.generated.openapi.msclient.nationalregistries.api</apiPackage>
-							<modelPackage>${project.groupId}.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model</modelPackage>
+							<apiPackage>${project.groupId}.deliverypushvalidator.generated.openapi.msclient.nationalregistries.api</apiPackage>
+							<modelPackage>${project.groupId}.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model</modelPackage>
 						</configuration>
 					</execution>
 					<!-- OPEN API CLIENT TEMPLATE-ENGINE -->
@@ -557,6 +560,7 @@
 							<generateModelTests>false</generateModelTests>
 							<typeMappings><typeMapping>OffsetDateTime=Instant</typeMapping></typeMappings>
 							<importMappings><importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping></importMappings>
+							<additionalProperties>removeEnumValuePrefix=false</additionalProperties>
 							<configOptions>
 								<useJakartaEe>true</useJakartaEe>
 								<dateLibrary>java8</dateLibrary>

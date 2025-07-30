@@ -45,7 +45,6 @@ class ValidationActionsConsumerTest {
         Mockito.when(message.getPayload()).thenReturn(action);
         Mockito.when(message.getHeaders()).thenReturn(new MessageHeaders(Map.of("test", "headerValue")));
 
-        validationActionsConsumer.pnDeliveryPushValidationActionsInboundConsumer(message);
         assertThrows(RuntimeException.class, () ->
                 validationActionsConsumer.pnDeliveryPushValidationActionsInboundConsumer(message));
 

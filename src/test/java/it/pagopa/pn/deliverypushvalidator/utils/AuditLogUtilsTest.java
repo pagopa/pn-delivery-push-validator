@@ -2,10 +2,10 @@ package it.pagopa.pn.deliverypushvalidator.utils;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.it.utils.NotificationRecipientTestBuilder;
-import it.pagopa.pn.deliverypushvalidator.it.utils.NotificationTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;

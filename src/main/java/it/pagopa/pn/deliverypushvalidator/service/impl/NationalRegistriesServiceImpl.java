@@ -2,24 +2,21 @@ package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.LogUtils;
-import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.nationalregistries.CheckTaxIdOKInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.ContactPhaseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.DeliveryModeInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.nationalregistries.NationalRegistriesClient;
 import it.pagopa.pn.deliverypushvalidator.service.NationalRegistriesService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
-import it.pagopa.pn.deliverypushvalidator.service.utils.PublicRegistryUtils;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.CheckTaxIdOK;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesRequestBody;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.RecipientAddressRequestBody;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.CheckTaxIdOK;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesRequestBody;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.RecipientAddressRequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -33,52 +30,19 @@ import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidat
 @Slf4j
 @Service
 public class NationalRegistriesServiceImpl implements NationalRegistriesService {
-    private final PublicRegistryUtils publicRegistryUtils;
     private final NationalRegistriesClient nationalRegistriesClient;
-    private final NotificationUtils notificationUtils;
 
     private final TimelineUtils timelineUtils;
 
     private final TimelineService timelineService;
 
-    public NationalRegistriesServiceImpl(PublicRegistryUtils publicRegistryUtils,
+    public NationalRegistriesServiceImpl(
                                          NationalRegistriesClient nationalRegistriesClient,
-                                         NotificationUtils notificationUtils,
                                          TimelineService timelineService,
                                          TimelineUtils timelineUtils) {
-        this.publicRegistryUtils = publicRegistryUtils;
         this.nationalRegistriesClient = nationalRegistriesClient;
-        this.notificationUtils = notificationUtils;
         this.timelineUtils = timelineUtils;
         this.timelineService = timelineService;
-    }
-
-    /**
-     * Send get request to public registry for get digital address
-     **/
-    @Override
-    public void sendRequestForGetDigitalGeneralAddress(NotificationInt notification,
-                                                       Integer recIndex,
-                                                       ContactPhaseInt contactPhase,
-                                                       int sentAttemptMade,
-                                                       String relatedFeedbackTimelineId) {
-
-        String correlationId = publicRegistryUtils.generateCorrelationId(notification.getIun(), recIndex, contactPhase, sentAttemptMade, DeliveryModeInt.DIGITAL);
-        log.debug("Start Async Request for get general address, correlationId={} - iun={} id={}", correlationId, notification.getIun(), recIndex);
-
-        NotificationRecipientInt recipient = notificationUtils.getRecipientFromIndex(notification,recIndex);
-
-        nationalRegistriesClient.sendRequestForGetDigitalAddress(recipient.getTaxId(), recipient.getRecipientType().getValue(), correlationId, notification.getSentAt());
-        publicRegistryUtils.addPublicRegistryCallToTimeline(
-                notification,
-                recIndex,
-                contactPhase,
-                sentAttemptMade,
-                correlationId, 
-                DeliveryModeInt.DIGITAL,
-                relatedFeedbackTimelineId);
-
-        log.debug("End sendRequestForGetAddress correlationId={} - iun={} id={}", correlationId, notification.getIun(), recIndex);
     }
 
     @Override

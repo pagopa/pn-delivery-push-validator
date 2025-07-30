@@ -3,9 +3,9 @@ package it.pagopa.pn.deliverypushvalidator.utils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.AddressSQSMessageDigitalAddressInner;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.PhysicalAddressResponse;
-import it.pagopa.pn.deliverypushworkflow.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesResponse;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.AddressSQSMessageDigitalAddressInner;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.PhysicalAddressResponse;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesResponse;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;

@@ -2,8 +2,9 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationPaymentInfoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationpaid.NotificationPaidInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationDigitalAddress;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationPaymentItem;
@@ -29,7 +30,7 @@ public class RecipientMapper {
                 .taxId(recipient.getTaxId())
                 .internalId(recipient.getInternalId())
                 .denomination(recipient.getDenomination())
-                .recipientType(NotificationPaidInt.RecipientTypeInt.valueOf(recipient.getRecipientType().name()));
+                .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()));
         NotificationDigitalAddress digitalDomicile = recipient.getDigitalDomicile();
         if (digitalDomicile != null) {
             LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE typeEnum = LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.valueOf(digitalDomicile.getType().name());

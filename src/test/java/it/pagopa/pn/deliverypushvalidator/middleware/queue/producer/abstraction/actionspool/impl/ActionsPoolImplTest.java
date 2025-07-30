@@ -31,7 +31,7 @@ class ActionsPoolImplTest {
                 .actionId("001")
                 .recipientIndex(0)
                 .notBefore(now.minus(Duration.ofSeconds(10)))
-                .type(ActionType.ANALOG_WORKFLOW)
+                .type(ActionType.DOCUMENT_CREATION_RESPONSE)
                 .build();
         //WHEN
         actionsPool.addOnlyAction(action);

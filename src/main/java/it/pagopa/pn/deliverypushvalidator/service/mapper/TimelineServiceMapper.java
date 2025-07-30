@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.StatusInfoInternal;

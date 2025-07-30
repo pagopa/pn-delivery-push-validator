@@ -3,9 +3,9 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationpaid.NotificationPaidInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
@@ -102,7 +102,7 @@ class LookupAddressHandlerTest {
     private static NotificationInt getNotification() {
         List<NotificationRecipientInt> recipients = List.of(
                 NotificationRecipientInt.builder()
-                        .recipientType(NotificationPaidInt.RecipientTypeInt.PF)
+                        .recipientType(RecipientTypeInt.PF)
                         .taxId("taxId")
                         .physicalAddress(getPhysicalAddress())
                         .build()

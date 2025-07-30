@@ -1,9 +1,9 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.F24Int;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationDocumentInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationPaymentInfoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.PagoPaInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.F24Int;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationDocumentInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.PagoPaInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;

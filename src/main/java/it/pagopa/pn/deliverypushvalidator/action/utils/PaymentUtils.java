@@ -2,8 +2,8 @@ package it.pagopa.pn.deliverypushvalidator.action.utils;
 
 import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResponseInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.PagoPaInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.PagoPaInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnPaymentUpdateRetryException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;

@@ -53,11 +53,6 @@ public class NotificationProcessCostServiceImpl implements NotificationProcessCo
     }
 
     @Override
-    public Mono<Integer> getSendFeeAsync() {
-        return Mono.just(sendFee);
-    }
-
-    @Override
     public int getSendFee() {
         return sendFee;
     }
@@ -112,11 +107,6 @@ public class NotificationProcessCostServiceImpl implements NotificationProcessCo
             log.error(msg);
             throw new PnInternalException(msg, ERROR_CODE_DELIVERYPUSH_TOTAL_COST_NOT_PRESENT);
         }
-    }
-
-    @Override
-    public Mono<NotificationProcessCost> notificationProcessCost(String iun, int recIndex, NotificationFeePolicy notificationFeePolicy, Boolean applyCost, Integer paFee, Integer vat) {
-        return Mono.fromCallable(() -> getNotificationProcessCost(iun, recIndex, notificationFeePolicy, applyCost, paFee, vat));
     }
 
     private NotificationProcessCost getNotificationProcessCost(

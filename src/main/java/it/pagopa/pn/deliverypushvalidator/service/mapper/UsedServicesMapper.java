@@ -1,7 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.UsedServicesInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.UsedServices;
 
 public class UsedServicesMapper {

@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NewTimelineElement;
@@ -8,7 +8,6 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineser
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElement;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.TimelineServiceMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 public class TimelineServiceHttpImpl implements TimelineService {
 
     private final TimelineClient timelineClient;
-    private final NotificationService notificationService;
 
     @Override
     public boolean addTimelineElement(TimelineElementInternal element, NotificationInt notification) {
@@ -100,6 +98,7 @@ public class TimelineServiceHttpImpl implements TimelineService {
         return Optional.ofNullable(timelineClient.getTimeline(iun, confidentialInfoRequired, false, null))
                 .orElseGet(Collections::emptyList)
                 .stream()
+                .filter(timelineElement -> TimelineElementCategoryInt.isKnownCategory(timelineElement.getCategory().getValue()))
                 .map(TimelineServiceMapper::toTimelineElementInternal)
                 .collect(Collectors.toSet());
     }
@@ -111,6 +110,7 @@ public class TimelineServiceHttpImpl implements TimelineService {
         return Optional.ofNullable(timelineClient.getTimeline(iun, confidentialInfoRequired, true, null))
                 .orElseGet(Collections::emptyList)
                 .stream()
+                .filter(timelineElement -> TimelineElementCategoryInt.isKnownCategory(timelineElement.getCategory().getValue()))
                 .map(TimelineServiceMapper::toTimelineElementInternal)
                 .collect(Collectors.toSet());
     }
@@ -122,6 +122,7 @@ public class TimelineServiceHttpImpl implements TimelineService {
         return Optional.ofNullable(timelineClient.getTimeline(iun, confidentialInfoRequired, false, timelineId))
                 .orElseGet(Collections::emptyList)
                 .stream()
+                .filter(timelineElement -> TimelineElementCategoryInt.isKnownCategory(timelineElement.getCategory().getValue()))
                 .map(TimelineServiceMapper::toTimelineElementInternal)
                 .collect(Collectors.toSet());
     }

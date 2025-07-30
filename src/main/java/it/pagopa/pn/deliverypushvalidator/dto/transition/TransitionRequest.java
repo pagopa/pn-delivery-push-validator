@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.dto.transition;
 
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.status.NotificationStatusInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.status.NotificationStatusInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import lombok.Builder;
 import lombok.Data;

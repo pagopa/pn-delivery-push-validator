@@ -51,14 +51,14 @@ class EventHandlerRegistryTest {
     void initializeRegistersAllHandlersCorrectly() {
         EventHandler<?> handler1 = mock(EventHandler.class);
         EventHandler<?> handler2 = mock(EventHandler.class);
-        when(handler1.getSupportedEventType()).thenReturn(SupportedEventType.NOTIFICATION_PAID);
-        when(handler2.getSupportedEventType()).thenReturn(SupportedEventType.START_RECIPIENT_WORKFLOW);
+        when(handler1.getSupportedEventType()).thenReturn(SupportedEventType.NOTIFICATION_VALIDATION);
+        when(handler2.getSupportedEventType()).thenReturn(SupportedEventType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
 
         EventHandlerRegistry registry = new EventHandlerRegistry(List.of(handler1, handler2));
         registry.initialize();
 
-        assertTrue(registry.getHandler("START_RECIPIENT_WORKFLOW").isPresent());
-        assertTrue(registry.getHandler("START_RECIPIENT_WORKFLOW").isPresent());
+        assertTrue(registry.getHandler("NOTIFICATION_VALIDATION").isPresent());
+        assertTrue(registry.getHandler("SCHEDULE_RECEIVED_LEGALFACT_GENERATION").isPresent());
     }
 
     @Test
@@ -79,8 +79,8 @@ class EventHandlerRegistryTest {
     void registerHandlerThrowsExceptionForDuplicateEventType() {
         EventHandler<?> handler1 = mock(EventHandler.class);
         EventHandler<?> handler2 = mock(EventHandler.class);
-        when(handler1.getSupportedEventType()).thenReturn(SupportedEventType.START_RECIPIENT_WORKFLOW);
-        when(handler2.getSupportedEventType()).thenReturn(SupportedEventType.START_RECIPIENT_WORKFLOW);
+        when(handler1.getSupportedEventType()).thenReturn(SupportedEventType.NOTIFICATION_VALIDATION);
+        when(handler2.getSupportedEventType()).thenReturn(SupportedEventType.NOTIFICATION_VALIDATION);
 
         EventHandlerRegistry registry = new EventHandlerRegistry(List.of(handler1, handler2));
 
@@ -91,7 +91,7 @@ class EventHandlerRegistryTest {
     @Test
     void getHandlerReturnsEmptyOptionalForUnknownEventType() {
         EventHandler<?> handler = mock(EventHandler.class);
-        when(handler.getSupportedEventType()).thenReturn(SupportedEventType.START_RECIPIENT_WORKFLOW);
+        when(handler.getSupportedEventType()).thenReturn(SupportedEventType.NOTIFICATION_VALIDATION);
 
         EventHandlerRegistry registry = new EventHandlerRegistry(List.of(handler));
         registry.initialize();

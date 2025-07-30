@@ -2,13 +2,13 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvali
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidAddressException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.AcceptedResponse;
-import it.pagopa.pn.deliverypushvalidator.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.AddressManagerService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import org.jetbrains.annotations.NotNull;

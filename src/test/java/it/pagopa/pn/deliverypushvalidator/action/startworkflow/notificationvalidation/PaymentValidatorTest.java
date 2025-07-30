@@ -5,13 +5,13 @@ import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateCostPhaseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.exception.PnPaymentUpdateRetryException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationPaymentException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
-import it.pagopa.pn.deliverypushvalidator.it.utils.NotificationRecipientTestBuilder;
-import it.pagopa.pn.deliverypushvalidator.it.utils.NotificationTestBuilder;
-import it.pagopa.pn.deliverypushvalidator.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-import static it.pagopa.pn.deliverypushvalidator.it.utils.TestUtils.verifyPaymentInfo;
+import static it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils.verifyPaymentInfo;
 import static org.mockito.Mockito.never;
 
 @ExtendWith(SpringExtension.class)
