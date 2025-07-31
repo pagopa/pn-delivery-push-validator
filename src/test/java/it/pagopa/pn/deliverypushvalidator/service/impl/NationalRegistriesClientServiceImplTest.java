@@ -31,9 +31,6 @@ class NationalRegistriesClientServiceImplTest {
     private NationalRegistriesClient nationalRegistriesClient;
 
     @Mock
-    private NotificationUtils notificationUtils;
-
-    @Mock
     private TimelineUtils timelineUtils;
 
     @Mock
@@ -44,7 +41,6 @@ class NationalRegistriesClientServiceImplTest {
     @BeforeEach
     void setUp() {
         nationalRegistriesClient = Mockito.mock(NationalRegistriesClient.class);
-        notificationUtils = Mockito.mock(NotificationUtils.class);
         timelineUtils = Mockito.mock(TimelineUtils.class);
         timelineService = Mockito.mock(TimelineService.class);
 

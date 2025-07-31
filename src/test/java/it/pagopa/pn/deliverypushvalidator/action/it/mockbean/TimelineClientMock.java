@@ -1,5 +1,9 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 
@@ -8,7 +12,7 @@ import java.util.List;
 
 public class TimelineClientMock implements TimelineClient {
     @Override
-    public boolean addTimelineElement(NewTimelineElement newTimelineElement) {
+    public boolean addTimelineElement(TimelineElementInternal element, NotificationInt notification) {
         return false;
     }
 
@@ -18,32 +22,27 @@ public class TimelineClientMock implements TimelineClient {
     }
 
     @Override
-    public TimelineElement getTimelineElement(String iun, String timelineId, Boolean strongly) {
+    public TimelineElementInternal getTimelineElement(String iun, String timelineId, Boolean strongly) {
         return null;
     }
 
     @Override
-    public TimelineElementDetails getTimelineElementDetails(String iun, String timelineId) {
+    public TimelineElementDetailsInt getTimelineElementDetails(String iun, String timelineId) {
         return null;
     }
 
     @Override
-    public TimelineElementDetails getTimelineElementDetailForSpecificRecipient(String iun, Integer recIndex, Boolean confidentialInfoRequired, TimelineCategory category) {
+    public TimelineElementDetailsInt getTimelineElementDetailForSpecificRecipient(String iun, Integer recIndex, Boolean confidentialInfoRequired, TimelineElementCategoryInt category) {
         return null;
     }
 
     @Override
-    public TimelineElement getTimelineElementForSpecificRecipient(String iun, Integer recIndex, TimelineCategory category) {
+    public TimelineElementInternal getTimelineElementForSpecificRecipient(String iun, Integer recIndex, TimelineElementCategoryInt category) {
         return null;
     }
 
     @Override
-    public List<TimelineElement> getTimeline(String iun, Boolean confidentialInfoRequired, Boolean strongly, String timelineId) {
+    public List<TimelineElementInternal> getTimeline(String iun, Boolean confidentialInfoRequired, Boolean strongly, String timelineId) {
         return List.of();
-    }
-
-    @Override
-    public NotificationHistoryResponse getTimelineAndStatusHistory(String iun, Integer numberOfRecipients, Instant createdAt) {
-        return null;
     }
 }

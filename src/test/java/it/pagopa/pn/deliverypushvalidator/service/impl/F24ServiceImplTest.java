@@ -92,27 +92,6 @@ public class F24ServiceImplTest {
         Mockito.verify(timelineService,Mockito.times(1)).addTimelineElement(eq(timelineElementInternal),eq(notification));
     }
 
-
-
-    private TimelineElementInternal buildGeneratedF24TimelineElement(NotificationInt notificationInt) {
-        return TimelineElementInternal.builder()
-                .iun(notificationInt.getIun())
-                .elementId(TimelineEventId.GENERATED_F24.buildEventId(
-                        EventId.builder()
-                                .iun(notificationInt.getIun())
-                                .recIndex(0)
-                                .build()))
-                .timestamp(Instant.now())
-                .paId("77777777777")
-                .category(TimelineElementCategoryInt.GENERATED_F24)
-                .legalFactsIds(new ArrayList<>())
-                .details(GeneratedF24DetailsInt.builder()
-                        .f24Attachments(List.of("test"))
-                        .recIndex(0)
-                        .build())
-                .build();
-    }
-
     private TimelineElementInternal buildF24RequestTimelineElement(NotificationInt notificationInt) {
         return TimelineElementInternal.builder()
                 .iun(notificationInt.getIun())

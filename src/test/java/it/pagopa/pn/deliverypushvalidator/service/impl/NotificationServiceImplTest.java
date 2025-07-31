@@ -53,40 +53,7 @@ class NotificationServiceImplTest {
 
     }
     
-    @Test
-    @ExtendWith(SpringExtension.class)
-    void getRecipientsQuickAccessLinkToken() {
-        Map<String, String> expected = Map.of("internalId","token");
-
-        Mockito.when(pnDeliveryClient.getQuickAccessLinkTokensPrivate("001")).thenReturn(expected);
-
-        Map<String, String> actual = service.getRecipientsQuickAccessLinkToken("001");
-
-        Assertions.assertEquals(expected, actual);
-    }
-    
-    
-    @Test
-    @ExtendWith(SpringExtension.class)
-    void getRecipientsQuickAccessLinkTokenFailure() {       
-        Mockito.when(pnDeliveryClient.getQuickAccessLinkTokensPrivate("001"))
-        .thenThrow(PnHttpResponseException.class);
-        Assertions.assertThrows(PnHttpResponseException.class, () -> service.getRecipientsQuickAccessLinkToken("001"));
-        
-    }
-
-
-
-    
     private SentNotificationV25 buildSentNotification() {
-        SentNotificationV25 sentNotification = new SentNotificationV25();
-        sentNotification.setIun("001");
-        sentNotification.setPhysicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890);
-        sentNotification.setNotificationFeePolicy(it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy.DELIVERY_MODE);
-        return sentNotification;
-    }
-
-    private SentNotificationV25 buildSentNotificationReactive() {
         SentNotificationV25 sentNotification = new SentNotificationV25();
         sentNotification.setIun("001");
         sentNotification.setPhysicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890);

@@ -1,7 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline;
 
-import it.pagopa.pn.deliverypushvalidator.dto.address.CourtesyDigitalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.address.DigitalAddressSourceInt;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.ContactPhaseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.DeliveryModeInt;
@@ -17,13 +15,11 @@ import lombok.*;
 public class EventId {
     private String iun;
     private Integer recIndex;
-    private DigitalAddressSourceInt source;
     private ContactPhaseInt contactPhase;
     private Integer sentAttemptMade;
     private DeliveryModeInt deliveryMode;
     private Integer progressIndex;
     private DocumentCreationTypeInt documentCreationType;
-    private CourtesyDigitalAddressInt.COURTESY_DIGITAL_ADDRESS_TYPE_INT courtesyAddressType;
     private String creditorTaxId;
     private String noticeCode;
     private Boolean isFirstSendRetry;

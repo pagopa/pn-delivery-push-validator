@@ -5,8 +5,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationT
 import java.util.Optional;
 
 public interface DocumentCreationRequestService {
-    void addDocumentCreationRequest(String fileKey, String iun, Integer recIndex, DocumentCreationTypeInt documentType, String timelineId);
-
     void addDocumentCreationRequest(String fileKey, String iun, DocumentCreationTypeInt documentType, String timelineId);
 
     Optional<DocumentCreationRequest> getDocumentCreationRequest(String fileKey);

@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.util.List;
@@ -9,10 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class PublicRegistryValidationCallDetailsInt implements TimelineElementDetailsInt{
+public class PublicRegistryValidationCallDetailsInt extends CategoryTypeTimelineElementDetailsInt implements TimelineElementDetailsInt{
 
     private List<Integer> recIndexes;
     private DeliveryModeInt deliveryMode;

@@ -49,8 +49,6 @@ class NotificationProcessCostServiceImplTest {
         this.cfg = Mockito.mock(PnDeliveryPushValidatorConfigs.class);
 
         Mockito.when(cfg.getPagoPaNotificationBaseCost()).thenReturn(notificationCost);
-        Mockito.when(cfg.getPagoPaNotificationFee()).thenReturn(notificationFee);
-        Mockito.when(cfg.getPagoPaNotificationVat()).thenReturn(notificationVat);
 
         service = new NotificationProcessCostServiceImpl(pnExternalRegistriesClientReactive, cfg, pnDeliveryPushClientReactive);
     }

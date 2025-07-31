@@ -35,12 +35,4 @@ public class NotificationServiceImpl implements NotificationService {
             throw new PnInternalException("Get notification is not valid for - iun " + iun, ERROR_CODE_DELIVERYPUSH_NOTIFICATIONFAILED);
         }        
     }
-
-
-    @Override
-    public Map<String, String> getRecipientsQuickAccessLinkToken(String iun) {
-       Map<String, String> resp = pnDeliveryClient.getQuickAccessLinkTokensPrivate(iun);
-       log.debug("Get QuickAccessLinkToken OK for - iun {}", iun);
-       return resp;         
-    }
 }

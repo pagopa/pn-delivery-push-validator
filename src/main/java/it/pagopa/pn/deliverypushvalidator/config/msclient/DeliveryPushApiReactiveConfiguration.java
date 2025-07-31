@@ -1,23 +1,18 @@
 package it.pagopa.pn.deliverypushvalidator.config.msclient;
 
+import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.deliverypush.api.NotificationProcessCostApi;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.deliverypush.ApiClient;
-import org.springframework.beans.factory.annotation.Qualifier;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.deliverypush.api.NotificationProcessCostApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class DeliveryPushApiReactiveConfiguration {
+public class DeliveryPushApiReactiveConfiguration extends CommonBaseClient {
 
     @Bean
-    @Primary
-    public NotificationProcessCostApi deliveryPushPrivateApiConfig(WebClient webClient,
-                                                                   PnDeliveryPushValidatorConfigs cfg) {
-        ApiClient apiClient = new ApiClient(webClient);
+    public NotificationProcessCostApi deliveryPushPrivateApiConfig(PnDeliveryPushValidatorConfigs cfg) {
+        ApiClient apiClient = new ApiClient(initWebClient(ApiClient.buildWebClientBuilder()));
         apiClient.setBasePath(cfg.getDeliveryPushBaseUrl());
         return new NotificationProcessCostApi(apiClient);
     }

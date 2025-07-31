@@ -28,7 +28,7 @@ import static org.mockserver.model.HttpResponse.response;
 class PnSafeStorageClientImplTestRestTemplateIT {
 
     private static ClientAndServer mockServer;
-//
+
     @BeforeAll
     public static void startMockServer() {
         mockServer = startClientAndServer(9998);

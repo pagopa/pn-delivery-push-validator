@@ -60,7 +60,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
 
         fileKey = fileKey.replace(SAFE_STORAGE_URL_PREFIX, "");
         String finalFileKey = fileKey;
-        return fileDownloadApi.getFile( fileKey, this.cfg.getSafeStorageCxId(), metadataOnly )
+        return fileDownloadApi.getFile( fileKey, this.cfg.getSafeStorageCxId(), metadataOnly, false )
                 .doOnSuccess( res -> log.debug("Received sync response from {} for {}", CLIENT_NAME, GET_FILE))
                 .onErrorResume( WebClientResponseException.class, error ->{
                     log.error("Exception in call getFile fileKey={} error={}", finalFileKey, error);
@@ -97,10 +97,9 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
         fileCreationRequest.setContentType(fileCreationRequestWithContent.getContentType());
         fileCreationRequest.setDocumentType(fileCreationRequestWithContent.getDocumentType());
         fileCreationRequest.setStatus(fileCreationRequestWithContent.getStatus());
-        fileCreationRequest.setChecksumValue(sha256);
 
-        return fileUploadApi.createFile( this.cfg.getSafeStorageCxId(), fileCreationRequest)
-                .doOnError( res -> log.error("File creation error - documentType={} filesize={} sha256={}", fileCreationRequest.getDocumentType(), fileCreationRequestWithContent.getContent().length, fileCreationRequestWithContent.getChecksumValue()));
+        return fileUploadApi.createFile( this.cfg.getSafeStorageCxId(), sha256, "SHA-256", fileCreationRequest)
+                .doOnError( res -> log.error("File creation error - documentType={} filesize={} sha256={}", fileCreationRequest.getDocumentType(), fileCreationRequestWithContent.getContent().length, sha256));
     }
 
     @Override

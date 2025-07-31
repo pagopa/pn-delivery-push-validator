@@ -175,7 +175,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.when(documentComposition.getNumberOfPageFromPdfBytes(Mockito.any())).thenReturn(5);
 
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.any(), Mockito.any())).thenReturn(pnAuditLogEventWarn);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
         handler.validateNotification(notification.getIun(), details);
 
@@ -285,7 +285,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.when(auditLogEvent.generateSuccess()).thenReturn(auditLogEvent);
 
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.any(), Mockito.any())).thenReturn(pnAuditLogEventWarn);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
         handler.validateNotification(notification.getIun(), details);
 
@@ -325,7 +325,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.when(auditLogEvent.generateSuccess()).thenReturn(auditLogEvent);
 
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.any(), Mockito.any())).thenReturn(pnAuditLogEventWarn);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
         handler.validateNotification(notification.getIun(), details);
 
@@ -412,14 +412,14 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
 
         //THEN
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, details.getStartWorkflowTime());
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
     }
 
@@ -479,7 +479,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
@@ -488,7 +488,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
                 Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
 
@@ -511,7 +511,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
@@ -520,7 +520,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
                 Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
 
@@ -632,7 +632,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
@@ -640,7 +640,7 @@ class NotificationValidationActionHandlerTest {
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(),ex, details.getStartWorkflowTime());
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
     }
 
     @ExtendWith(SpringExtension.class)
@@ -709,7 +709,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         PnF24MetadataValidationIssue validationIssue = PnF24MetadataValidationIssue.builder()
                 .detail("error detail")
@@ -748,7 +748,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
@@ -756,7 +756,7 @@ class NotificationValidationActionHandlerTest {
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(),ex, details.getStartWorkflowTime());
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
     }
 
     @ExtendWith(SpringExtension.class)
@@ -779,7 +779,7 @@ class NotificationValidationActionHandlerTest {
         PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogService.buildAuditLogEvent(Mockito.eq(notification.getIun()), Mockito.eq(PnAuditLogEventType.AUD_NT_VALID), Mockito.anyString(), any()))
                 .thenReturn(auditLogEvent);
-        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
         handler.validateNotification(notification.getIun(), details);
@@ -788,7 +788,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
                 Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
-        Mockito.verify(auditLogEvent).generateWarning(any(), any());
+        Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
 

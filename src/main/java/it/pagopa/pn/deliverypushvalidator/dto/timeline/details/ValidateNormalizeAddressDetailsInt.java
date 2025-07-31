@@ -3,15 +3,16 @@ package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 
 import it.pagopa.pn.deliverypushvalidator.utils.AuditLogUtils;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class ValidateNormalizeAddressDetailsInt implements TimelineElementDetailsInt{
+public class ValidateNormalizeAddressDetailsInt extends CategoryTypeTimelineElementDetailsInt implements TimelineElementDetailsInt{
     
     public String toLog() {
         return AuditLogUtils.EMPTY;

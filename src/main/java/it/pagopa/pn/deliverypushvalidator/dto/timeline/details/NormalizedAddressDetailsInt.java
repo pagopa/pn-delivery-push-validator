@@ -4,15 +4,16 @@ package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.utils.AuditLogUtils;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class NormalizedAddressDetailsInt implements RecipientRelatedTimelineElementDetails, NewAddressRelatedTimelineElement, PhysicalAddressRelatedTimelineElement{
+public class NormalizedAddressDetailsInt extends CategoryTypeTimelineElementDetailsInt implements RecipientRelatedTimelineElementDetails, NewAddressRelatedTimelineElement, PhysicalAddressRelatedTimelineElement{
     private int recIndex;
     private PhysicalAddressInt oldAddress;
     private PhysicalAddressInt normalizedAddress;

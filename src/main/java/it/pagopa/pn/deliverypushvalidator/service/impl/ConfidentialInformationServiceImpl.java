@@ -1,12 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.BaseRecipientDtoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.ConfidentialTimelineElementDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.*;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.NotificationRecipientAddressesDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;

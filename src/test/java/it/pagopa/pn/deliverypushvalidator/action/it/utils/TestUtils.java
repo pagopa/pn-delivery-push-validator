@@ -1,15 +1,12 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.utils;
 
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
-import it.pagopa.pn.deliverypushvalidator.action.utils.EndWorkflowStatus;
-import it.pagopa.pn.deliverypushvalidator.dto.address.DigitalAddressSourceInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileCreationWithContentRequest;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
-import it.pagopa.pn.deliverypushvalidator.dto.mandate.DelegateInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
@@ -35,14 +32,6 @@ public class TestUtils {
     public static final String TOO_BIG = "TOO_BIG";
     public static final String NOT_A_PDF = "NOT_A_PDF";
 
-
-
-    private static boolean isPossibileCaseToRepeat(DigitalAddressSourceInt digitalAddressSource, int sentAttemptMade) {
-        return (DigitalAddressSourceInt.PLATFORM.equals(digitalAddressSource) ||
-                DigitalAddressSourceInt.GENERAL.equals(digitalAddressSource))
-                &&
-                sentAttemptMade == 1;
-    }
 
     public static boolean checkIsPresentNationalRegistryValidationCall(String iun, TimelineService timelineService) {
         Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
@@ -244,14 +233,8 @@ public class TestUtils {
     }
 
     public static void checkGeneratedLegalFacts(NotificationInt notification,
-                                                NotificationRecipientInt recipient,
-                                                Integer recIndex,
-                                                int sentPecAttemptNumber,
                                                 GeneratedLegalFactsInfo generatedLegalFactsInfo,
-                                                EndWorkflowStatus endWorkflowStatus,
-                                                LegalFactGenerator legalFactGenerator,
-                                                TimelineService timelineService,
-                                                DelegateInfoInt delegateInfo
+                                                LegalFactGenerator legalFactGenerator
     ) {
         TestUtils.checkNotificationReceivedLegalFactGeneration(
                 notification,

@@ -21,8 +21,6 @@ import java.util.List;
 @CustomLog
 public class NationalRegistriesClientImpl extends CommonBaseClient implements NationalRegistriesClient {
 
-    public static final String PN_NATIONAL_REGISTRIES_CX_ID_VALUE = "pn-delivery-push";
-    
     private final AddressApi addressApi;
     private final AgenziaEntrateApi agenziaEntrateApi;
 

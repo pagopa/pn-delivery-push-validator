@@ -2,14 +2,15 @@ package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 
 import it.pagopa.pn.deliverypushvalidator.utils.AuditLogUtils;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class GenerateF24Int implements TimelineElementDetailsInt{
+public class GenerateF24Int extends CategoryTypeTimelineElementDetailsInt implements TimelineElementDetailsInt{
 
     public String toLog() {
         return AuditLogUtils.EMPTY;

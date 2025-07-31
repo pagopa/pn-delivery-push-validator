@@ -1,15 +1,16 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class SenderAckCreationRequestDetailsInt implements TimelineElementDetailsInt{
+public class SenderAckCreationRequestDetailsInt extends CategoryTypeTimelineElementDetailsInt implements TimelineElementDetailsInt{
     private String legalFactId;
 
     @Override

@@ -82,13 +82,4 @@ public class PnDeliveryClientMock implements PnDeliveryClient {
         }
         throw new RuntimeException("Test error, iun is not presente in getSentNotification IUN:" + iun);
     }
-
-    @Override
-    public Map<String, String> getQuickAccessLinkTokensPrivate(String iun) {
-        return this.notifications.stream()
-        .filter(n->n.getIun().equals(iun))
-        .map(SentNotificationV25::getRecipients)
-        .flatMap(List::stream)
-        .collect(Collectors.toMap(NotificationRecipientV24::getInternalId, (n) -> "test"));
-    }
 }

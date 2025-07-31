@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service;
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.cost.NotificationProcessCost;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateCostPhaseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResponseInt;

@@ -30,8 +30,6 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class NationalRegistriesClientImplTestIT extends MockAWSObjectsTest {
 
-    private static final String PN_NATIONAL_REGISTRIES_CX_ID = "pn-national-registries-cx-id";
-
     private static ClientAndServer mockServer;
 
     @Autowired

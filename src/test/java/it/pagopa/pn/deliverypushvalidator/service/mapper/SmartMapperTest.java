@@ -1,56 +1,71 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.NormalizedAddressDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.NotificationRequestAcceptedDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.RequestRefusedDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NotificationRequestAcceptedDetails;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
 class SmartMapperTest {
+    private SmartMapper smartMapper;
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        smartMapper = new SmartMapper(objectMapper);
+    }
 
     @Test
-    @Disabled("In questo dominio non ci sono elementi ti timeline con date di business da rimappare al posto del timestamp")
-    void testTimelineElementInternalMappingTransformer(){
-        Instant elementTimestamp = Instant.EPOCH.plusMillis(100);
-
-        Instant eventTimestamp = Instant.EPOCH.plusMillis(10);
-
-        TimelineElementInternal source = TimelineElementInternal.builder()
-                .elementId("elementid")
-                .iun("iun")
-                .timestamp(elementTimestamp)
-                .details(NormalizedAddressDetailsInt.builder()
-                        .recIndex(0)
-                        .build())
+    void fromInternalToExternalNormalizedAddressRequestDetails() {
+        NotificationRequestAcceptedDetailsInt notificationRequestAcceptedDetailsInt = NotificationRequestAcceptedDetailsInt.builder()
+                .notificationRequestId("notificationRequestId")
+                .idempotenceToken("idempotenceToken")
+                .paProtocolNumber("paProtocolNumber")
+                .categoryType("REQUEST_ACCEPTED")
                 .build();
+
+        var details = smartMapper.mapToClassWithObjectMapper(notificationRequestAcceptedDetailsInt, TimelineElementDetails.class);
+        var notificationRequestAcceptedDetailsIntExt = (NotificationRequestAcceptedDetails) details;
+        Assertions.assertEquals(((NotificationRequestAcceptedDetails) details).getIdempotenceToken(),  notificationRequestAcceptedDetailsIntExt.getIdempotenceToken());
+        Assertions.assertEquals(((NotificationRequestAcceptedDetails) details).getNotificationRequestId(), notificationRequestAcceptedDetailsIntExt.getNotificationRequestId());
+    }
+
+    @Test
+    void fromExternalToInternalNormalizedAddressRequestDetails() {
+        var timelineElementDetails = new NotificationRequestAcceptedDetails()
+                .paProtocolNumber("paProtocolNumber")
+                .idempotenceToken("idempotenceToken")
+                .notificationRequestId("notificationRequestId");
+
+        NotificationRequestAcceptedDetailsInt details = SmartMapper.mapToClass(timelineElementDetails, NotificationRequestAcceptedDetailsInt.class);
+
+        Assertions.assertEquals(timelineElementDetails.getIdempotenceToken(), details.getIdempotenceToken());
+        Assertions.assertEquals(timelineElementDetails.getNotificationRequestId(), details.getNotificationRequestId());
+        Assertions.assertEquals(timelineElementDetails.getPaProtocolNumber(), details.getPaProtocolNumber());
+    }
+
+    @Test
+    void mapToClassWithNullSource() {
+        TimelineElementInternal source = null;
 
         TimelineElementInternal ret = SmartMapper.mapToClass(source, TimelineElementInternal.class);
 
-        Assertions.assertNotSame(ret, source);
-        Assertions.assertEquals(eventTimestamp, ret.getTimestamp());
+        Assertions.assertNull(ret);
     }
-
 
     @Test
-    void testTimelineElementInternalMappingTransformerNo1(){
-        Instant elementTimestamp = Instant.EPOCH.plusMillis(100);
+    void mapToClassWithObjectMappperWithNullSource() {
+        TimelineElementInternal source = null;
 
-        TimelineElementInternal source = TimelineElementInternal.builder()
-                .elementId("elementid")
-                .iun("iun")
-                .timestamp(elementTimestamp)
-                .details(RequestRefusedDetailsInt.builder()
-                        .numberOfRecipients(2)
-                        .build())
-                .build();
+        TimelineElementDetails ret = smartMapper.mapToClassWithObjectMapper(source, TimelineElementDetails.class);
 
-        TimelineElementInternal ret = SmartMapper.mapToClass(source, TimelineElementInternal.class);
-
-
-        Assertions.assertEquals(elementTimestamp, ret.getTimestamp());
+        Assertions.assertNull(ret);
     }
-
 }

@@ -1,15 +1,16 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline.details;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
 @ToString
-public class ValidatedF24DetailInt implements TimelineElementDetailsInt{
+public class ValidatedF24DetailInt extends CategoryTypeTimelineElementDetailsInt implements TimelineElementDetailsInt{
     private String status;
 
     public String toLog() {
