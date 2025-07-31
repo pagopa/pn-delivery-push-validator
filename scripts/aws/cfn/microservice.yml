@@ -108,7 +108,7 @@ Parameters:
   AutoscalingThresholdValidator:
     Default: 70
     Type: String
-  
+
   # Logging parameters
   WireTapLogActivation:
     Type: String
@@ -117,17 +117,17 @@ Parameters:
     AllowedValues:
       - true
       - false
-  
+
   PnCronAnalyzer:
     Type: String
     Default: '-'
     Description: Cron for which you send the metric to CloudWatch
-  
+
   # EFS parameters
   FargateEFSFileSystemID:
     Type: String
     Description: "EFS Filesystem"
-  
+
   MountEfs:
     Type: String
     Default: "false"
@@ -170,7 +170,7 @@ Parameters:
   DocumentCreationRequestTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
-  
+
   DocumentCreationRequestTableArn:
     Type: String
     Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
@@ -188,7 +188,6 @@ Parameters:
   AlbSecurityGroup:
     Type: String
     Description: 'Application load balancer security group'
-
 
   ScheduledValidationActionsQueueName:
     Type: String
