@@ -43,6 +43,7 @@ public class PnDeliveryPushValidatorConfigs {
     private String templatesEngineBaseUrl;
     private String deliveryBaseUrl;
     private String safeStorageBaseUrl;
+    private String deliveryPushBaseUrl;
     private boolean checkCfEnabled;
     private DataSize checkPdfSize;
     private boolean checkPdfValidEnabled;

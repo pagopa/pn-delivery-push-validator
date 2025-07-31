@@ -13,12 +13,7 @@ public enum TimelineElementCategoryInt {
     REQUEST_ACCEPTED(NotificationRequestAcceptedDetailsInt.class, TimelineElementCategoryInt.VERSION_10),
     GENERATE_F24_REQUEST(ValidateF24Int.class, TimelineElementCategoryInt.VERSION_23),
     GENERATED_F24(GeneratedF24DetailsInt.class,  TimelineElementCategoryInt.VERSION_23),
-    REFINEMENT(RefinementDetailsInt.class, TimelineElementCategoryInt.VERSION_10),
-    SCHEDULE_REFINEMENT(ScheduleRefinementDetailsInt.class,TimelineElementCategoryInt.PRIORITY_SCHEDULE_REFINEMENT, TimelineElementCategoryInt.VERSION_10),
-    SEND_SIMPLE_REGISTERED_LETTER(SimpleRegisteredLetterDetailsInt.class, TimelineElementCategoryInt.VERSION_10),
-    NOTIFICATION_VIEWED_CREATION_REQUEST(NotificationViewedCreationRequestDetailsInt.class, TimelineElementCategoryInt.VERSION_10),
     REQUEST_REFUSED(RequestRefusedDetailsInt.class,  TimelineElementCategoryInt.VERSION_10),
-    SEND_ANALOG_DOMICILE(SendAnalogDetailsInt.class, TimelineElementCategoryInt.VERSION_10),
     NOTIFICATION_CANCELLATION_REQUEST(NotificationCancellationRequestDetailsInt.class, TimelineElementCategoryInt.VERSION_20),
     PUBLIC_REGISTRY_VALIDATION_CALL(PublicRegistryValidationCallDetailsInt.class, TimelineElementCategoryInt.VERSION_27),
     PUBLIC_REGISTRY_VALIDATION_RESPONSE(PublicRegistryValidationResponseDetailsInt.class, TimelineElementCategoryInt.VERSION_27);
@@ -27,7 +22,6 @@ public enum TimelineElementCategoryInt {
     private final Class<? extends TimelineElementDetailsInt> detailsJavaClass;
     private final int priority;
     private final int version;
-    public static final int PRIORITY_SCHEDULE_REFINEMENT = 70;
 
     public static final int PRIORITY_BEFORE = 10;
 
