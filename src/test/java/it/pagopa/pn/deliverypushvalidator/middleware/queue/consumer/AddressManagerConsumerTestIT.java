@@ -1,50 +1,51 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
-import it.pagopa.pn.deliverypushvalidator.LocalStackTestConfig;
-import it.pagopa.pn.deliverypushvalidator.MockActionPoolTest;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.AnalogAddress;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeItemsResult;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeResult;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.AddressManagerResponseHandler;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.function.context.FunctionCatalog;
-import org.springframework.cloud.function.context.test.FunctionalSpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.function.Consumer;
+@ExtendWith(SpringExtension.class)
+class AddressManagerConsumerTestIT {
 
-@FunctionalSpringBootTest
-@Import(LocalStackTestConfig.class)
-class AddressManagerConsumerTestIT extends MockActionPoolTest {
-
-    @Autowired
-    private FunctionCatalog functionCatalog;
-
-    @MockitoBean
+    @Mock
     private AddressManagerResponseHandler handler;
+
+    @InjectMocks
+    private AddressManagerConsumer consumer;
 
     @Test
     void consumeMessageOK() {
-        Message<NormalizeItemsResult> pnNationalRegistriesEventInboundConsumer = functionCatalog.lookup(Consumer.class, "pnAddressManagerEventInboundConsumer");
-        NormalizeItemsResult normalizeItemsResult = new NormalizeItemsResult()
-                .correlationId("VALIDATE_NORMALIZE_ADDRESSES_REQUEST.IUN_KWKU-JHXN-HJXM-202304-U-1")
-                .addResultItemsItem(new NormalizeResult().normalizedAddress(
-                        new AnalogAddress()
-                                .addressRow("Info1")
-                                .addressRow2("Info2")
-                                .cap("80078")
-                                .pr("NA")
-                                .city("Lago")
-                                .city2("Nuovo")
-                                .country("IT")
-                ));
-        
-        MessageBuilder.withPayload(normalizeItemsResult).build();
-        Mockito.verify(handler).handleResponseReceived(Mockito.any());
+        NormalizeItemsResult result = new NormalizeItemsResult();
+
+        Message<NormalizeItemsResult> message = MessageBuilder.withPayload(result)
+                .setHeader("test", "headerValue")
+                .build();
+
+        consumer.pnAddressManagerEventInboundConsumer(message);
+
+        Mockito.verify(handler, Mockito.times(1)).handleResponseReceived(result);
+    }
+
+    @Test
+    void consumeMessageKO() {
+        NormalizeItemsResult result = new NormalizeItemsResult();
+
+        Message<NormalizeItemsResult> message = MessageBuilder.withPayload(result)
+                .setHeader("test", "headerValue")
+                .build();
+
+        Mockito.doThrow(new RuntimeException("Test Exception")).when(handler).handleResponseReceived(Mockito.any());
+
+        Assertions.assertThrows(RuntimeException.class, () -> consumer.pnAddressManagerEventInboundConsumer(message));
+
+        Mockito.verify(handler, Mockito.times(1)).handleResponseReceived(result);
     }
 }
