@@ -7,10 +7,6 @@
     "MaxTasksNumberValidator": "1",
     "AutoscalingThresholdValidator": "650",
     "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
-    "DocumentCreationRequestTableArn": "arn:aws:dynamodb:eu-south-1:830192246553:table/pn-DocumentCreationRequestTable"
-    "WireTapLogActivation": "false",
-    "PnCronAnalyzer": "-",
-    "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
     "DocumentCreationRequestTableArn": "arn:aws:dynamodb:eu-south-1:830192246553:table/pn-DocumentCreationRequestTable",
     "PaperNotificationFailedDynamoTableName": "pn-PaperNotificationFailed",
     "ScheduledValidationActionsQueueName": "pn-delivery_push_validation_actions",
@@ -34,7 +30,6 @@
     "F24ToDeliveryPushQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-DLQ-HasMessage",
     "F24ToDeliveryPushQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-HasOldMessage",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
-    "EcsValidatorLogGroup": "/aws/ecs/pn-delivery-push-validator",
     "PnCronAnalyzer": "* */1 * * * *",
     "WireTapLogActivation": "false",
     "MountEfs": "false"

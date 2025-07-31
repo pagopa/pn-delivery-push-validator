@@ -11,14 +11,6 @@ Parameters:
     Type: String
     Description: ARN of alarm topic
 
-  WebApiDnsName:
-    Type: String
-    Description: 'The DNS name used for WEB rest API.'
-  
-  CorsAllowedDomains:
-    Type: String
-    Description: 'Comma separated list of domains allowed to make cross origin request'
-
   ContainerImageUri:
     Type: String
     Description: 'Exact container image URI with full repository and image digest'
@@ -36,7 +28,7 @@ Parameters:
     Description: 'The name of the ECS cluster where the microservice is going to be deployed'
 
   SubnetsIds:
-    Type: String
+    Type: CommaDelimitedList
     Description: 'subnets ids comma separated list. Where to deploy the microservice'
 
   VpcId:
@@ -345,7 +337,6 @@ Resources:
         ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry6: !Sub 'PN_DELIVERYPUSH_MANDATEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry8: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
         ContainerEnvEntry9: !Sub 'PN_DELIVERYPUSH_FAILEDNOTIFICATIONDAO_TABLENAME=${PaperNotificationFailedDynamoTableName}'
         ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
         ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
@@ -369,6 +360,7 @@ Resources:
         ContainerSecret1: !Sub 'PN_DELIVERYPUSH_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
+        ParentMicroserviceName: !Sub '${ProjectName}-delivery-push-validator'
         JavaToolOptions: '-Dreactor.netty.ioWorkerCount=50'
         MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
@@ -376,7 +368,7 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
-        LoadBalancerRulePriority: !Ref MicroserviceNumber
+        LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref DeliveryPushValidatorMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
