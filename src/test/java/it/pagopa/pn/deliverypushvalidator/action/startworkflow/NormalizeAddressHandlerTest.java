@@ -12,7 +12,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationpaid.NotificationPaidInt;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;

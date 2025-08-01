@@ -2,12 +2,12 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvali
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.PnValidationException;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationpaid.NotificationPaidInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.UpdateFileMetadataResponseInt;
@@ -15,10 +15,6 @@ import it.pagopa.pn.deliverypushvalidator.exception.PnFileGoneException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileGoneException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotMatchingShaException;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.SafeStorageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +27,6 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.List;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTFOUND;
 import static org.junit.jupiter.api.Assertions.assertThrows;
