@@ -25,7 +25,7 @@ class DocumentCreationRequestServiceImplTest {
     void addDocumentCreationRequestTest() {
         String fileKey = "fileKey";
         String iun = "iun";
-        String timelineId = "timelineId";
+        String timelineId = "timelineID";
         DocumentCreationTypeInt documentType = DocumentCreationTypeInt.DIGITAL_DELIVERY;
 
         documentCreationRequestService.addDocumentCreationRequest(fileKey, iun, documentType, timelineId);
