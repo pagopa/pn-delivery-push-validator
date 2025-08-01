@@ -1,10 +1,9 @@
-package it.pagopa.pn.deliverypushvalidator.action;
+package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationRequest;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.pnsafestorage.model.FileDownloadResponse;
-import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.service.DocumentCreationRequestService;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import org.junit.jupiter.api.BeforeEach;
