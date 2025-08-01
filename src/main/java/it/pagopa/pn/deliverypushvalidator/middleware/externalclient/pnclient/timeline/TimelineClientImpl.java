@@ -6,13 +6,16 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.api.TimelineControllerApi;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.*;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NewTimelineElement;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineCategory;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElement;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.TimelineServiceMapper;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import java.time.Instant;
+
 import java.util.List;
 
 @CustomLog
@@ -60,6 +63,9 @@ public class TimelineClientImpl implements TimelineClient {
         log.logInvokingExternalService(CLIENT_NAME, GET_TIMELINE_ELEMENT_DETAILS);
 
         TimelineElementDetails timelineElementDetails = timelineControllerApi.getTimelineElementDetails(iun, timelineId);
+        if(timelineElementDetails == null) {
+            return null;
+        }
         return timelineServiceMapper.toTimelineElementDetailsInt(timelineElementDetails, TimelineElementCategoryInt.valueOf(timelineElementDetails.getCategoryType()));
     }
 
