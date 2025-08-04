@@ -11,14 +11,6 @@ Parameters:
     Type: String
     Description: ARN of alarm topic
 
-  WebApiDnsName:
-    Type: String
-    Description: 'The DNS name used for WEB rest API.'
-  
-  CorsAllowedDomains:
-    Type: String
-    Description: 'Comma separated list of domains allowed to make cross origin request'
-
   ContainerImageUri:
     Type: String
     Description: 'Exact container image URI with full repository and image digest'
@@ -36,7 +28,7 @@ Parameters:
     Description: 'The name of the ECS cluster where the microservice is going to be deployed'
 
   SubnetsIds:
-    Type: String
+    Type: CommaDelimitedList
     Description: 'subnets ids comma separated list. Where to deploy the microservice'
 
   VpcId:
@@ -113,10 +105,10 @@ Parameters:
     Type: Number
     Default: 2
 
-  AutoscalingThresholdWorkflow:
+  AutoscalingThresholdValidator:
     Default: 70
     Type: String
-  
+
   # Logging parameters
   WireTapLogActivation:
     Type: String
@@ -125,17 +117,17 @@ Parameters:
     AllowedValues:
       - true
       - false
-  
+
   PnCronAnalyzer:
     Type: String
     Default: '-'
     Description: Cron for which you send the metric to CloudWatch
-  
+
   # EFS parameters
   FargateEFSFileSystemID:
     Type: String
     Description: "EFS Filesystem"
-  
+
   MountEfs:
     Type: String
     Default: "false"
@@ -173,12 +165,12 @@ Parameters:
     Type: String
     Default: ''
     Description: 'Applicative environment variable file checksum'
-  
+
   # --- Dynamo Table ---
   DocumentCreationRequestTableName:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
-  
+
   DocumentCreationRequestTableArn:
     Type: String
     Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
@@ -196,14 +188,6 @@ Parameters:
   AlbSecurityGroup:
     Type: String
     Description: 'Application load balancer security group'
-  
-  
-  
-  
-  
-  PaperNotificationFailedDynamoTableName:
-    Type: String
-    Description: 'Name of dynamodb table containing unreacheble notifications recipients'
 
   ScheduledValidationActionsQueueName:
     Type: String
@@ -289,28 +273,9 @@ Parameters:
     Type: String
     Description: 'Safe storage base url'
 
-  ExternalChannelBaseUrl:
-    Type: String
-    Description: 'External channel base url'
-
   F24DeliveryPushUser:
     Type: String
     Description: 'pn-delivery-push clientId for communication with pn-f24'
-
-  PnCronAnalyzer:
-    Type: String
-    Default: '-'
-    Description: Cron for which you send the metric to CloudWatch
-
-  PagoPaNotificationFee:
-    Type: String
-    Description: 'PagoPa notification fee per le notifiche create PRIMA della v2.1. Per le successive, il default viene impostato da pn-delivery e arriva nella notifica.'
-    Default: '100'
-
-  PagoPaNotificationVat:
-    Type: String
-    Description: 'PagoPa notification vat per le notifiche create PRIMA della v2.1. Per le successive, il default viene impostato da pn-delivery e arriva nella notifica.'
-    Default: '22'
 
   # Log group parameters
   EcsValidatorLogGroup:
@@ -337,45 +302,40 @@ Resources:
         HealthyThresholdCount: !Ref HealthyThresholdCount
         UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
         AutoscalingStrategy: CUSTOM
-        AutoscalingThreshold: !Ref AutoscalingThresholdWorkflow
+        AutoscalingThreshold: !Ref AutoscalingThresholdValidator
         AutoscalingCheckPeriod: !Ref AutoscalingCheckPeriod
         MinTasksNumber: !Ref MinTasksNumberValidator
         MaxTasksNumber: !Ref MaxTasksNumberValidator
         AutoscalingDataPointN: !Ref AutoscalingDataPointValidatorN
         AutoscalingDataPointM: !Ref AutoscalingDataPointValidatorM
         AlarmSNSTopicArn: !Ref AlarmSNSTopicArn
+        EfsFilesystem: !Ref FargateEFSFileSystemID
+        MountEfs: !Ref MountEfs
+        WireTapLogActivation: !Ref WireTapLogActivation
         ContainerImageURI: !Sub '${ContainerImageUri}'
         ContainerEnvEntry1: !Sub 'AWS_REGIONCODE=${AWS::Region}'
-        ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_PAPERCHANNELBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry3: !Sub 'PN_DELIVERYPUSH_USERATTRIBUTESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry4: !Sub 'PN_DELIVERYPUSH_SAFESTORAGEBASEURL=${SandboxSafeStorageBaseUrl}'
-        ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry6: !Sub 'PN_DELIVERYPUSH_MANDATEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry8: !Sub 'CORS_ALLOWED_DOMAINS=${CorsAllowedDomains}'
-        ContainerEnvEntry9: !Sub 'PN_DELIVERYPUSH_FAILEDNOTIFICATIONDAO_TABLENAME=${PaperNotificationFailedDynamoTableName}'
-        ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
-        ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
-        ContainerEnvEntry12: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry13: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
-        ContainerEnvEntry14: 'PN_DELIVERYPUSH_WEBAPP_FAQSENDHASH=send-cosa-e'
-        ContainerEnvEntry15: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
-        ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
-        ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry18: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
-        ContainerEnvEntry19: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
-        ContainerEnvEntry20: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
-        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONFEE=${PagoPaNotificationFee}'
-        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSH_PAGOPANOTIFICATIONVAT=${PagoPaNotificationVat}'
-        ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
-        ContainerEnvEntry24: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry25: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry26: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry28: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
-        ContainerEnvEntry29: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry2: !Sub 'PN_DELIVERYPUSH_TOPICS_VALIDATIONACTIONS=${ScheduledValidationActionsQueueName}'
+        ContainerEnvEntry3: !Sub 'PN_DELIVERYPUSH_TOPICS_SAFESTORAGEEVENTS=${SafeStorageToDeliveryPushQueueName}'
+        ContainerEnvEntry4: !Sub 'PN_DELIVERYPUSH_TOPICS_ADDRESSMANAGEREVENTS=${AddressManagerToDeliveryPushQueueName}'
+        ContainerEnvEntry5: !Sub 'PN_DELIVERYPUSH_TOPICS_F24EVENTS=${F24ToDeliveryPushQueueName}'
+        ContainerEnvEntry6: !Sub 'PN_DELIVERYPUSH_TOPICS_DELIVERYVALIDATIONEVENTS=${DeliveryPushValidationInputsQueueName}'
+        ContainerEnvEntry7: !Sub 'PN_DELIVERYPUSH_DOCUMENTCREATIONREQUESTDAO_TABLENAME=${DocumentCreationRequestTableName}'
+        ContainerEnvEntry8: !Sub 'PN_DELIVERYPUSH_F24CXID=${F24DeliveryPushUser}'
+        ContainerEnvEntry9: !Sub 'PN_DELIVERYPUSH_F24BASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry10: !Sub 'PN_DELIVERYPUSH_SAFESTORAGEBASEURL=${SandboxSafeStorageBaseUrl}'
+        ContainerEnvEntry11: !Sub 'PN_DELIVERYPUSH_DELIVERYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry12: !Sub 'PN_DELIVERYPUSH_EXTERNALREGISTRYBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry13: !Sub 'PN_DELIVERYPUSH_NATIONALREGISTRIESBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry14: !Sub 'PN_DELIVERYPUSH_TEMPLATESENGINEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry15: !Sub 'PN_DELIVERYPUSH_TIMELINECLIENTBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry16: !Sub 'PN_DELIVERYPUSH_ACTIONMANAGERBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSH_DELIVERYPUSHBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry18: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
+        ContainerEnvEntry19: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSH_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
+        ParentMicroserviceName: !Sub '${ProjectName}-delivery-push-validator'
         JavaToolOptions: '-Dreactor.netty.ioWorkerCount=50'
         MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
@@ -383,10 +343,10 @@ Resources:
         VpcId: !Ref VpcId
         EcsDefaultSecurityGroup: !Ref EcsDefaultSecurityGroup
         LoadBalancerListenerArn: !Ref ApplicationLoadBalancerListenerArn
+        LoadbalancerRulePriority: !Ref MicroserviceNumber
         TaskRoleManagedPolicyArn: !Ref DeliveryPushValidatorMicroserviceTaskManagedPolicy
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
-        LoadBalancerRulePriority: !Ref MicroserviceNumber
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
 
   ## Dashboard
@@ -547,9 +507,6 @@ Resources:
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
-              - 'dynamodb:Query'
               - 'dynamodb:PutItem'
-              - 'dynamodb:DeleteItem'
-              - 'dynamodb:UpdateItem'
             Resource:
               - !Sub "${DocumentCreationRequestTableArn}"

@@ -23,6 +23,10 @@ Parameters:
   LogRetention:
     Type: Number
     Default: 14
+  
+  LogsKinesisSourceStreamArn:
+    Type: String
+    Description: 'Where to send Logs'
 
   AlarmSNSTopicArn:
     Type: String
@@ -32,10 +36,20 @@ Parameters:
     Description: 'keep track of used projects commitIds'
 
 Resources:
-    NullResource:
-        Type: AWS::CloudFormation::WaitConditionHandle
+  
+  PnDeliveryPushValidatorLogGroup:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/log-group.yaml"
+      Parameters:
+        LogGroupName: !Sub '${ProjectName}-delivery-push-validator'
+        LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
+        LogGroupRetention: !Ref LogRetention
 
 Outputs:
-    SampleOutput:
-      Description: A Sample Output
-      Value: 'na'
+  # Log groups
+  EcsValidatorLogGroup:
+    Value: !GetAtt PnDeliveryPushValidatorLogGroup.Outputs.LogGroupName
+    
