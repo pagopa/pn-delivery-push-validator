@@ -14,8 +14,6 @@ for qn in  $( echo $queues | tr " " "\n" ) ; do
         --queue-name $qn
 
 done
-echo "Initialization terminated"
-## Quando viene aggiornato questo file, aggiornare anche il commitId presente nel file initsh-for-testcontainer-sh
 
 echo " - Create pn-delivery-push-validator TABLE"
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
