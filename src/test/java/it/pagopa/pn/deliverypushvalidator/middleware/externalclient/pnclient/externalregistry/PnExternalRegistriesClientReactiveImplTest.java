@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,11 +31,12 @@ import static org.mockserver.model.HttpResponse.response;
 })
 class PnExternalRegistriesClientReactiveImplTest extends MockAWSObjectsTest {
     @Autowired
+    @SuppressWarnings("unused")
     private PnExternalRegistriesClientReactive client;
 
     @BeforeAll
     static void startMockServer() {
-        ClientAndServer mockServer = startClientAndServer(9998);
+        startClientAndServer(9998);
     }
     
     @Test

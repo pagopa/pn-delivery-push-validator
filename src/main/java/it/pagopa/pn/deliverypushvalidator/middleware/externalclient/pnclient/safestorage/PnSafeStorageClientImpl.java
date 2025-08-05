@@ -31,9 +31,6 @@ import reactor.core.publisher.Mono;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.net.URL;
-
-import static org.springframework.util.ResourceUtils.toURL;
 
 @Component
 @CustomLog
@@ -43,6 +40,8 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
     private final FileMetadataUpdateApi fileMetadataUpdateApi;
     private final RestTemplate restTemplate;
     private final PnDeliveryPushValidatorConfigs cfg;
+
+    private static final String errorLog = " error=";
 
     public PnSafeStorageClientImpl(PnDeliveryPushValidatorConfigs cfg,
                                    @Qualifier("withOffsetDateTimeFormatter") RestTemplate restTemplate,
@@ -65,10 +64,10 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
         return fileDownloadApi.getFile( fileKey, this.cfg.getSafeStorageCxId(), metadataOnly, false )
                 .doOnSuccess( res -> log.debug("Received sync response from {} for {}", CLIENT_NAME, GET_FILE))
                 .onErrorResume( WebClientResponseException.class, error ->{
-                    log.error("Exception in call getFile fileKey=" + finalFileKey + " error=" + error);
+                    log.error("Exception in call getFile fileKey=" + finalFileKey + errorLog + error);
 
                     if(error.getStatusCode().equals(HttpStatus.NOT_FOUND)){
-                        log.error("File not found from safeStorage fileKey=" + finalFileKey + " error=" + error);
+                        log.error("File not found from safeStorage fileKey=" + finalFileKey + errorLog + error);
                         String errorDetail = "Allegato non trovato. fileKey=" + finalFileKey;
                         return Mono.error(
                                 new PnFileNotFoundException(
@@ -77,7 +76,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
                                 )
                         );
                     } else if(error.getStatusCode().equals(HttpStatus.GONE)){
-                        log.error("File deleted from safeStorage fileKey=" + finalFileKey + " error=" + error);
+                        log.error("File deleted from safeStorage fileKey=" + finalFileKey + errorLog + error);
                         String errorDetail = "Allegato non disponibile: superati i termini di conservazione. fileKey=" + finalFileKey;
                         return Mono.error(
                             new PnFileGoneException(

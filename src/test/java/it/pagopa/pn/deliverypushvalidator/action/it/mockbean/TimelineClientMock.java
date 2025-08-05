@@ -19,15 +19,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
     final HashMap<String, Long> counter = new HashMap<>();
+    @SuppressWarnings("unused")
     private final NotificationService notificationService;
+    @SuppressWarnings("unused")
     private final NotificationUtils notificationUtils;
 
 
-    public TimelineClientMock(@Lazy NotificationService notificationService,
-                              @Lazy NotificationUtils notificationUtils) {
-        timelineList = new CopyOnWriteArrayList<>();
+    public TimelineClientMock(@Lazy NotificationUtils notificationUtils,
+                              @Lazy NotificationService notificationService) {
         this.notificationService = notificationService;
         this.notificationUtils = notificationUtils;
+        timelineList = new CopyOnWriteArrayList<>();
     }
 
     public void clear() {
