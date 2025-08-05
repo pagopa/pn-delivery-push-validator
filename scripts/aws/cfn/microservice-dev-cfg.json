@@ -1,6 +1,5 @@
 {
   "Parameters": {
-    "AutoscalingThreshold": "650",
     "CpuValueValidator": "2048",
     "MemoryAmountValidator": "4GB",
     "MinTasksNumberValidator": "1",
@@ -12,24 +11,8 @@
     "ScheduledValidationActionsQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-delivery_push_validation_actions",
     "ScheduledValidationActionsQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_actions-DLQ-HasMessage",
     "ScheduledValidationActionsQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_actions-HasOldMessage",
-    "SafeStorageToDeliveryPushQueueName": "pn-safestore_to_deliverypush",
-    "SafeStorageToDeliveryPushQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-safestore_to_deliverypush",
-    "SafeStorageToDeliveryPushQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-safestore_to_deliverypush-DLQ-HasMessage",
-    "SafeStorageToDeliveryPushQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-safestore_to_deliverypush-HasOldMessage",
-    "AddressManagerToDeliveryPushQueueName": "pn-addressmanager_to_deliverypush",
-    "AddressManagerToDeliveryPushQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-addressmanager_to_deliverypush",
-    "AddressManagerToDeliveryPushQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-addressmanager_to_deliverypush-DLQ-HasMessage",
-    "AddressManagerToDeliveryPushQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-addressmanager_to_deliverypush-HasOldMessage",
-    "DeliveryPushValidationInputsQueueName": "pn-delivery_push_validation_inputs",
-    "DeliveryPushValidationInputsQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-delivery_push_validation_inputs",
-    "DeliveryPushValidationInputsQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_inputs-DLQ-HasMessage",
-    "DeliveryPushValidationInputsQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_inputs-HasOldMessage",
-    "F24ToDeliveryPushQueueName": "pn-f24_to_deliverypush",
-    "F24ToDeliveryPushQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-f24_to_deliverypush",
-    "F24ToDeliveryPushQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-DLQ-HasMessage",
-    "F24ToDeliveryPushQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-f24_to_deliverypush-HasOldMessage",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
-    "PnCronAnalyzer": "* */1 * * * *",
+    "PnCronAnalyzer": "-",
     "WireTapLogActivation": "false",
     "MountEfs": "false"
   }
