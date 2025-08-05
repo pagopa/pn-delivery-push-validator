@@ -11,7 +11,7 @@ class CustomInstantWriterTest {
     private CustomInstantWriter customInstantWriter;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         customInstantWriter = new CustomInstantWriter();
     }
 

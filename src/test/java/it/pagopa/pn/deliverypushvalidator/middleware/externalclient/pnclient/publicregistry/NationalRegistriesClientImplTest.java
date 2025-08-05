@@ -20,8 +20,8 @@ import java.util.List;
 class NationalRegistriesClientImplTest {
 
     private NationalRegistriesClientImpl publicRegistry;
-    private AddressApi addressApi = Mockito.mock(AddressApi.class);
-    private AgenziaEntrateApi agenziaEntrateApi = Mockito.mock(AgenziaEntrateApi.class);
+    private final AddressApi addressApi = Mockito.mock(AddressApi.class);
+    private final AgenziaEntrateApi agenziaEntrateApi = Mockito.mock(AgenziaEntrateApi.class);
 
     @BeforeEach
     void setUp() {
@@ -67,7 +67,7 @@ class NationalRegistriesClientImplTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(2, result.size());
-        Assertions.assertEquals("Test Address", result.get(0).getPhysicalAddress().getAddress());
+        Assertions.assertEquals("Test Address", result.getFirst().getPhysicalAddress().getAddress());
         Mockito.verify(addressApi, Mockito.times(1)).getPhysicalAddresses(Mockito.any(PhysicalAddressesRequestBody.class));
     }
 
@@ -84,7 +84,7 @@ class NationalRegistriesClientImplTest {
         Mockito.verify(addressApi, Mockito.times(1)).getPhysicalAddresses(Mockito.any(PhysicalAddressesRequestBody.class));
     }
 
-    public List<RecipientAddressRequestBody> createRecipientAddressRequestBodyList() {
+    private List<RecipientAddressRequestBody> createRecipientAddressRequestBodyList() {
         List<RecipientAddressRequestBody> addresses = new ArrayList<>();
 
         RecipientAddressRequestBody address1 = new RecipientAddressRequestBody();
@@ -109,12 +109,12 @@ class NationalRegistriesClientImplTest {
         PhysicalAddressResponse address1 = new PhysicalAddressResponse();
         address1.setRegistry("ANPR");
         address1.setRecIndex(0);
-        address1.setPhysicalAddress(setPhysicalAddressForResponse(address1));
+        address1.setPhysicalAddress(setPhysicalAddressForResponse());
 
         PhysicalAddressResponse address2 = new PhysicalAddressResponse();
         address2.setRegistry("REGISTRO_IMPRESE");
         address2.setRecIndex(1);
-        address2.setPhysicalAddress(setPhysicalAddressForResponse(address2));
+        address2.setPhysicalAddress(setPhysicalAddressForResponse());
 
         physicalAddressResponses.add(address1);
         physicalAddressResponses.add(address2);
@@ -122,7 +122,7 @@ class NationalRegistriesClientImplTest {
         return physicalAddressResponses;
     }
 
-    public PhysicalAddress setPhysicalAddressForResponse(PhysicalAddressResponse response) {
+    private PhysicalAddress setPhysicalAddressForResponse() {
         PhysicalAddress physicalAddress = new PhysicalAddress();
         physicalAddress.setAddress("Test Address");
         physicalAddress.setMunicipality("Municipality");

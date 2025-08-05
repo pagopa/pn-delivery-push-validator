@@ -537,8 +537,8 @@ public class TestUtils {
     private static String getIun(String callerMethod) {
         Random rand = new Random();
         int upperbound = 10000;
-        int int_random = rand.nextInt(upperbound);
-        return "iun-" + callerMethod + "_" + int_random;
+        int intRandom = rand.nextInt(upperbound);
+        return "iun-" + callerMethod + "_" + intRandom;
     }
 
 

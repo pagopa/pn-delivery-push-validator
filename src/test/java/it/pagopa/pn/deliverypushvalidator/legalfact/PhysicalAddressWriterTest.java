@@ -15,7 +15,7 @@ class PhysicalAddressWriterTest {
 	private PhysicalAddressWriter physicalAddressWriter;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		physicalAddressWriter = new PhysicalAddressWriter();
 	}
 
@@ -42,7 +42,7 @@ class PhysicalAddressWriterTest {
 
 
 		// WHEN
-		NotificationRecipientInt recipient = notification.getRecipients().get( 0 );
+		NotificationRecipientInt recipient = notification.getRecipients().getFirst();
 		String output = physicalAddressWriter.nullSafePhysicalAddressToString( recipient.getPhysicalAddress(), recipient.getDenomination(), ";" );
 
 		// THEN
@@ -69,7 +69,7 @@ class PhysicalAddressWriterTest {
 
 
 		// WHEN
-		NotificationRecipientInt recipient = notification.getRecipients().get( 0 );
+		NotificationRecipientInt recipient = notification.getRecipients().getFirst();
 		String output = physicalAddressWriter.nullSafePhysicalAddressToString( recipient.getPhysicalAddress(), recipient.getDenomination(), ";" );
 
 		// THEN
@@ -90,6 +90,7 @@ class PhysicalAddressWriterTest {
 												.municipalityDetails("mundetails")
 												.addressDetails( "addressDetail" )
 												.zip( "zip" )
+												.at(null)
 												.build()
 										).build()
 						)
@@ -97,7 +98,7 @@ class PhysicalAddressWriterTest {
 
 
 		// WHEN
-		NotificationRecipientInt recipient = notification.getRecipients().get( 0 );
+		NotificationRecipientInt recipient = notification.getRecipients().getFirst();
 		String output = physicalAddressWriter.nullSafePhysicalAddressToString( recipient.getPhysicalAddress(), recipient.getDenomination(), ";" );
 
 		// THEN
@@ -118,6 +119,8 @@ class PhysicalAddressWriterTest {
 												.municipalityDetails("mundetails")
 												.addressDetails( "addressDetail" )
 												.zip( "zip" )
+												.at("at")
+												.foreignState(null)
 												.build()
 										).build()
 						)
@@ -125,10 +128,11 @@ class PhysicalAddressWriterTest {
 
 
 		// WHEN
-		NotificationRecipientInt recipient = notification.getRecipients().get( 0 );
+		NotificationRecipientInt recipient = notification.getRecipients().getFirst();
 		String output = physicalAddressWriter.nullSafePhysicalAddressToString( recipient.getPhysicalAddress(), recipient.getDenomination(), ";" );
 
 		// THEN
-		Assertions.assertEquals("denomination;addressDetail;address;zip municipality mundetails", output, "Different notification data");
+		Assertions.assertEquals("denomination;at;addressDetail;address;zip municipality mundetails", output, "Different notification data");
+		Assertions.assertEquals(null,recipient.getPhysicalAddress().getForeignState());
 	}
 }

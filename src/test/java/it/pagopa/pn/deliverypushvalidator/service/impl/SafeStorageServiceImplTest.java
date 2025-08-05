@@ -23,7 +23,7 @@ class SafeStorageServiceImplTest {
     private SafeStorageServiceImpl safeStorageService;
     
     @BeforeEach
-    public void init(){
+    void init(){
         safeStorageService = new SafeStorageServiceImpl( safeStorageClient);
     }
     

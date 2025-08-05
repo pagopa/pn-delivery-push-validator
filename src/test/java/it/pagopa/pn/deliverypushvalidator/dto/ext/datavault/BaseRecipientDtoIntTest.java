@@ -9,7 +9,7 @@ class BaseRecipientDtoIntTest {
     private BaseRecipientDtoInt baseRecipientDtoInt;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         baseRecipientDtoInt = BaseRecipientDtoInt.builder()
                 .denomination("001")
                 .recipientType(RecipientTypeInt.PF)

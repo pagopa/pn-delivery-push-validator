@@ -4,10 +4,8 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 
-import java.time.Instant;
 import java.util.List;
 
 public class TimelineClientMock implements TimelineClient {

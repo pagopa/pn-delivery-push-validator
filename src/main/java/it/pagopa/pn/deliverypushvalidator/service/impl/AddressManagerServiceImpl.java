@@ -27,7 +27,6 @@ import java.util.List;
 public class AddressManagerServiceImpl implements AddressManagerService {
 
     private final AddressManagerClient addressManagerClient;
-    private final NotificationUtils notificationUtils;
     
     public Mono<AcceptedResponse> normalizeAddresses(NotificationInt notification, String correlationId){
         log.debug("Start normalize and validate address - iun={}", notification.getIun());
@@ -43,7 +42,7 @@ public class AddressManagerServiceImpl implements AddressManagerService {
         List<NormalizeRequest> normalizeRequestList = new ArrayList<>();
 
         notification.getRecipients().forEach(recipient -> {
-            int recIndex = notificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
+            int recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
 
             if(recipient.getPhysicalAddress() != null){
                 

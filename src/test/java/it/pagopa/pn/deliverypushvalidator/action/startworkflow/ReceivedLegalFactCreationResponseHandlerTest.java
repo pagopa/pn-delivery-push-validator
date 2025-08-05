@@ -35,7 +35,7 @@ class ReceivedLegalFactCreationResponseHandlerTest {
     private ReceivedLegalFactCreationResponseHandler handler;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         handler = new ReceivedLegalFactCreationResponseHandler(notificationService, timelineService, timelineUtils, schedulerService, f24Service);
     }
     

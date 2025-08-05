@@ -21,9 +21,11 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SaveLegalFactsServiceImplTest {
 
@@ -52,7 +54,7 @@ class SaveLegalFactsServiceImplTest {
     void saveNotificationReceivedLegalFact() throws IOException {
         String denomination = "<h1>SSRF WITH IMAGE POC</h1> <img src='https://prova.it'></img>";
         NotificationInt notification = buildNotification(denomination);
-        FileCreationWithContentRequest fileCreation = buildFileCreationWithContentRequest(PN_LEGAL_FACTS);
+        FileCreationWithContentRequest fileCreation = buildFileCreationWithContentRequest();
         FileCreationResponseInt file = buildFileCreationResponseInt();
 
         Mockito.when(legalFactBuilder.generateNotificationReceivedLegalFact(notification)).thenReturn(denomination.getBytes());
@@ -60,31 +62,42 @@ class SaveLegalFactsServiceImplTest {
 
         String actual = saveLegalFactsService.sendCreationRequestForNotificationReceivedLegalFact(notification);
 
-        Assertions.assertEquals("safestorage://001", actual);
+        assertEquals("safestorage://001", actual);
+        assertEquals("application/pdf", fileCreation.getContentType());
+        assertEquals("PN_LEGAL_FACTS", fileCreation.getDocumentType());
+        assertEquals("SAVED", fileCreation.getStatus());
+        assertNotNull(fileCreation.getContent());
+
+        assertEquals("001", file.getKey());
     }
 
     @Test
     void saveNotificationReceivedLegalFactFailed() {
         String denomination = "<h1>SSRF WITH IMAGE POC</h1> <img src='https://prova.it'></img>";
         NotificationInt notification = buildNotification(denomination);
-        FileCreationWithContentRequest fileCreation = buildFileCreationWithContentRequest(PN_LEGAL_FACTS);
+        FileCreationWithContentRequest fileCreation = buildFileCreationWithContentRequest();
         FileCreationResponseInt file = buildFileCreationResponseInt();
 
-        PnInternalException pnInternalException = Assertions.assertThrows(PnInternalException.class, () -> {
-            saveLegalFactsService.sendCreationRequestForNotificationReceivedLegalFact(notification);
-        });
+        PnInternalException pnInternalException = Assertions.assertThrows(PnInternalException.class, () ->
+                saveLegalFactsService.sendCreationRequestForNotificationReceivedLegalFact(notification));
 
         String expectErrorMsg = "PN_DELIVERYPUSH_SAVELEGALFACTSFAILED";
 
-        Assertions.assertEquals(expectErrorMsg, pnInternalException.getProblem().getErrors().get(0).getCode());
+        assertEquals(expectErrorMsg, pnInternalException.getProblem().getErrors().getFirst().getCode());
+        assertEquals("application/pdf", fileCreation.getContentType());
+        assertEquals("PN_LEGAL_FACTS", fileCreation.getDocumentType());
+        assertEquals("SAVED", fileCreation.getStatus());
+        assertNotNull(fileCreation.getContent());
+
+        assertEquals("001", file.getKey());
     }
 
-    private FileCreationWithContentRequest buildFileCreationWithContentRequest(String type) {
+    private FileCreationWithContentRequest buildFileCreationWithContentRequest() {
         String denomination = "<h1>SSRF WITH IMAGE POC</h1> <img src='https://prova.it'></img>";
 
         FileCreationWithContentRequest fileCreationRequest = new FileCreationWithContentRequest();
         fileCreationRequest.setContentType(LEGALFACTS_MEDIATYPE_STRING);
-        fileCreationRequest.setDocumentType(type);
+        fileCreationRequest.setDocumentType(SaveLegalFactsServiceImplTest.PN_LEGAL_FACTS);
         fileCreationRequest.setStatus(SAVED);
         fileCreationRequest.setContent(denomination.getBytes());
         return fileCreationRequest;
@@ -102,7 +115,7 @@ class SaveLegalFactsServiceImplTest {
                 .sentAt(Instant.now())
                 .iun("Example_IUN_1234_Test")
                 .subject("notification test subject")
-                .documents(Arrays.asList(
+                .documents(Collections.singletonList(
                                 NotificationDocumentInt.builder()
                                         .ref(NotificationDocumentInt.Ref.builder()
                                                 .key("doc00")
@@ -122,7 +135,7 @@ class SaveLegalFactsServiceImplTest {
 
     private NotificationRecipientInt buildRecipient(String denomination) {
         String defaultDenomination = StringUtils.hasText(denomination) ? denomination : "Galileo Bruno";
-        NotificationRecipientInt rec1 = NotificationRecipientInt.builder()
+        return NotificationRecipientInt.builder()
                 .taxId("CDCFSC11R99X001Z")
                 .denomination(defaultDenomination)
                 .digitalDomicile(LegalDigitalAddressInt.builder()
@@ -131,8 +144,6 @@ class SaveLegalFactsServiceImplTest {
                         .build())
                 .physicalAddress(buildPhysicalAddressInt())
                 .build();
-
-        return rec1;
     }
 
     private PhysicalAddressInt buildPhysicalAddressInt() {

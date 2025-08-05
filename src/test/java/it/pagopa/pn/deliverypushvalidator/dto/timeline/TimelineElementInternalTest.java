@@ -17,22 +17,22 @@ class TimelineElementInternalTest {
     @Test
     void compareToBase() {
 
-        Instant t_primo = Instant.EPOCH.plus(1, ChronoUnit.DAYS);
-        Instant t_secondo = Instant.EPOCH.plus(2, ChronoUnit.DAYS);
+        Instant tPrimo = Instant.EPOCH.plus(1, ChronoUnit.DAYS);
+        Instant tSecondo = Instant.EPOCH.plus(2, ChronoUnit.DAYS);
 
         // caso 1: un xxx con data maggiore va dopo
-        TimelineElementInternal t1_progress = TimelineElementInternal.builder()
-                .timestamp(t_primo)
+        TimelineElementInternal t1Progress = TimelineElementInternal.builder()
+                .timestamp(tPrimo)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_RESPONSE)
                 .build();
 
-        TimelineElementInternal t2_progress = TimelineElementInternal.builder()
-                .timestamp(t_secondo)
+        TimelineElementInternal t2Progress = TimelineElementInternal.builder()
+                .timestamp(tSecondo)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_RESPONSE)
                 .build();
 
 
-        Assertions.assertTrue(t1_progress.compareTo(t2_progress) < 0);
+        Assertions.assertTrue(t1Progress.compareTo(t2Progress) < 0);
     }
 
 
@@ -42,23 +42,23 @@ class TimelineElementInternalTest {
         Instant t1 = Instant.EPOCH.plus(1, ChronoUnit.DAYS);
         Instant t2 = Instant.EPOCH.plus(2, ChronoUnit.DAYS);
 
-        TimelineElementInternal t1_progress = TimelineElementInternal.builder()
+        TimelineElementInternal t1Progress = TimelineElementInternal.builder()
                 .timestamp(t1)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_RESPONSE)
                 .build();
 
-        TimelineElementInternal t2_progress = TimelineElementInternal.builder()
+        TimelineElementInternal t2Progress = TimelineElementInternal.builder()
                 .timestamp(t2)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_RESPONSE)
                 .build();
 
-        Set<TimelineElementInternal> set = Set.of(t1_progress, t2_progress);
+        Set<TimelineElementInternal> set = Set.of(t1Progress, t2Progress);
         List<TimelineElementInternal> list = set.stream()
                 .sorted(Comparator.naturalOrder())
                 .toList();
 
-        Assertions.assertEquals(t1_progress, list.get(0));
-        Assertions.assertEquals(t2_progress, list.get(1));
+        Assertions.assertEquals(t1Progress, list.get(0));
+        Assertions.assertEquals(t2Progress, list.get(1));
 
     }
 
@@ -67,25 +67,25 @@ class TimelineElementInternalTest {
 
         Instant t1 = Instant.EPOCH.plus(1, ChronoUnit.DAYS);
 
-        TimelineElementInternal t1_progress = TimelineElementInternal.builder()
+        TimelineElementInternal t1Progress = TimelineElementInternal.builder()
                 .elementId("a")
                 .timestamp(t1)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_RESPONSE)
                 .build();
 
-        TimelineElementInternal t2_progress = TimelineElementInternal.builder()
+        TimelineElementInternal t2Progress = TimelineElementInternal.builder()
                 .elementId("b")
                 .timestamp(t1)
                 .category(TimelineElementCategoryInt.PUBLIC_REGISTRY_VALIDATION_CALL)
                 .build();
 
-        Set<TimelineElementInternal> set = Set.of(t1_progress, t2_progress);
+        Set<TimelineElementInternal> set = Set.of(t1Progress, t2Progress);
         List<TimelineElementInternal> list = set.stream()
                 .sorted(Comparator.naturalOrder())
                 .toList();
 
-        Assertions.assertEquals(t1_progress, list.get(0));
-        Assertions.assertEquals(t2_progress, list.get(1));
+        Assertions.assertEquals(t1Progress, list.get(0));
+        Assertions.assertEquals(t2Progress, list.get(1));
 
     }
 }

@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileCreationWithContentRequest;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.pnsafestorage.model.*;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.safestorage.PnSafeStorageClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.service.DocumentCreationRequestService;
@@ -82,32 +82,30 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
         
         savedFileMap.put(key,fileCreationRequest);
 
-        ThreadPool.start( new Thread(() -> {
-            Assertions.assertDoesNotThrow(() -> {
-                String keyWithPrefix = FileUtils.getKeyWithStoragePrefix(key);
-                
-                log.info("[TEST] Start wait for createFile documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
+        ThreadPool.start( new Thread(() -> Assertions.assertDoesNotThrow(() -> {
+            String keyWithPrefix = FileUtils.getKeyWithStoragePrefix(key);
 
-                if(! TestUtils.PN_NOTIFICATION_ATTACHMENT.equals(fileCreationRequest.getDocumentType())){
-                    log.info("[TEST] Start wait for createFile in IF documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
+            log.info("[TEST] Start wait for createFile documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
 
-                    MethodExecutor.waitForExecution(
-                            () -> creationRequestService.getDocumentCreationRequest(keyWithPrefix)
-                    );
-                    
-                    log.info("[TEST] END wait for createFile documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
+            if(! TestUtils.PN_NOTIFICATION_ATTACHMENT.equals(fileCreationRequest.getDocumentType())){
+                log.info("[TEST] Start wait for createFile in IF documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
 
-                    FileDownloadResponse mockedResponse =  new FileDownloadResponse();
-                    mockedResponse.setDocumentType(fileCreationRequest.getDocumentType());
-                    mockedResponse.setDocumentStatus(fileCreationRequest.getStatus());
-                    mockedResponse.setKey(key);
-                    mockedResponse.setChecksum(sha256);
-                    safeStorageResponseHandler.handleSafeStorageResponse(mockedResponse);
-                } else{
-                    log.info("[TEST] No need to wait response for PN_NOTIFICATION_ATTACHMENT");
-                }
-            });
-        }));
+                MethodExecutor.waitForExecution(
+                        () -> creationRequestService.getDocumentCreationRequest(keyWithPrefix)
+                );
+
+                log.info("[TEST] END wait for createFile documentType={} keyWithPrefix={}",fileCreationRequest.getDocumentType(), keyWithPrefix);
+
+                FileDownloadResponse mockedResponse =  new FileDownloadResponse();
+                mockedResponse.setDocumentType(fileCreationRequest.getDocumentType());
+                mockedResponse.setDocumentStatus(fileCreationRequest.getStatus());
+                mockedResponse.setKey(key);
+                mockedResponse.setChecksum(sha256);
+                safeStorageResponseHandler.handleSafeStorageResponse(mockedResponse);
+            } else{
+                log.info("[TEST] No need to wait response for PN_NOTIFICATION_ATTACHMENT");
+            }
+        })));
         
         FileCreationResponse fileCreationResponse = new FileCreationResponse();
         fileCreationResponse.setKey(key);
@@ -143,10 +141,6 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
             res[1] = 0x2D;
             res[2] = 0x2D;
             res[3] = 0x2D;
-            res[4] = 0x2D;
-            res[5] = 0x2D;
-            res[6] = 0x2D;
-            res[7] = 0x2D;
         }
         else
         {
@@ -155,11 +149,11 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
             res[1] = 0x50;
             res[2] = 0x44;
             res[3] = 0x46;
-            res[4] = 0x2D;
-            res[5] = 0x2D;
-            res[6] = 0x2D;
-            res[7] = 0x2D;
         }
+        res[4] = 0x2D;
+        res[5] = 0x2D;
+        res[6] = 0x2D;
+        res[7] = 0x2D;
 
 
         return res;
@@ -169,19 +163,19 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
         FileCreationWithContentRequest fileCreationRequest = savedFileMap.get(fileKey);
 
         String ext = getExtensionFromContentType(fileCreationRequest.getContentType());
-        String TEST_DIR_NAME = "target" + File.separator + "generated-test-PDF-IT";
-        Path TEST_DIR_PATH = Paths.get(TEST_DIR_NAME);
+        String testDirName = "target" + File.separator + "generated-test-PDF-IT";
+        Path testDirPath = Paths.get(testDirName);
 
         //create target test folder, if not exists
-        if (Files.notExists(TEST_DIR_PATH)) {
+        if (Files.notExists(testDirPath)) {
             try {
-                Files.createDirectory(TEST_DIR_PATH);
+                Files.createDirectory(testDirPath);
             } catch (IOException e) {
                 System.out.println("Exception in uploadContent " + e);
             }
         }
 
-        Path filePath = Paths.get(TEST_DIR_NAME + File.separator + testName+ "-"+ legalFactCategory.getValue() + "." + ext);
+        Path filePath = Paths.get(testDirName + File.separator + testName+ "-"+ legalFactCategory.getValue() + "." + ext);
         try {
             Files.write(filePath, fileCreationRequest.getContent());
         } catch (IOException e) {
@@ -190,14 +184,13 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
     }
     
     private String getExtensionFromContentType(String contentType) {
-        switch (contentType){
-            case "application/pdf":
-                return "pdf";
-            case "text/html":
-                return "html";
-            default:
-                System.out.println("Content type not expected "+contentType);
-                return "pdf";
-        }
+        return switch (contentType) {
+            case "application/pdf" -> "pdf";
+            case "text/html" -> "html";
+            default -> {
+                System.out.println("Content type not expected " + contentType);
+                yield "pdf";
+            }
+        };
     }
 }

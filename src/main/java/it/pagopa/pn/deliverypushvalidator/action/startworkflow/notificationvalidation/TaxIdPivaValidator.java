@@ -1,6 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
-import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.nationalregistries.CheckTaxIdOKInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationTaxIdNotValidException;
@@ -9,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
 
+import static it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils.getRecipientIndexFromTaxId;
+
 @Component
 @AllArgsConstructor
 @CustomLog
@@ -16,13 +17,12 @@ public class TaxIdPivaValidator {
     private static final String VALIDATE_TAXID_PROCESS = "Validate taxId";
 
     private final NationalRegistriesService nationalRegistriesService;
-    private final NotificationUtils notificationUtils;
-    
+
     public void validateTaxIdPiva(NotificationInt notification){
         log.logChecking(VALIDATE_TAXID_PROCESS);
 
         notification.getRecipients().forEach( recipient -> {
-            int recIndex = notificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
+            int recIndex = getRecipientIndexFromTaxId(notification, recipient.getTaxId());
             log.debug("Start taxIdValidation for specific recipient - iun={} id={}", notification.getIun(), recIndex);
             
             CheckTaxIdOKInt response = nationalRegistriesService.checkTaxId(recipient.getTaxId());

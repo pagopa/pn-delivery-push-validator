@@ -9,7 +9,7 @@ class SendingReceiptTest {
     private SendingReceipt sendingReceipt;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         sendingReceipt = SendingReceipt.builder()
                 .id("001")
                 .system("002")

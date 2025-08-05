@@ -28,17 +28,15 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push-validator.external-registry-base-url=http://localhost:9998",
+        "pn.delivery-push-validator.external-registry-base-url=http://localhost:9998"
 })
 class PnExternalRegistriesClientReactiveImplTest extends MockAWSObjectsTest {
     @Autowired
     private PnExternalRegistriesClientReactive client;
 
-    private static ClientAndServer mockServer;
-
     @BeforeAll
-    public static void startMockServer() {
-        mockServer = startClientAndServer(9998);
+    static void startMockServer() {
+        ClientAndServer mockServer = startClientAndServer(9998);
     }
     
     @Test

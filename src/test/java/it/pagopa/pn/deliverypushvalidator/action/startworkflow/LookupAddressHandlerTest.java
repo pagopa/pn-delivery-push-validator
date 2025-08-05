@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class LookupAddressHandlerTest {
@@ -59,7 +58,7 @@ class LookupAddressHandlerTest {
         when(nationalRegistriesService.getMultiplePhysicalAddress(notification)).thenReturn(List.of(response));
 
         TimelineElementInternal timelineElement = mock(TimelineElementInternal.class);
-        when(timelineUtils.buildNationalRegistryValidationResponse(eq(notification), eq(response))).thenReturn(timelineElement);
+        when(timelineUtils.buildNationalRegistryValidationResponse(notification, response)).thenReturn(timelineElement);
 
         when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Mono.empty());
@@ -67,7 +66,7 @@ class LookupAddressHandlerTest {
         lookupAddressHandler.performValidation(notification);
 
         verify(nationalRegistriesService, times(1)).getMultiplePhysicalAddress(notification);
-        verify(timelineService, times(1)).addTimelineElement(eq(timelineElement), eq(notification));
+        verify(timelineService, times(1)).addTimelineElement(timelineElement, notification);
         verify(confidentialInformationService, times(1)).updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any());
     }
 

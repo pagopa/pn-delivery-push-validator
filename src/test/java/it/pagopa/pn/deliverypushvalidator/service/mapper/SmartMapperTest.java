@@ -2,17 +2,12 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.NormalizedAddressDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.NotificationRequestAcceptedDetailsInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.RequestRefusedDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NotificationRequestAcceptedDetails;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
 
 class SmartMapperTest {
     private SmartMapper smartMapper;

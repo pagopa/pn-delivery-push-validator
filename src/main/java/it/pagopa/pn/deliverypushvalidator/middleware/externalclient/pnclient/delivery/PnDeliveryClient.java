@@ -3,14 +3,10 @@ package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.de
 import it.pagopa.pn.commons.log.PnLogger;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV25;
 
-
-import java.util.Map;
-
 public interface PnDeliveryClient {
     String CLIENT_NAME = PnLogger.EXTERNAL_SERVICES.PN_DELIVERY;
 
     String GET_NOTIFICATION = "GET NOTIFICATION";
-    String GET_QUICK_ACCESS_TOKEN = "GET QUICK ACCESS TOKEN";
 
     SentNotificationV25 getSentNotification(String iun);
 }

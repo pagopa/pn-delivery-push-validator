@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -30,23 +29,19 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static reactor.core.publisher.Mono.when;
 
 class NotificationProcessCostServiceImplTest {
     private PnExternalRegistriesClientReactive pnExternalRegistriesClientReactive;
-    private PnDeliveryPushValidatorConfigs cfg;
     private PnDeliveryPushClientReactive pnDeliveryPushClientReactive;
     
     private NotificationProcessCostService service;
 
     Integer notificationCost = 100;
-    Integer notificationFee = 99;
-    Integer notificationVat = 22;
     @BeforeEach
     void setUp() {
         this.pnExternalRegistriesClientReactive = Mockito.mock(PnExternalRegistriesClientReactive.class);
         this.pnDeliveryPushClientReactive = Mockito.mock(PnDeliveryPushClientReactive.class);
-        this.cfg = Mockito.mock(PnDeliveryPushValidatorConfigs.class);
+        PnDeliveryPushValidatorConfigs cfg = Mockito.mock(PnDeliveryPushValidatorConfigs.class);
 
         Mockito.when(cfg.getPagoPaNotificationBaseCost()).thenReturn(notificationCost);
 
@@ -87,10 +82,10 @@ class NotificationProcessCostServiceImplTest {
         //THEN
         Assertions.assertNotNull(updateNotificationCostResponseInt);
         Assertions.assertNotNull(updateNotificationCostResponseInt.getUpdateResults());
-        Assertions.assertNotNull(updateNotificationCostResponseInt.getUpdateResults().get(0));
+        Assertions.assertNotNull(updateNotificationCostResponseInt.getUpdateResults().getFirst());
         
-        UpdateNotificationCostResultInt updateNotificationCostResultInt = updateNotificationCostResponseInt.getUpdateResults().get(0);
-        final UpdateNotificationCostResult updateNotificationCostResponseExpected = updateNotificationCostResponse.getUpdateResults().get(0);
+        UpdateNotificationCostResultInt updateNotificationCostResultInt = updateNotificationCostResponseInt.getUpdateResults().getFirst();
+        final UpdateNotificationCostResult updateNotificationCostResponseExpected = updateNotificationCostResponse.getUpdateResults().getFirst();
 
         Assertions.assertEquals(updateNotificationCostResponseExpected.getResult().getValue(), updateNotificationCostResultInt.getResult().getValue());
         Assertions.assertEquals(updateNotificationCostResponseExpected.getNoticeCode(), updateNotificationCostResultInt.getPaymentsInfoForRecipient().getNoticeCode());

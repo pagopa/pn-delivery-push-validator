@@ -48,7 +48,7 @@ class ReceivedLegalFactCreationRequestTest {
     private ReceivedLegalFactCreationRequest receivedLegalFactCreationRequest;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         receivedLegalFactCreationRequest = new ReceivedLegalFactCreationRequest(saveLegalFactsService, documentCreationRequestService,
                 timelineService, timelineUtils, attachmentUtils, notificationService, schedulerService, pnDeliveryPushConfigs);
     }

@@ -38,8 +38,7 @@ class AddressManagerServiceImplTest {
     @BeforeEach
     void setup() {
         addressManagerService = new AddressManagerServiceImpl(
-                addressManagerClient,
-                notificationUtils);
+                addressManagerClient);
     }
 
     @ExtendWith(MockitoExtension.class)
@@ -97,7 +96,7 @@ class AddressManagerServiceImplTest {
         Assertions.assertEquals(notification.getRecipients().size(), listRequest.size());
         
         listRequest.forEach(elem -> {
-            NotificationRecipientInt recipient = notificationUtils.getRecipientFromIndex(notification, Integer.valueOf(elem.getId()));
+            NotificationRecipientInt recipient = notificationUtils.getRecipientFromIndex(notification, Integer.parseInt(elem.getId()));
             AnalogAddress address = AddressManagerMapper.getAnalogAddressFromPhysical(recipient.getPhysicalAddress());
             Assertions.assertEquals(address, elem.getAddress());
         });
