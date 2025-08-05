@@ -35,6 +35,11 @@ public class ActionHandlerMock {
                     var handler = actionHandlerRegistry.getReceivedLegalFactGenerationHandler();
                     handler.handle(message.getPayload(), message.getHeaders());
                 }
+                case DOCUMENT_CREATION_RESPONSE ->{
+                    final Message<Action> message = getBaseActionMessage(action);
+                    var handler = actionHandlerRegistry.getDocumentCreationResponseEventHandler();
+                    handler.handle(message.getPayload(), message.getHeaders());
+                }
                 default ->
                         log.error("[TEST] actionType not found {}", action.getType());
             }

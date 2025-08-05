@@ -5,8 +5,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileCreationWithContentRequest;
-import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
-import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
@@ -175,7 +173,7 @@ public class TestUtils {
     public static List<DocumentWithContent> getDocumentWithContents(String fileDoc, List<NotificationDocumentInt> notificationDocumentList) {
         DocumentWithContent documentWithContent = DocumentWithContent.builder()
                 .content(fileDoc)
-                .document(notificationDocumentList.get(0))
+                .document(notificationDocumentList.getFirst())
                 .build();
         return Collections.singletonList(documentWithContent);
     }
@@ -208,27 +206,6 @@ public class TestUtils {
                         )
                         .pagoPA(null)
                         .build()
-        );
-    }
-
-    public static void writeAllGeneratedLegalFacts(String iun, String className, TimelineService timelineService, SafeStorageClientMock safeStorageClientMock) {
-        writeAllGeneratedLegalFacts(iun, className, timelineService, safeStorageClientMock, 3);
-    }
-
-    public static void writeAllGeneratedLegalFacts(String iun, String className, TimelineService timelineService, SafeStorageClientMock safeStorageClientMock, int depth) {
-        String testName = className + "-" + getMethodName(depth);
-
-        timelineService.getTimeline(iun, true).forEach(
-                elem -> {
-                    if (!elem.getLegalFactsIds().isEmpty()) {
-                        LegalFactsIdInt legalFactsId = elem.getLegalFactsIds().get(0);
-                        if (!LegalFactCategoryInt.PEC_RECEIPT.equals(legalFactsId.getCategory()) && !LegalFactCategoryInt.ANALOG_DELIVERY.equals(legalFactsId.getCategory())) {
-                            String key = legalFactsId.getKey().replace("safestorage://", "");
-                            log.info("[TEST] writing safestoragemock key={} testName={} cat={}", key, testName, legalFactsId.getCategory());
-                            safeStorageClientMock.writeFile(key, legalFactsId.getCategory(), testName);
-                        }
-                    }
-                }
         );
     }
 
@@ -325,109 +302,6 @@ public class TestUtils {
                 .build();
     }
 
-    public static NotificationInt getNotificationV2WithDocument() {
-        return NotificationInt.builder()
-                .iun("IUN_01")
-                .paProtocolNumber("protocol_01")
-                .sender(NotificationSenderInt.builder()
-                        .paId(" pa_02")
-                        .build()
-                )
-                .documents(List.of(NotificationDocumentInt.builder()
-                        .digests(NotificationDocumentInt.Digests.builder()
-                                .sha256("sha256").build())
-                        .ref(NotificationDocumentInt.Ref.builder().key("test").versionToken("1").build())
-                        .build()))
-                .recipients(Collections.singletonList(
-                        NotificationRecipientInt.builder()
-                                .taxId("testIdRecipient")
-                                .internalId("test")
-                                .denomination("Nome Cognome/Ragione Sociale")
-                                .digitalDomicile(LegalDigitalAddressInt.builder()
-                                        .type(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC)
-                                        .address("account@dominio.it")
-                                        .build())
-                                .payments(List.of(NotificationPaymentInfoInt.builder()
-                                        .pagoPA(PagoPaInt.builder()
-                                                .noticeCode("noticeCode")
-                                                .creditorTaxId("taxId")
-                                                .attachment(NotificationDocumentInt.builder()
-                                                        .ref(NotificationDocumentInt.Ref.builder().key("paymentAttach").versionToken("1").build())
-                                                        .digests(NotificationDocumentInt.Digests.builder()
-                                                                .sha256("sha256").build())
-                                                        .build())
-                                                .build())
-                                        .build()))
-                                .build()
-                ))
-                .build();
-    }
-
-    public static NotificationInt getNotificationV2WithDocument(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE channelType, String address) {
-        return NotificationInt.builder()
-                .iun("IUN_01")
-                .paProtocolNumber("protocol_01")
-                .sender(NotificationSenderInt.builder()
-                        .paId(" pa_02")
-                        .build()
-                )
-                .documents(List.of(NotificationDocumentInt.builder()
-                        .digests(NotificationDocumentInt.Digests.builder()
-                                .sha256("sha256").build())
-                        .ref(NotificationDocumentInt.Ref.builder().key("test").versionToken("1").build())
-                        .build()))
-                .recipients(Collections.singletonList(
-                        NotificationRecipientInt.builder()
-                                .taxId("testIdRecipient")
-                                .internalId("test")
-                                .denomination("Nome Cognome/Ragione Sociale")
-                                .digitalDomicile(LegalDigitalAddressInt.builder()
-                                        .type(channelType)
-                                        .address(address)
-                                        .build())
-                                .payments(List.of(NotificationPaymentInfoInt.builder()
-                                        .pagoPA(PagoPaInt.builder()
-                                                .noticeCode("noticeCode")
-                                                .creditorTaxId("taxId")
-                                                .attachment(NotificationDocumentInt.builder()
-                                                        .ref(NotificationDocumentInt.Ref.builder().key("paymentAttach").versionToken("1").build())
-                                                        .digests(NotificationDocumentInt.Digests.builder()
-                                                                .sha256("sha256").build())
-                                                        .build())
-                                                .build())
-                                        .build()))
-                                .build()
-                ))
-                .build();
-    }
-
-    public static NotificationInt getNotificationV2WithoutPayments() {
-        return NotificationInt.builder()
-                .iun("IUN_01")
-                .paProtocolNumber("protocol_01")
-                .sender(NotificationSenderInt.builder()
-                        .paId(" pa_02")
-                        .build()
-                )
-                .documents(List.of(NotificationDocumentInt.builder()
-                        .digests(NotificationDocumentInt.Digests.builder()
-                                .sha256("sha256").build())
-                        .ref(NotificationDocumentInt.Ref.builder().key("test").versionToken("1").build())
-                        .build()))
-                .recipients(Collections.singletonList(
-                        NotificationRecipientInt.builder()
-                                .taxId("testIdRecipient")
-                                .internalId("test")
-                                .denomination("Nome Cognome/Ragione Sociale")
-                                .digitalDomicile(LegalDigitalAddressInt.builder()
-                                        .type(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC)
-                                        .address("account@dominio.it")
-                                        .build())
-                                .build()
-                ))
-                .build();
-    }
-
     public static NotificationInt getNotificationV2WithF24() {
         return getNotificationV2WithF24(null);
     }
@@ -518,11 +392,6 @@ public class TestUtils {
         return ste[depth].getMethodName();
     }
 
-    public static String getMethodNameAndClassName(final int depth) {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        return ste[depth].getClassName()+"."+ste[depth].getMethodName();
-    }
-
     public static String getRandomIun(int level) {
         String callerMethod = getMethodName(level);
         return getIun(callerMethod);
@@ -548,7 +417,8 @@ public class TestUtils {
                                                PnDataVaultClientReactiveMock pnDataVaultClientReactiveMock,
                                                DocumentCreationRequestDaoMock documentCreationRequestDaoMock,
                                                AddressManagerClientMock addressManagerClientMock,
-                                               ActionPoolMock actionPoolMock
+                                               ActionPoolMock actionPoolMock,
+                                               TimelineClientMock timelineClientMock
     ) {
 
         log.info("CLEARING MOCKS");
@@ -562,6 +432,7 @@ public class TestUtils {
         documentCreationRequestDaoMock.clear();
         addressManagerClientMock.clear();
         actionPoolMock.clear();
+        timelineClientMock.clear();
         
         ConsoleAppenderCustom.initializeLog();
     }
@@ -582,48 +453,10 @@ public class TestUtils {
         );
     }
 
-
-    public static NotificationRecipientInt getNotificationRecipientInt() {
-        return NotificationRecipientInt.builder()
-                .taxId("testIdRecipient")
-                .internalId("test")
-                .denomination("Nome Cognome/Ragione Sociale")
-                .digitalDomicile(LegalDigitalAddressInt.builder()
-                        .type(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC)
-                        .address("account@dominio.it")
-                        .build())
-                .payments(List.of(NotificationPaymentInfoInt.builder()
-                        .pagoPA(PagoPaInt.builder()
-                                .noticeCode("noticeCode")
-                                .creditorTaxId("taxId")
-                                .attachment(NotificationDocumentInt.builder()
-                                        .ref(NotificationDocumentInt.Ref.builder().build())
-                                        .digests(NotificationDocumentInt.Digests.builder()
-                                                .sha256("sha256").build())
-                                        .build())
-                                .build())
-                        .f24(F24Int.builder()
-                                .title("title")
-                                .applyCost(true)
-                                .metadataAttachment(NotificationDocumentInt.builder()
-                                        .ref(NotificationDocumentInt.Ref.builder().build())
-                                        .digests(NotificationDocumentInt.Digests.builder()
-                                                .sha256("sha256").build())
-                                        .build())
-                                .build())
-                        .build()))
-                .build();
-    }
-
     @Builder
     @Getter
     public static class GeneratedLegalFactsInfo {
         boolean notificationReceivedLegalFactGenerated;
-        boolean notificationAARGenerated;
-        boolean notificationViewedLegalFactGenerated;
-        boolean pecDeliveryWorkflowLegalFactsGenerated;
-        boolean notificationCompletelyUnreachableLegalFactGenerated;
-        boolean notificationCancelled;
     }
 
     @Builder

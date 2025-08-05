@@ -15,6 +15,7 @@ import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterCon
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
 import it.pagopa.pn.deliverypushvalidator.logtest.ConsoleAppenderCustom;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.*;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.DocumentCreationResponseEventHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationRefusedHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationValidationHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.ReceivedLegalFactGenerationHandler;
@@ -101,7 +102,9 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         F24Consumer.class,
         NewNotificationConsumer.class,
         SafeStorageConsumer.class,
-        ValidationActionsConsumer.class
+        ValidationActionsConsumer.class,
+        DocumentCreationResponseHandler.class,
+        DocumentCreationResponseEventHandler.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
@@ -129,6 +132,8 @@ public class CommonTestConfiguration {
     @Autowired
     DocumentCreationRequestDaoMock documentCreationRequestDaoMock;
     @Autowired
+    TimelineClientMock timelineClientMock;
+    @Autowired
     AddressManagerClientMock addressManagerClientMock;
     @Autowired
     PnDeliveryPushValidatorConfigs cfg;
@@ -153,7 +158,8 @@ public class CommonTestConfiguration {
                 pnDataVaultClientReactiveMock,
                 documentCreationRequestDaoMock,
                 addressManagerClientMock,
-                actionPoolMock
+                actionPoolMock,
+                timelineClientMock
         );
     }
 
