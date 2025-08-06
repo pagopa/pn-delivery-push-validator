@@ -37,7 +37,7 @@ Parameters:
 
 Resources:
   
-  PnDeliveryPushValidatorLogGroup:
+  PnDeliveryPushValidatorServiceLogGroup:
     Type: AWS::CloudFormation::Stack
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
@@ -51,5 +51,5 @@ Resources:
 Outputs:
   # Log groups
   EcsValidatorLogGroup:
-    Value: !GetAtt PnDeliveryPushValidatorLogGroup.Outputs.LogGroupName
+    Value: !GetAtt PnDeliveryPushValidatorServiceLogGroup.Outputs.LogGroupName
     
