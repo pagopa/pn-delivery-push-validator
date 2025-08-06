@@ -13,13 +13,16 @@ import java.util.List;
 
 public class NationalRegistriesClientMock implements NationalRegistriesClient {
 
+    int getNationalRegistriesCalledTimes = 0;
     public static final String NOT_VALID = "NOT_VALID";
     public static final String EXCEPTION = "EXCEPTION";
     public static final String PHYS_ADDR_NOT_FOUND = "NOT_FOUND";
     public static final String PHYS_ADDR_ERROR = "ERROR";
 
 
-    public void clear() {}
+    public void clear() {
+        this.getNationalRegistriesCalledTimes++;
+    }
 
     @Override
     public CheckTaxIdOK checkTaxId(String taxId) {
