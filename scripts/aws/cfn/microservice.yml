@@ -358,7 +358,7 @@ Resources:
         DashboardName: !Sub "${ProjectName}-delivery-push-validator-service"
         DynamoDBTableNames: !Join
           - ','
-          - !Ref DocumentCreationRequestTableName
+          - - !Ref DocumentCreationRequestTableName
         AlarmArns: !Join
           - ','
           - - !GetAtt DeliveryPushValidatorMicroservice.Outputs.FatalLogsMetricAlarmArn
