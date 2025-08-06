@@ -133,6 +133,6 @@ class PhysicalAddressWriterTest {
 
 		// THEN
 		Assertions.assertEquals("denomination;at;addressDetail;address;zip municipality mundetails", output, "Different notification data");
-		Assertions.assertEquals(null,recipient.getPhysicalAddress().getForeignState());
+        Assertions.assertNull(recipient.getPhysicalAddress().getForeignState());
 	}
 }

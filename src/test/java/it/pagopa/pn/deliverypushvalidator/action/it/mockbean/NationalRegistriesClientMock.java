@@ -17,12 +17,9 @@ public class NationalRegistriesClientMock implements NationalRegistriesClient {
     public static final String EXCEPTION = "EXCEPTION";
     public static final String PHYS_ADDR_NOT_FOUND = "NOT_FOUND";
     public static final String PHYS_ADDR_ERROR = "ERROR";
-    int getNationalRegistriesCalledTimes = 0;
 
 
-    public void clear() {
-        getNationalRegistriesCalledTimes = 0;
-    }
+    public void clear() {}
 
     @Override
     public CheckTaxIdOK checkTaxId(String taxId) {

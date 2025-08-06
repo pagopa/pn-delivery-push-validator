@@ -3,7 +3,6 @@ package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileCreationWithContentRequest;
-import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.pnsafestorage.model.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.safestorage.PnSafeStorageClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
@@ -14,12 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -157,40 +151,5 @@ public class SafeStorageClientMock implements PnSafeStorageClient {
 
 
         return res;
-    }
-
-    public void writeFile(String fileKey, LegalFactCategoryInt legalFactCategory, String testName){
-        FileCreationWithContentRequest fileCreationRequest = savedFileMap.get(fileKey);
-
-        String ext = getExtensionFromContentType(fileCreationRequest.getContentType());
-        String testDirName = "target" + File.separator + "generated-test-PDF-IT";
-        Path testDirPath = Paths.get(testDirName);
-
-        //create target test folder, if not exists
-        if (Files.notExists(testDirPath)) {
-            try {
-                Files.createDirectory(testDirPath);
-            } catch (IOException e) {
-                System.out.println("Exception in uploadContent " + e);
-            }
-        }
-
-        Path filePath = Paths.get(testDirName + File.separator + testName+ "-"+ legalFactCategory.getValue() + "." + ext);
-        try {
-            Files.write(filePath, fileCreationRequest.getContent());
-        } catch (IOException e) {
-            System.out.println("Exception in uploadContent " + e);
-        }
-    }
-    
-    private String getExtensionFromContentType(String contentType) {
-        return switch (contentType) {
-            case "application/pdf" -> "pdf";
-            case "text/html" -> "html";
-            default -> {
-                System.out.println("Content type not expected " + contentType);
-                yield "pdf";
-            }
-        };
     }
 }

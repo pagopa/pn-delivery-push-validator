@@ -1,15 +1,12 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
-import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.RecipientRelatedTimelineElementDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,16 +16,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
     final HashMap<String, Long> counter = new HashMap<>();
-    @SuppressWarnings("unused")
-    private final NotificationService notificationService;
-    @SuppressWarnings("unused")
-    private final NotificationUtils notificationUtils;
 
-
-    public TimelineClientMock(@Lazy NotificationUtils notificationUtils,
-                              @Lazy NotificationService notificationService) {
-        this.notificationService = notificationService;
-        this.notificationUtils = notificationUtils;
+    public TimelineClientMock() {
         timelineList = new CopyOnWriteArrayList<>();
     }
 
