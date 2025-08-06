@@ -387,7 +387,7 @@ Resources:
   AlarmCustomAutoscalingValidator:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmName: !Sub "${ProjectName}-delivery-push-validator-autoscaling-custom-validator"
+      AlarmName: !Sub "${ProjectName}-delivery-push-validator-service-autoscaling-custom"
       AlarmDescription: "Trigger scaling based on custom metric"
       DatapointsToAlarm: !Ref AutoscalingDataPointValidatorN
       ComparisonOperator: "GreaterThanOrEqualToThreshold"
