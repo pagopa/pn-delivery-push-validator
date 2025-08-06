@@ -13,7 +13,7 @@ class LegalDigitalAddressIntTest {
 
         assertThat(address.getType()).isEqualTo(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC);
         assertThat(address.getType().getValue()).isEqualTo("PEC");
-        assertThat(address.getType().toString()).isEqualTo("PEC");
+        assertThat(address.getType()).hasToString("PEC");
     }
 
     @Test
