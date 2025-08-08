@@ -18,7 +18,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 @Configuration
 public class F24Consumer {
     private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
-    private F24ResponseHandler handler;
+    private final F24ResponseHandler handler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.f24Events}")
     public void pnF24EventInboundConsumer(Message<DetailedTypePayload> message) {

@@ -18,7 +18,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 @RequiredArgsConstructor
 public class AddressManagerConsumer {
     private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
-    private AddressManagerResponseHandler handler;
+    private final AddressManagerResponseHandler handler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.addressManagerEvents}")
     public void pnAddressManagerEventInboundConsumer(Message<NormalizeItemsResult> message) {
