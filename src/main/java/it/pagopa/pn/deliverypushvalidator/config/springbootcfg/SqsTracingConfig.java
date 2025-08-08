@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 @Configuration
 public class SqsTracingConfig {
-    private static final String DEFAULT_LISTENER_CONTAINER_FACTORY_BEAN_NAME = "tracedMessageListenerContainerFactory";
+    private static final String DEFAULT_LISTENER_CONTAINER_FACTORY_BEAN_NAME = "tracedMessagesListenerContainerFactory";
 
     @Bean
     SqsListenerConfigurer configurer() {
