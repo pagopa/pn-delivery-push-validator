@@ -22,7 +22,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 @RequiredArgsConstructor
 public class SafeStorageConsumer {
     private final PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
-    private SafeStorageResponseHandler handler;
+    private final SafeStorageResponseHandler handler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.safeStorageEvents}")
     public void pnSafeStorageEventInboundConsumer(Message<FileDownloadResponse> message) {
