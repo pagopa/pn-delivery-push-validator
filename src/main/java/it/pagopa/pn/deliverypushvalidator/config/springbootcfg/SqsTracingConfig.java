@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.config.springbootcfg;
 
+import io.awspring.cloud.sqs.config.SqsListenerConfigurer;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import io.micrometer.observation.ObservationRegistry;
@@ -9,6 +10,13 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 @Configuration
 public class SqsTracingConfig {
+    private static final String DEFAULT_LISTENER_CONTAINER_FACTORY_BEAN_NAME = "tracedMessageListenerContainerFactory";
+
+    @Bean
+    SqsListenerConfigurer configurer() {
+        return registrar -> registrar.setDefaultListenerContainerFactoryBeanName(DEFAULT_LISTENER_CONTAINER_FACTORY_BEAN_NAME);
+    }
+
     @Bean
     SqsTemplate sqsTemplate(SqsAsyncClient sqsAsyncClient, ObservationRegistry observationRegistry) {
         return SqsTemplate.builder()
@@ -17,8 +25,8 @@ public class SqsTracingConfig {
                 .build();
     }
 
-    @Bean
-    SqsMessageListenerContainerFactory<Object> sqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, ObservationRegistry observationRegistry) {
+    @Bean(name = DEFAULT_LISTENER_CONTAINER_FACTORY_BEAN_NAME)
+    SqsMessageListenerContainerFactory<Object> factory(SqsAsyncClient sqsAsyncClient, ObservationRegistry observationRegistry) {
         return SqsMessageListenerContainerFactory.builder()
                 .sqsAsyncClient(sqsAsyncClient)
                 .configure(options -> options.observationRegistry(observationRegistry))
