@@ -20,13 +20,13 @@ public class NewNotificationConsumer {
     private final StartWorkflowHandler startWorkflowHandler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.deliveryValidationEvents}")
-    public void pnDeliveryNewNotificationEventConsumer(Message<PnDeliveryNewNotificationEvent> message) {
+    public void pnDeliveryNewNotificationEventConsumer(Message<PnDeliveryNewNotificationEvent.Payload> message) {
         setMdc(message);
         final String processName = "NEW NOTIFICATION";
         try {
             log.info("Handle message from {} with content {}", PnDeliveryClient.CLIENT_NAME, message);
             PnDeliveryNewNotificationEvent pnDeliveryNewNotificationEvent = PnDeliveryNewNotificationEvent.builder()
-                    .payload(message.getPayload().getPayload())
+                    .payload(message.getPayload())
                     .header(HandleEventUtils.mapStandardEventHeader(message.getHeaders()))
                     .build();
             String iun = pnDeliveryNewNotificationEvent.getPayload().getIun();
@@ -35,6 +35,7 @@ public class NewNotificationConsumer {
             startWorkflowHandler.startWorkflow(iun);
             log.logEndingProcess(processName);
         } catch (Exception ex) {
+            log.logEndingProcess(processName, false, ex.getMessage());
             HandleEventUtils.handleException(message.getHeaders(), ex);
             throw ex;
         }
