@@ -5,7 +5,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistr
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.CheckTaxIdOK;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.nationalregistries.model.PhysicalAddressesRequestBody;
 
-import java.time.Instant;
 import java.util.List;
 
 public interface NationalRegistriesClient {

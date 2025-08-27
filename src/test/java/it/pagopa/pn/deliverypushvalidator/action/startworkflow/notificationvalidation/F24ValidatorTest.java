@@ -30,7 +30,7 @@ class F24ValidatorTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         f24Validator = new F24Validator(pnF24Client, timelineService, timelineUtils);
     }
 

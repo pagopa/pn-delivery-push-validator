@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.utils;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
@@ -20,8 +19,8 @@ import java.util.List;
 public class RefusalCostCalculator {
     private final PnTechnicalRefusalCostMode pnTechnicalRefusalCostMode;
     private final NotificationProcessCostService notificationProcessCostService;
-    private final String ERROR_MESSAGE = "Invalid number of recipients not affected by technical errors";
-    private final String ERROR_CODE = "INVALID_NUMBER_OF_RECIPIENTS";
+    private static final String ERROR_MESSAGE = "Invalid number of recipients not affected by technical errors";
+    private static final String ERROR_CODE = "INVALID_NUMBER_OF_RECIPIENTS";
 
     public int calculateRefusalCost(NotificationInt notification, List<NotificationRefusedErrorInt> errors) {
         // Numero totale di destinatari della notifica
@@ -48,12 +47,12 @@ public class RefusalCostCalculator {
     }
 
     private int countRecipientsWithTechnicalErrors(List<NotificationRefusedErrorInt> errors, String iun) {
-        // Calcolo del numero di destinatari che sono legati ad un errore che produce un rifiuto tecnico
+        // Calcolo del numero di destinatari che sono legati a un errore che produce un rifiuto tecnico
         int count = 0;
         for (NotificationRefusedErrorInt error : errors) {
-            PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt errorCode =
+            PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt refusedErrorCode =
                     PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.fromValue(error.getErrorCode());
-            if (errorCode != null && errorCode.getIsTechnicalRefusal()) {
+            if (refusedErrorCode != null && refusedErrorCode.getIsTechnicalRefusal()) {
                 log.info("Notification with iun {} and recipient with index {} is affected by a technical error: {}", iun, error.getRecIndex(), error.getErrorCode());
                 count++;
             }

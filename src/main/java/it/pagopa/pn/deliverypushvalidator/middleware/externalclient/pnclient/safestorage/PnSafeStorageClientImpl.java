@@ -31,7 +31,6 @@ import reactor.core.publisher.Mono;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.net.URL;
 
 @Component
 @CustomLog
@@ -63,10 +62,10 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
         return fileDownloadApi.getFile( fileKey, this.cfg.getSafeStorageCxId(), metadataOnly, false )
                 .doOnSuccess( res -> log.debug("Received sync response from {} for {}", CLIENT_NAME, GET_FILE))
                 .onErrorResume( WebClientResponseException.class, error ->{
-                    log.error("Exception in call getFile fileKey={} error={}", finalFileKey, error);
+                    log.error("Exception in call getFile fileKey={}", finalFileKey, error);
 
                     if(error.getStatusCode().equals(HttpStatus.NOT_FOUND)){
-                        log.error("File not found from safeStorage fileKey={} error={}", finalFileKey, error);
+                        log.error("File not found from safeStorage fileKey={}", finalFileKey, error);
                         String errorDetail = "Allegato non trovato. fileKey=" + finalFileKey;
                         return Mono.error(
                                 new PnFileNotFoundException(
@@ -75,7 +74,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
                                 )
                         );
                     } else if(error.getStatusCode().equals(HttpStatus.GONE)){
-                        log.error("File deleted from safeStorage fileKey={} error={}", finalFileKey, error);
+                        log.error("File deleted from safeStorage fileKey={}", finalFileKey, error);
                         String errorDetail = "Allegato non disponibile: superati i termini di conservazione. fileKey=" + finalFileKey;
                         return Mono.error(
                             new PnFileGoneException(
@@ -104,8 +103,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
 
     @Override
     @Retryable(
-            value = {PnInternalException.class},
-            maxAttempts = 3,
+            retryFor = {PnInternalException.class},
             backoff = @Backoff(random = true, delay = 500, maxDelay = 1000, multiplier = 2)
     )
     public Mono<OperationResultCodeResponse> updateFileMetadata(String fileKey, UpdateFileMetadataRequest request) {
@@ -135,7 +133,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
 
             ResponseEntity<String> res = restTemplate.exchange(url, method, req, String.class);
 
-            if (res.getStatusCodeValue() != HttpStatus.OK.value())
+            if (res.getStatusCode().value() != HttpStatus.OK.value())
             {
                 throw new PnInternalException("File upload failed", PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_UPLOADFILEERROR);
             }
@@ -162,7 +160,7 @@ public class PnSafeStorageClientImpl extends CommonBaseClient implements PnSafeS
      */
     public byte[] downloadPieceOfContent(String url, long maxSize) {
         long readSize = 0;
-        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+        try (BufferedInputStream in = new BufferedInputStream(URI.create(url).toURL().openStream());
              ByteArrayOutputStream fileOutputStream = new ByteArrayOutputStream()) {
             byte[] dataBuffer = new byte[1024];
             int bytesRead;

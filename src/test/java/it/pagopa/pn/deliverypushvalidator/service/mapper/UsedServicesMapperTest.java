@@ -5,7 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.mo
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class UsedServicesMapperTest {
+class UsedServicesMapperTest {
     @Test
     void testExternalToInternal() {
         UsedServices external = new UsedServices();

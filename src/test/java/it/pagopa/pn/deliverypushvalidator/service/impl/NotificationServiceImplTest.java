@@ -16,7 +16,6 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
-import java.util.Map;
 
 class NotificationServiceImplTest {
 
@@ -26,7 +25,7 @@ class NotificationServiceImplTest {
     private NotificationServiceImpl service;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         service = new NotificationServiceImpl(pnDeliveryClient);
     }
 

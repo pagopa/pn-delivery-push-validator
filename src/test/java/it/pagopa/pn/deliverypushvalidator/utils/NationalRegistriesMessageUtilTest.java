@@ -64,9 +64,9 @@ class NationalRegistriesMessageUtilTest {
         List<NationalRegistriesResponse> responses = NationalRegistriesMessageUtil.buildPublicRegistryValidationResponse(physicalAddressesResponse);
 
         assertThat(responses).hasSize(1);
-        NationalRegistriesResponse response = responses.get(0);
+        NationalRegistriesResponse response = responses.getFirst();
         assertThat(response.getCorrelationId()).isEqualTo("corrId1");
-        assertThat(response.getRecIndex()).isEqualTo(0);
+        assertThat(response.getRecIndex()).isZero();
         assertThat(response.getPhysicalAddress()).isNotNull();
         assertThat(response.getPhysicalAddress().getAddress()).isEqualTo("Via Roma 1");
         assertThat(response.getPhysicalAddress().getZip()).isEqualTo("00100");
@@ -100,7 +100,7 @@ class NationalRegistriesMessageUtilTest {
         List<NationalRegistriesResponse> responses = NationalRegistriesMessageUtil.buildPublicRegistryValidationResponse(physicalAddressesResponse);
 
         assertThat(responses).hasSize(1);
-        NationalRegistriesResponse response = responses.get(0);
+        NationalRegistriesResponse response = responses.getFirst();
         assertThat(response.getCorrelationId()).isEqualTo("corrId3");
         assertThat(response.getRecIndex()).isEqualTo(1);
         assertThat(response.getPhysicalAddress()).isNull();

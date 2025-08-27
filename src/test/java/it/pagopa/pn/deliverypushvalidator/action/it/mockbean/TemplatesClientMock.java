@@ -8,9 +8,6 @@ import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.tem
 import java.io.IOException;
 
 public class TemplatesClientMock implements TemplatesClient {
-
-    private static final String RESULT_STRING = "Templates As String Result";
-
     @Override
     public byte[] notificationReceivedLegalFact(LanguageEnum xLanguage, NotificationReceivedLegalFact notificationReceivedLegalFact) {
         return resultPdf();

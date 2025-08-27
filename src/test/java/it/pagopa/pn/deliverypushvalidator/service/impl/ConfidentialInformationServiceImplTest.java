@@ -1,15 +1,15 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.dto.address.DigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.AddressDto;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.AnalogDomicile;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.NotificationRecipientAddressesDto;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
-import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,7 +17,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class ConfidentialInformationServiceImplTest {
@@ -80,6 +81,10 @@ class ConfidentialInformationServiceImplTest {
 
         verify(pnDataVaultClientReactive, times(1))
                 .updateNotificationAddressesByIun(eq(iun), eq(normalizer), anyList());
+        Assertions.assertEquals(analogDomicile, notificationRecipientAddressesDto.getPhysicalAddress());
+        Assertions.assertEquals(addressDto, notificationRecipientAddressesDto.getDigitalAddress());
+        Assertions.assertEquals("denomination", notificationRecipientAddressesDto.getDenomination());
+        Assertions.assertEquals(1, notificationRecipientAddressesDto.getRecIndex());
     }
 
 }

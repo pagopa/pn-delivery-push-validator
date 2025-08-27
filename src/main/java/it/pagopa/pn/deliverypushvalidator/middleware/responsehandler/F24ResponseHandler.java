@@ -32,15 +32,17 @@ public class F24ResponseHandler {
     private static final String PATH_TOKEN_SEPARATOR = "_";
 
 
-    public void handleEventF24(DetailedTypePayload event){
-        if(event instanceof PnF24MetadataValidationEndEvent.Detail metadataValidationEndEvent) {
-            log.info("Handle event PnF24MetadataValidationEndEvent to handleValidationResponseReceived");
-            handleValidationResponseReceived(metadataValidationEndEvent);
-        }else if(event instanceof PnF24PdfSetReadyEvent.Detail pdfSetReadyEvent){
-            log.info("Handle event PnF24PdfSetReadyEvent to handlePrepareResponseReceived");
-            handlePrepareResponseReceived(pdfSetReadyEvent);
-        }else{
-            throw new PnInternalException("Invalid type for handleMessageF24", PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_INVALIDEVENTCODE);
+    public void handleEventF24(DetailedTypePayload event) {
+        switch (event) {
+            case PnF24MetadataValidationEndEvent.Detail metadataValidationEndEvent -> {
+                log.info("Handle event PnF24MetadataValidationEndEvent to handleValidationResponseReceived");
+                handleValidationResponseReceived(metadataValidationEndEvent);
+            }
+            case PnF24PdfSetReadyEvent.Detail pdfSetReadyEvent -> {
+                log.info("Handle event PnF24PdfSetReadyEvent to handlePrepareResponseReceived");
+                handlePrepareResponseReceived(pdfSetReadyEvent);
+            }
+            default -> throw new PnInternalException("Invalid type for handleMessageF24", PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_INVALIDEVENTCODE);
         }
     }
 

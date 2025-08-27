@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
@@ -86,12 +85,10 @@ class NationalRegistriesClientServiceImplTest {
                 .recipients(Collections.emptyList())
                 .build();
 
-        PnInternalException exception = Assertions.assertThrows(PnInternalException.class, () -> {
-            service.getMultiplePhysicalAddress(notification);
-        });
+        PnInternalException exception = Assertions.assertThrows(PnInternalException.class, () -> service.getMultiplePhysicalAddress(notification));
 
         Assertions.assertEquals("No recipients to send request for get physical address", exception.getProblem().getDetail());
-        Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS, exception.getProblem().getErrors().get(0).getCode());
+        Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS, exception.getProblem().getErrors().getFirst().getCode());
     }
 
     private List<NationalRegistriesResponse> getNationalRegistriesResponses() {

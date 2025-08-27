@@ -32,7 +32,7 @@ class SafeStorageResponseHandlerTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         handler = new SafeStorageResponseHandler(documentCreationRequestService, schedulerService, timelineUtils);
     }
 
@@ -49,9 +49,6 @@ class SafeStorageResponseHandlerTest {
         Mockito.when(documentCreationRequestService.getDocumentCreationRequest(Mockito.anyString())).thenReturn(Optional.of(documentCreationRequest));
         //WHEN
         handler.handleSafeStorageResponse(fileDownloadResponse);
-
-        //THEN
-        //schedulerService.scheduleEvent(request.getIun(), request.getRecIndex(), schedulingDate, ActionType.DOCUMENT_CREATION_RESPONSE, request.getTimelineId(), details);
         Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 

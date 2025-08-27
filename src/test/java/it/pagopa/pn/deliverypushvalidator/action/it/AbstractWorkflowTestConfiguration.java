@@ -17,15 +17,15 @@ import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.tem
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.deserializer.RouterDeserializer;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.deserializer.impl.JsonRouterDeserializer;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
-import it.pagopa.pn.deliverypushvalidator.service.*;
+import it.pagopa.pn.deliverypushvalidator.service.DocumentCreationRequestService;
+import it.pagopa.pn.deliverypushvalidator.service.F24Service;
+import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
+import it.pagopa.pn.deliverypushvalidator.service.SafeStorageService;
 import it.pagopa.pn.deliverypushvalidator.service.impl.NotificationProcessCostServiceImpl;
 import it.pagopa.pn.deliverypushvalidator.service.impl.SaveLegalFactsServiceImpl;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AbstractWorkflowTestConfiguration {
     static final int SEND_FEE = 100;

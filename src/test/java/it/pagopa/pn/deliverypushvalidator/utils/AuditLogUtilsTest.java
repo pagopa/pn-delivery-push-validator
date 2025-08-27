@@ -2,10 +2,10 @@ package it.pagopa.pn.deliverypushvalidator.utils;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -30,14 +30,12 @@ class AuditLogUtilsTest {
     }
     
     public Consumer<Integer> testMethod(){
-        return message -> {
-            System.out.println("questo è un consumer "+ message);
-        };
+        return message -> System.out.println("questo è un consumer "+ message);
     }
 
     @Test
     void getAuditLogEventTypeMandate() {
-        String iun_01 = "IUN_01";
+        String iun01 = "IUN_01";
         String taxId = "TaxId";
         
         NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
@@ -46,7 +44,7 @@ class AuditLogUtilsTest {
                 .build();
 
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withIun(iun_01)
+                .withIun(iun01)
                 .withNotificationRecipient(recipient)
                 .build();
 
@@ -57,7 +55,7 @@ class AuditLogUtilsTest {
 
     @Test
     void getAuditLogEventTypeRecipient() {
-        String iun_01 = "IUN_01";
+        String iun01 = "IUN_01";
         String taxId = "TaxId";
 
         NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
@@ -66,7 +64,7 @@ class AuditLogUtilsTest {
                 .build();
 
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withIun(iun_01)
+                .withIun(iun01)
                 .withNotificationRecipient(recipient)
                 .build();
 
@@ -77,7 +75,7 @@ class AuditLogUtilsTest {
 
     @Test
     void getAuditLogEventTypeRecipientSender() {
-        String iun_01 = "IUN_01";
+        String iun01 = "IUN_01";
         String taxId = "TaxId";
 
         NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
@@ -86,7 +84,7 @@ class AuditLogUtilsTest {
                 .build();
 
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withIun(iun_01)
+                .withIun(iun01)
                 .withPaId("paMilano")
                 .withNotificationRecipient(recipient)
                 .build();
@@ -98,7 +96,7 @@ class AuditLogUtilsTest {
 
     @Test
     void getAuditLogEventTypeRecipientError() {
-        String iun_01 = "IUN_01";
+        String iun01 = "IUN_01";
         String taxId = "TaxId";
 
         NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
@@ -107,14 +105,12 @@ class AuditLogUtilsTest {
                 .build();
 
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withIun(iun_01)
+                .withIun(iun01)
                 .withPaId("paMilano")
                 .withNotificationRecipient(recipient)
                 .build();
 
-        assertThrows(PnInternalException.class, () -> {
-            AuditLogUtils.getAuditLogEventType(notification, "TO_ERROR", null);
-        });
+        assertThrows(PnInternalException.class, () -> AuditLogUtils.getAuditLogEventType(notification, "TO_ERROR", null));
 
     }
 }

@@ -36,7 +36,7 @@ class AddressValidatorTest {
     private AddressValidator addressValidator;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         addressValidator = new AddressValidator(addressManagerService, timelineUtils, timelineService);
     }
 

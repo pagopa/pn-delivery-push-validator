@@ -81,7 +81,7 @@ class NotificationValidationActionHandlerTest {
 
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         //quickWorkAroundForPN-9116
         ParameterConsumer parameterConsumerMock = Mockito.mock(ParameterConsumer.class);
         SendMoreThan20GramsParameterConsumer sendMoreThan20GramsParameterConsumer = new SendMoreThan20GramsParameterConsumer(parameterConsumerMock, cfg);
@@ -170,7 +170,7 @@ class NotificationValidationActionHandlerTest {
                         .build())
                 .contentType("contentType")
                 .build()));
-        Mockito.when(safeStorageService.downloadPieceOfContent(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(downloadPieceOfContent(true));
+        Mockito.when(safeStorageService.downloadPieceOfContent(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(downloadPieceOfContent());
 
         Mockito.when(documentComposition.getNumberOfPageFromPdfBytes(Mockito.any())).thenReturn(5);
 
@@ -235,7 +235,7 @@ class NotificationValidationActionHandlerTest {
                         .build())
                 .contentType("contentType")
                 .build()));
-        Mockito.when(safeStorageService.downloadPieceOfContent(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(downloadPieceOfContent(true));
+        Mockito.when(safeStorageService.downloadPieceOfContent(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(downloadPieceOfContent());
 
         Mockito.when(documentComposition.getNumberOfPageFromPdfBytes(Mockito.any())).thenReturn(1);
 
@@ -333,7 +333,7 @@ class NotificationValidationActionHandlerTest {
 
     }
 
-    public Mono<byte[]> downloadPieceOfContent(boolean isPdf) {
+    private Mono<byte[]> downloadPieceOfContent() {
         byte[] res = new byte[8];
         res[0] = 0x25;
         res[1] = 0x50;
@@ -343,9 +343,6 @@ class NotificationValidationActionHandlerTest {
         res[5] = 0x2D;
         res[6] = 0x2D;
         res[7] = 0x2D;
-
-        if (!isPdf)
-            res[1] = 0x2D;
 
         return Mono.just(res);
     }
