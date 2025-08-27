@@ -21,7 +21,7 @@ class AddressManagerResponseHandlerTest {
     private AddressManagerResponseHandler handler;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         handler = new AddressManagerResponseHandler(notificationValidationActionHandler, timelineUtils);
     }
 

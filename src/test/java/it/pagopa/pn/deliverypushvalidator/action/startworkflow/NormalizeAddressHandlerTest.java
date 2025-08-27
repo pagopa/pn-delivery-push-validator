@@ -1,21 +1,21 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
-
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,12 +25,7 @@ import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-
-
 class NormalizeAddressHandlerTest {
 
     @Mock
@@ -44,7 +39,7 @@ class NormalizeAddressHandlerTest {
     private NormalizeAddressHandler normalizeAddressHandler;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
         normalizeAddressHandler = new NormalizeAddressHandler(timelineService, notificationUtils, timelineUtils,confidentialInformationService);
     }
@@ -62,7 +57,7 @@ class NormalizeAddressHandlerTest {
         NotificationRecipientInt notificationRecipientInt =
                 new NotificationRecipientInt("","","",new LegalDigitalAddressInt(),
                         new PhysicalAddressInt("","","","","","","","",""),
-                        Arrays.asList(new NotificationPaymentInfoInt()), RecipientTypeInt.PF);
+                        List.of(new NotificationPaymentInfoInt()), RecipientTypeInt.PF);
         Mockito.when(notificationUtils.getRecipientFromIndex(Mockito.any(),Mockito.anyInt())).thenReturn(notificationRecipientInt);
 
         Mockito.when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.empty());
@@ -74,23 +69,22 @@ class NormalizeAddressHandlerTest {
         Mockito.verify(confidentialInformationService).updateNotificationAddresses(Mockito.any(),Mockito.any(), captor.capture());
         List<NotificationRecipientAddressesDtoInt> capturedList = captor.getValue();
 
-
         //THEN
-        PhysicalAddressInt capturedPhysicalAddressAtPosition0 = capturedList.get(0).getPhysicalAddress();
+        PhysicalAddressInt capturedPhysicalAddressAtPosition0 = capturedList.getFirst().getPhysicalAddress();
         PhysicalAddressInt originPhysicalAddressAtPosition1 = getNormalizeResultIntUnsortedList().get(1).getNormalizedAddress();
-        assertEquals(capturedPhysicalAddressAtPosition0.getAddressDetails(),originPhysicalAddressAtPosition1.getAddressDetails());
-        assertEquals(capturedPhysicalAddressAtPosition0.getZip(),originPhysicalAddressAtPosition1.getZip());
-        assertEquals(capturedPhysicalAddressAtPosition0.getMunicipality(),originPhysicalAddressAtPosition1.getMunicipality());
-        assertEquals(capturedPhysicalAddressAtPosition0.getMunicipalityDetails(),originPhysicalAddressAtPosition1.getMunicipalityDetails());
-        assertEquals(capturedPhysicalAddressAtPosition0.getProvince(),originPhysicalAddressAtPosition1.getProvince());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition0.getAddressDetails(), originPhysicalAddressAtPosition1.getAddressDetails());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition0.getZip(), originPhysicalAddressAtPosition1.getZip());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition0.getMunicipality(), originPhysicalAddressAtPosition1.getMunicipality());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition0.getMunicipalityDetails(), originPhysicalAddressAtPosition1.getMunicipalityDetails());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition0.getProvince(), originPhysicalAddressAtPosition1.getProvince());
 
         PhysicalAddressInt capturedPhysicalAddressAtPosition1 = capturedList.get(1).getPhysicalAddress();
-        PhysicalAddressInt originPhysicalAddressAtPosition0 = getNormalizeResultIntUnsortedList().get(0).getNormalizedAddress();
-        assertEquals(capturedPhysicalAddressAtPosition1.getAddressDetails(),originPhysicalAddressAtPosition0.getAddressDetails());
-        assertEquals(capturedPhysicalAddressAtPosition1.getZip(),originPhysicalAddressAtPosition0.getZip());
-        assertEquals(capturedPhysicalAddressAtPosition1.getMunicipality(),originPhysicalAddressAtPosition0.getMunicipality());
-        assertEquals(capturedPhysicalAddressAtPosition1.getMunicipalityDetails(),originPhysicalAddressAtPosition0.getMunicipalityDetails());
-        assertEquals(capturedPhysicalAddressAtPosition1.getProvince(),originPhysicalAddressAtPosition0.getProvince());
+        PhysicalAddressInt originPhysicalAddressAtPosition0 = getNormalizeResultIntUnsortedList().getFirst().getNormalizedAddress();
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition1.getAddressDetails(), originPhysicalAddressAtPosition0.getAddressDetails());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition1.getZip(), originPhysicalAddressAtPosition0.getZip());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition1.getMunicipality(), originPhysicalAddressAtPosition0.getMunicipality());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition1.getMunicipalityDetails(), originPhysicalAddressAtPosition0.getMunicipalityDetails());
+        Assertions.assertEquals(capturedPhysicalAddressAtPosition1.getProvince(), originPhysicalAddressAtPosition0.getProvince());
     }
 
 

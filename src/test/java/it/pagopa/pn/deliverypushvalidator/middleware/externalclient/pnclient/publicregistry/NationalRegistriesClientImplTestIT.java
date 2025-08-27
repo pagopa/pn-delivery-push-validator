@@ -36,12 +36,12 @@ class NationalRegistriesClientImplTestIT extends MockAWSObjectsTest {
     private NationalRegistriesClient nationalRegistriesClient;
 
     @BeforeAll
-    public static void startMockServer() {
+    static void startMockServer() {
         mockServer = startClientAndServer(9999);
     }
 
     @AfterAll
-    public static void stopMockServer() {
+    static void stopMockServer() {
         mockServer.stop();
     }
 

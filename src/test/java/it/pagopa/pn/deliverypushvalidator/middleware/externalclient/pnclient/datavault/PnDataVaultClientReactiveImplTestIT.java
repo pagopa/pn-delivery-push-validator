@@ -25,8 +25,7 @@ import static org.mockserver.model.HttpResponse.response;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "pn.delivery-push-validator.data-vault-base-url=http://localhost:9998",
-//        "spring.cloud.stream.default.consumer.autoStartup=false"
+        "pn.delivery-push-validator.data-vault-base-url=http://localhost:9998"
 })
 class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
     @Autowired
@@ -73,7 +72,7 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
     }
 
     @Test
-    void getRecipientDenominationByInternalIdKo() throws JsonProcessingException {
+    void getRecipientDenominationByInternalIdKo() {
         mockServer = startClientAndServer(9998);
 
         //Given
@@ -143,9 +142,11 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
 
         ConfidentialTimelineElementDto dto = fluxDto.blockFirst();
 
+        Assertions.assertNotNull(dto);
         Assertions.assertEquals("denomination", dto.getDenomination());
         Assertions.assertEquals("timelineElementId", dto.getTimelineElementId());
         Assertions.assertEquals("taxId", dto.getTaxId());
+        Assertions.assertNotNull(dto.getPhysicalAddress());
         Assertions.assertEquals(analogDomicile.getAddress(), dto.getPhysicalAddress().getAddress());
         Assertions.assertEquals(analogDomicile.getAt(), dto.getPhysicalAddress().getAt());
         Assertions.assertEquals(analogDomicile.getCap(), dto.getPhysicalAddress().getCap());

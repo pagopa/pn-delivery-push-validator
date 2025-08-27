@@ -24,18 +24,17 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-
 class PnSafeStorageClientImplTestRestTemplateIT {
 
     private static ClientAndServer mockServer;
 
     @BeforeAll
-    public static void startMockServer() {
+    static void startMockServer() {
         mockServer = startClientAndServer(9998);
     }
 
     @AfterAll
-    public static void stopMockServer() {
+    static void stopMockServer() {
         mockServer.stop();
     }
 
@@ -95,8 +94,10 @@ class PnSafeStorageClientImplTestRestTemplateIT {
                 .respond(response()
                         .withStatusCode(200));
         
-        safeStorageClient.uploadContent(fileCreationRequest, fileCreationResponse, "sha");
-        Assertions.assertDoesNotThrow(() -> safeStorageClient.uploadContent (fileCreationRequest, fileCreationResponse,"sha"));
+        safeStorageClient.uploadContent(fileCreationRequest, fileCreationResponse, sha256);
+        Assertions.assertDoesNotThrow(() -> safeStorageClient.uploadContent (fileCreationRequest, fileCreationResponse,sha256));
+        Assertions.assertEquals(200, response.getStatusCode().value());
+        Assertions.assertEquals(fileCreationResponse, response.getBody());
     }
 
 
@@ -104,8 +105,6 @@ class PnSafeStorageClientImplTestRestTemplateIT {
     @Test
     void downloadPieceOfContent() {
         //Given
-        String fileKey = "abcd";
-        String sha256 = "base64Sha256";
         String path = "/fileuploadid123123123";
         String fileUrl = "http://localhost:9998" + path;
 

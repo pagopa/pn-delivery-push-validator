@@ -1,6 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.utils;
 
-
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
@@ -17,9 +16,8 @@ public class NotificationRecipientTestBuilder {
     private String internalId;
     private LegalDigitalAddressInt digitalDomicile;
     private List<NotificationPaymentInfoInt> payments;
-    private RecipientTypeInt recipientType;
     private String denomination;
-    
+
     public static NotificationRecipientTestBuilder builder() {
         return new NotificationRecipientTestBuilder();
     }
@@ -49,11 +47,6 @@ public class NotificationRecipientTestBuilder {
     public NotificationRecipientTestBuilder withPayments(List<NotificationPaymentInfoInt> payments) {
         this.payments = payments;
         return this;
-    }
-
-    public NotificationRecipientTestBuilder withRecipientType(RecipientTypeInt recipientType) {
-      this.recipientType = recipientType;
-      return this;
     }
 
     public NotificationRecipientTestBuilder withDenomination(String denomination) {

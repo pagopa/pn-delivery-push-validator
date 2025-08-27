@@ -362,8 +362,6 @@ class AttachmentUtilsTest {
         FileDownloadResponseInt resp = new FileDownloadResponseInt();
         resp.setKey("abcd");
 
-        String message = String.format("Get file failed for - fileKey=%s isMetadataOnly=%b", resp.getKey(), false);
-
         Mockito.when(safeStorageService.getFile(any(), Mockito.anyBoolean())).thenReturn(Mono.error(new PnFileGoneException("File removed", new RuntimeException())));
 
         //THEN

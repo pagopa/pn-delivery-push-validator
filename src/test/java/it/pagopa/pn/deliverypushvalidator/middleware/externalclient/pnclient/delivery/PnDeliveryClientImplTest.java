@@ -11,8 +11,6 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Map;
-
 class PnDeliveryClientImplTest {
 
     @Mock

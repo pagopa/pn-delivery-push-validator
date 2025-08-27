@@ -139,7 +139,7 @@ public class CommonTestConfiguration {
     PnDeliveryPushValidatorConfigs cfg;
     
     @BeforeEach
-    public void setup() {
+    void setup() {
         setDefaultTimeout(Duration.ofSeconds(120));
 
         // Viene creato un oggetto Answer per ottenere l'istante corrente al momento della chiamata ...
@@ -147,7 +147,7 @@ public class CommonTestConfiguration {
         // e configurato Mockito per restituire l'istante corrente al momento della chiamata
         Mockito.when(instantNowSupplier.get()).thenAnswer(answer);
         
-        setcCommonsConfigurationPropertiesForTest(cfg);
+        setCommonsConfigurationPropertiesForTest(cfg);
 
         ConsoleAppenderCustom.initializeLog();
 
@@ -163,7 +163,7 @@ public class CommonTestConfiguration {
         );
     }
 
-    private void setcCommonsConfigurationPropertiesForTest(PnDeliveryPushValidatorConfigs cfg) {
+    private void setCommonsConfigurationPropertiesForTest(PnDeliveryPushValidatorConfigs cfg) {
         // Impostazione delle proprietà TimeParams
         TimeParams times = new TimeParams();
         times.setAttachmentRetentionTimeAfterValidation(Duration.ofSeconds(5));

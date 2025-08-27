@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PnTechnicalRefusalCostModeTest {
+class PnTechnicalRefusalCostModeTest {
     private PnDeliveryPushValidatorConfigs configs;
     private NotificationProcessCostService costService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         configs = mock(PnDeliveryPushValidatorConfigs.class);
         costService = mock(NotificationProcessCostService.class);
     }

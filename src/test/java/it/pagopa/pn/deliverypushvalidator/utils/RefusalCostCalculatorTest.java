@@ -7,6 +7,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -46,7 +46,7 @@ class RefusalCostCalculatorTest {
 
         int result = refusalCostCalculator.calculateRefusalCost(notification, Collections.emptyList());
 
-        assertEquals(3 * SEND_FEE, result);
+        Assertions.assertEquals(3 * SEND_FEE, result);
         verify(notificationProcessCostService, times(1)).getSendFee();
     }
 
@@ -59,7 +59,7 @@ class RefusalCostCalculatorTest {
 
         int result = refusalCostCalculator.calculateRefusalCost(notification, getErrorsList());
 
-        assertEquals(50, result);
+        Assertions.assertEquals(50, result);
         verify(pnTechnicalRefusalCostMode, times(1)).getMode();
         verify(pnTechnicalRefusalCostMode, times(1)).getCost();
     }
@@ -73,7 +73,7 @@ class RefusalCostCalculatorTest {
 
         int result = refusalCostCalculator.calculateRefusalCost(notification, getErrorsList());
 
-        assertEquals(220, result); // 1 recipient with technical error (20) + 2 recipients without (100 each)
+        Assertions.assertEquals(220, result); // 1 recipient with technical error (20) + 2 recipients without (100 each)
         verify(pnTechnicalRefusalCostMode, times(1)).getMode();
         verify(pnTechnicalRefusalCostMode, times(1)).getCost();
         verify(notificationProcessCostService, times(1)).getSendFee();
@@ -96,8 +96,8 @@ class RefusalCostCalculatorTest {
                 refusalCostCalculator.calculateRefusalCost(notification, errors)
         );
 
-        assertEquals("Invalid number of recipients not affected by technical errors", exception.getProblem().getDetail());
-        assertEquals("INVALID_NUMBER_OF_RECIPIENTS", exception.getProblem().getErrors().get(0).getCode());
+        Assertions.assertEquals("Invalid number of recipients not affected by technical errors", exception.getProblem().getDetail());
+        Assertions.assertEquals("INVALID_NUMBER_OF_RECIPIENTS", exception.getProblem().getErrors().getFirst().getCode());
     }
 
     private List<NotificationRecipientInt> getRecipientsList() {

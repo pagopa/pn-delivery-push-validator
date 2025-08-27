@@ -40,7 +40,7 @@ class PaymentValidatorTest {
     private NotificationProcessCostService notificationProcessCostService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         paymentValidator = new PaymentValidator(notificationProcessCostService);
     }
 

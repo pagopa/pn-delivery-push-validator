@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
@@ -8,11 +9,9 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.GenerateF24Int;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.GeneratedF24DetailsInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.f24.model.RequestAccepted;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.f24.PnF24Client;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
@@ -29,15 +28,12 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 
-public class F24ServiceImplTest {
-
-
+class F24ServiceImplTest {
     private PnF24Client pnF24Client;
     private NotificationProcessCostService notificationProcessCostService;
     private NotificationService notificationService;
     private TimelineUtils timelineUtils;
     private TimelineService timelineService;
-
     private F24ServiceImpl f24Service;
 
     @BeforeEach
@@ -68,10 +64,10 @@ public class F24ServiceImplTest {
 
         f24Service.preparePDF("123");
 
-        Mockito.verify(notificationService,Mockito.times(1)).getNotificationByIun(eq(iun));
-        Mockito.verify(timelineUtils,Mockito.times(1)).buildGenerateF24RequestTimelineElement(eq(notification));
-        Mockito.verify(pnF24Client,Mockito.times(1)).preparePDF(eq(timelineElementInternal.getElementId()),eq(iun),eq(10));
-        Mockito.verify(timelineService,Mockito.times(1)).addTimelineElement(eq(timelineElementInternal),eq(notification));
+        Mockito.verify(notificationService,Mockito.times(1)).getNotificationByIun(iun);
+        Mockito.verify(timelineUtils,Mockito.times(1)).buildGenerateF24RequestTimelineElement(notification);
+        Mockito.verify(pnF24Client,Mockito.times(1)).preparePDF(timelineElementInternal.getElementId(),iun,10);
+        Mockito.verify(timelineService,Mockito.times(1)).addTimelineElement(timelineElementInternal,notification);
     }
 
     @Test
@@ -87,9 +83,9 @@ public class F24ServiceImplTest {
 
         f24Service.handleF24PrepareResponse(iun,urls);
 
-        Mockito.verify(notificationService,Mockito.times(1)).getNotificationByIun(eq(iun));
-        Mockito.verify(timelineUtils,Mockito.times(1)).buildGeneratedF24TimelineElement(eq(notification),eq(0),eq(List.of("test")));
-        Mockito.verify(timelineService,Mockito.times(1)).addTimelineElement(eq(timelineElementInternal),eq(notification));
+        Mockito.verify(notificationService,Mockito.times(1)).getNotificationByIun(iun);
+        Mockito.verify(timelineUtils,Mockito.times(1)).buildGeneratedF24TimelineElement(notification,0,List.of("test"));
+        Mockito.verify(timelineService,Mockito.times(1)).addTimelineElement(timelineElementInternal,notification);
     }
 
     private TimelineElementInternal buildF24RequestTimelineElement(NotificationInt notificationInt) {
