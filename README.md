@@ -10,7 +10,6 @@ Il servizio gestisce la validazione asincrona delle notifiche digitali attravers
 - Elaborazione di messaggi da code SQS dedicate
 - Controlli di coerenza, integrità e completezza dei dati
 - Orchestrazione delle azioni di validazione
-- Persistenza degli stati su DynamoDB
 - Comunicazione con servizi esterni dell'ecosistema PN
 
 ## Funzionamento del Servizio
@@ -23,19 +22,18 @@ Il servizio gestisce la validazione asincrona delle notifiche digitali attravers
 
 3. **Gestione degli Esiti**
     - **Validazione positiva**: La notifica prosegue nel workflow con aggiornamento dello stato
-    - **Validazione fallita**: L'errore viene tracciato e gestito secondo le policy configurate
+    - **Validazione fallita**: L'errore viene tracciato mediante un apposito elemento di timeline in cui sono riportati i dettagli dell'errore.
 
 4. **Persistenza e Comunicazione**  
-   Gli stati e i risultati vengono persistiti su DynamoDB e propagati ai servizi downstream tramite code SQS o chiamate REST.
+   Gli stati e i risultati vengono persistiti su DynamoDB e propagati ai servizi downstream tramite code SQS.
 
 ## Panoramica Architetturale
 Il microservizio **pn-delivery-push-validator-service** si compone di:
 - **Message Handlers**: Processamento asincrono di eventi da code SQS
 - **Validation Services**: Logica di business per controlli di validazione
-- **Data Persistence**: Gestione stato su tabelle DynamoDB
 - **External Integration**: Comunicazione con servizi dell'ecosistema PN
 
-Il servizio implementa pattern event-driven per gestire il flusso di validazione asincrona delle notifiche digitali, processando eventi di tipo `DeliveryPushValidationInput`, `ScheduledValidationAction`, `SafeStorageEvent`, `AddressManagerEvent` e `F24Event`.
+Il servizio implementa pattern event-driven per gestire il flusso di validazione asincrona delle notifiche digitali, processando eventi ricevuti dalle code `DeliveryPushValidationInput`, `ScheduledValidationAction`, `SafeStorageEvent`, `AddressManagerEvent` e `F24Event`.
 
 ### Diagramma Architetturale
  ToDo: inserire il diagramma
@@ -50,34 +48,6 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 - **Nome risorsa CloudFormation**: `DocumentCreationRequestTableName`
 - **Tipo**: Tabella DynamoDB
 
-### Funzionamento
-- **Scopo**: Persistenza degli stati e dei dati delle richieste di validazione delle notifiche digitali, inclusi esiti, timestamp, destinatari e metadati.
-- **Operazioni**: Lettura e scrittura di item relativi alle notifiche durante il flusso di validazione asincrona.
-- **Handler/Service**: Utilizzata dai service e handler di validazione (`DeliveryPushValidationService`, `ScheduledValidationActionHandler`, ecc.).
-
-### Struttura Item
-- **Chiave primaria**:
-    - `iun` (string) — Identificativo univoco notifica
-- **Altri campi principali**:
-    - `paProtocolNumber`
-    - `recipients`
-    - `validationStatus`
-    - `lastUpdateTimestamp`
-    - `errorDetails` (se presenti errori)
-
-#### Esempio di item
-```json
-{
-  "iun": "ABC123456",
-  "paProtocolNumber": "2024-0001",
-  "recipients": [
-    { "taxId": "XYZ12345A", "status": "VALIDATED" }
-  ],
-  "validationStatus": "OK",
-  "lastUpdateTimestamp": "2024-06-01T12:34:56Z",
-  "errorDetails": null
-}
-```
 
 ## Code SQS gestite dal servizio
 
@@ -301,10 +271,8 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 ### pn-delivery-push-validator-service
 
 #### Responsabilità
-- Legge e scrive sulle code SQS: DeliveryPushValidationInputsQueue, ScheduledValidationActionsQueue, SafeStorageToDeliveryPushQueue, AddressManagerToDeliveryPushQueue, F24ToDeliveryPushQueue
+- Legge dalle code SQS: DeliveryPushValidationInputsQueue, ScheduledValidationActionsQueue, SafeStorageToDeliveryPushQueue, AddressManagerToDeliveryPushQueue, F24ToDeliveryPushQueue
 - Legge e scrive sulla tabella DynamoDB: DocumentCreationRequestTable
-- Espone endpoint REST per la validazione delle richieste di consegna (`/delivery/validate`) e per il recupero dello stato (`/delivery/status/{id}`)
-- Implementa logica di validazione tramite i service (`DeliveryPushValidationService`, `ValidationActionService`) e handler (`DeliveryPushValidationHandler`, `ScheduledValidationActionHandler`)
 - Processa messaggi/eventi di tipo:
     - DeliveryPushValidationInput (richieste di validazione)
     - ScheduledValidationAction (azioni pianificate)
