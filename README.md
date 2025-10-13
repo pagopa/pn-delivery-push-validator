@@ -47,6 +47,7 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 - **Variabile d'ambiente**: `PN_DELIVERYPUSHVALIDATOR_DOCUMENTCREATIONREQUESTDAO_TABLENAME`
 - **Nome risorsa CloudFormation**: `DocumentCreationRequestTableName`
 - **Tipo**: Tabella DynamoDB
+- **Funzionalità**: La tabella DocumentCreationRequestTable viene utilizzata per persistere le informazioni della richiesta di creazione del legalFacts per poter effettuare successivamente una lookup dal responseHandler di SafeStorage
 
 
 ## Code SQS gestite dal servizio
@@ -69,7 +70,7 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 
 ### Configurazione
 - **Variabile d'ambiente**: `PN_DELIVERYPUSHVALIDATOR_TOPICS_VALIDATIONACTIONS`
-- **Tipo**: Input/Output
+- **Tipo**: Input
 
 ### Funzionamento
 - **Scopo**: Gestisce azioni pianificate di validazione (retry, escalation).
@@ -96,8 +97,8 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 - **Tipo**: Input
 
 ### Funzionamento
-- **Scopo**: Riceve aggiornamenti sugli indirizzi dei destinatari delle notifiche.
-- **Trigger**: Modifica/aggiornamento indirizzo da AddressManager.
+- **Scopo**: Riceve l'esito del processo di normalizzazione degli indirizzi analogici relativi ai destinatari delle notifiche.
+- **Trigger**: Esito del processo di normalizzazione degli indirizzi analogici da Address Manager.
 - **Handler**: `AddressManagerEventHandler.java`
 ---
 
@@ -108,8 +109,8 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 - **Tipo**: Input
 
 ### Funzionamento
-- **Scopo**: Riceve eventi relativi a pagamenti F24 associati alle notifiche.
-- **Trigger**: Evento di pagamento F24 da sistema esterno.
+- **Scopo**: Riceve eventi relativi a pagamenti F24 associati alle notifiche (validazione o generazione).
+- **Trigger**: Evento di pagamento F24 da Pn-F24.
 - **Handler**: `F24EventHandler.java`
 ---
 ## Componenti
@@ -149,10 +150,3 @@ Il servizio implementa pattern event-driven per gestire il flusso di validazione
 | PN_DELIVERYPUSHVALIDATOR_DELIVERYPUSHBASEURL                  | Base URL delivery push       | -       | Si           |
 | PN_CRON_ANALYZER                                              | Cron per metriche CloudWatch | -       | No           |
 | WIRE_TAP_LOG                                                  | Attivazione wire logs        | -       | No           |
-
-## Testing in locale
-
-### Prerequisiti
-1. Docker/Podman avviato con container di Localstack (puoi utilizzare il Docker Compose di [Localdev](https://github.com/pagopa/pn-localdev))
-2. Java 17 installato e configurato nel `PATH`
-3. Node.js (>=18) e npm installati per l'esecuzione degli script di supporto
