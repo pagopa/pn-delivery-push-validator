@@ -36,9 +36,8 @@ Il microservizio **pn-delivery-push-validator-service** si compone di:
 Il servizio implementa pattern event-driven per gestire il flusso di validazione asincrona delle notifiche digitali, processando eventi ricevuti dalle code `DeliveryPushValidationInput`, `ScheduledValidationAction`, `SafeStorageEvent`, `AddressManagerEvent` e `F24Event`.
 
 ### Diagramma Architetturale
- ToDo: inserire il diagramma
-
-
+![Architettura.png](Architettura.png)
+https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ---
 
 ## DocumentCreationRequestTable (DynamoDB)
