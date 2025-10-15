@@ -62,7 +62,6 @@ https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ### Funzionamento
 - **Scopo**: Riceve richieste di validazione asincrona delle notifiche digitali.
 - **Trigger**: Invio di una richiesta di notifica da parte di un ente, dopo la validazione sincrona.
-- **Handler**: `DeliveryPushValidationHandler.java`
 ---
 
 ## ScheduledValidationActionsQueue
@@ -74,7 +73,6 @@ https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ### Funzionamento
 - **Scopo**: Gestisce azioni pianificate di validazione (retry, escalation).
 - **Trigger**: Scheduling automatico o eventi di errore.
-- **Handler**: `ScheduledValidationActionHandler.java`
 ---
 
 ## SafeStorageToDeliveryPushQueue
@@ -86,7 +84,6 @@ https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ### Funzionamento
 - **Scopo**: Riceve eventi da SafeStorage relativi a documenti delle notifiche.
 - **Trigger**: Completamento operazioni su documenti in SafeStorage.
-- **Handler**: `SafeStorageEventHandler.java`
 ---
 
 ## AddressManagerToDeliveryPushQueue
@@ -98,7 +95,6 @@ https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ### Funzionamento
 - **Scopo**: Riceve l'esito del processo di normalizzazione degli indirizzi analogici relativi ai destinatari delle notifiche.
 - **Trigger**: Esito del processo di normalizzazione degli indirizzi analogici da Address Manager.
-- **Handler**: `AddressManagerEventHandler.java`
 ---
 
 ## F24ToDeliveryPushQueue
@@ -110,7 +106,6 @@ https://excalidraw.com/#json=tUdOjrMu5CRGvpSLmEpfv,tR10W69U_yQjrsEpOnCPtw
 ### Funzionamento
 - **Scopo**: Riceve eventi relativi a pagamenti F24 associati alle notifiche (validazione o generazione).
 - **Trigger**: Evento di pagamento F24 da Pn-F24.
-- **Handler**: `F24EventHandler.java`
 ---
 ## Componenti
 
