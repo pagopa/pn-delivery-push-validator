@@ -286,6 +286,11 @@ Parameters:
     Type: String
     Default: 'FATAL'
 
+  ValidationActionQueueDetailType:
+    Type: CommaDelimitedList
+    Default: ''
+    Description: 'List of action detail type to accept in event bridge rule'
+
 Resources:
 
   # PN-Delivery-push validator microservice
@@ -510,3 +515,44 @@ Resources:
               - 'dynamodb:PutItem'
             Resource:
               - !Sub "${DocumentCreationRequestTableArn}"
+
+  EventBusEnqueueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref "AWS::AccountId"
+        Version: "2012-10-17"
+      Policies:
+        - PolicyName: !Sub ${ProjectName}-actionmanager-2-validationactionqueue-eventBusRulePolicy
+          PolicyDocument:
+            Statement:
+              - Sid: putEvents
+                Action:
+                  - sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  - !Ref ScheduledValidationActionsQueueARN
+
+  PnCoreEventBusActionManagerToValidationActionsQueueRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Route ActionManager events to scheduled validation actions queue
+      RoleArn: !GetAtt "EventBusEnqueueRole.Arn"
+      EventBusName: !Sub '${ProjectName}-CoreEventBus'
+      EventPattern:
+        detail-type: "ActionManagerEventOutcome"
+        detail:
+          routingActionType: !Ref ValidationActionQueueDetailType
+      Targets:
+        - Id: !Sub '${ProjectName}-CoreEventBus-ActionManager2ValidationActionQueue'
+          Arn: !Ref ScheduledValidationActionsQueueARN
+          InputPath: $.detail.body
+          DeadLetterConfig:
+            Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
