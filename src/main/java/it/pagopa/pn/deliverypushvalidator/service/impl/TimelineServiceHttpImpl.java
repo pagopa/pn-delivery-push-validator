@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -110,7 +112,8 @@ public class TimelineServiceHttpImpl implements TimelineService {
         try {
             return Optional.of(timelineClient.getNotificationCancellationRequested(iun));
         } catch (PnHttpResponseException pnHttpResponseException) {
-            if (pnHttpResponseException.getStatusCode() == HttpStatus.NOT_FOUND.value()) {
+            if (pnHttpResponseException.getStatusCode() == HttpStatus.NOT_FOUND.value()
+                    && pnHttpResponseException.getProblem().getErrors().getFirst().getCode().equals(ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT)) {
                 log.debug("Cancellation request not found for iun: {}. Returning empty Optional.", iun);
                 return Optional.empty();
             }
