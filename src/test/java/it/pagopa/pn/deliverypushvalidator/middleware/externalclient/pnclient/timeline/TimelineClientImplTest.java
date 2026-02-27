@@ -61,7 +61,8 @@ class TimelineClientImplTest {
         Mockito.when(timelineServiceMapper.getNewTimelineElement(timelineElementInternal, notificationInt))
                 .thenReturn(newTimelineElement);
 
-        Mockito.doNothing().when(timelineControllerApi).addTimelineElement(Mockito.any());
+        Mockito.when(timelineControllerApi.addTimelineElement(Mockito.any()))
+                .thenReturn(new TimelineElementIdResponse());
 
         boolean result = timelineServiceClient.addTimelineElement(timelineElementInternal, notificationInt);
 
