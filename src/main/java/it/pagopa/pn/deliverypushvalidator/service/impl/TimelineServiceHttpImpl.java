@@ -110,7 +110,7 @@ public class TimelineServiceHttpImpl implements TimelineService {
     public Optional<Instant> getNotificationCancellationRequested(String iun){
         log.debug("getNotificationCancellationRequested - IUN={}", iun);
         try {
-            return Optional.of(timelineClient.getNotificationCancellationRequested(iun));
+            return Optional.ofNullable(timelineClient.getNotificationCancellationRequested(iun));
         } catch (PnHttpResponseException pnHttpResponseException) {
             if (pnHttpResponseException.getStatusCode() == HttpStatus.NOT_FOUND.value()
                     && pnHttpResponseException.getProblem().getErrors().getFirst().getCode().equals(ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT)) {
