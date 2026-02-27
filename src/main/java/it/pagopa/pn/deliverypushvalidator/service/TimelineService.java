@@ -3,6 +3,8 @@ package it.pagopa.pn.deliverypushvalidator.service;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
+
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,4 +30,6 @@ public interface TimelineService {
     Set<TimelineElementInternal> getTimelineStrongly(String iun, boolean confidentialInfoRequired);
 
     Set<TimelineElementInternal> getTimelineByIunTimelineId(String iun, String timelineId, boolean confidentialInfoRequired);
+
+    Optional<Instant> getNotificationCancellationRequested(String iun);
 }

@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @CustomLog
 @RequiredArgsConstructor
@@ -94,5 +96,10 @@ public class TimelineClientImpl implements TimelineClient {
                 .filter(element -> TimelineElementCategoryInt.isKnownCategory(element.getCategory().getValue()))
                 .map(timelineServiceMapper::toTimelineElementInternal)
                 .toList();
+    }
+
+    @Override
+    public Instant getNotificationCancellationRequested(String iun) {
+        return timelineControllerApi.getCancellationRequest(iun).getTimestamp();
     }
 }

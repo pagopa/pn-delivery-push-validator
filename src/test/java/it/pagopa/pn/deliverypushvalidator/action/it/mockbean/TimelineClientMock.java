@@ -8,13 +8,17 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDe
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
+    private Instant notificationCancellationRequestedTimestamp;
+
     final HashMap<String, Long> counter = new HashMap<>();
 
     public TimelineClientMock() {
@@ -91,5 +95,10 @@ public class TimelineClientMock implements TimelineClient {
                                 (timelineId == null || timelineElement.getElementId().startsWith(timelineId))
                 )
                 .toList();
+    }
+
+    @Override
+    public Instant getNotificationCancellationRequested(String iun) {
+        return notificationCancellationRequestedTimestamp;
     }
 }

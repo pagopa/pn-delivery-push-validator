@@ -21,8 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
-import static it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId.NOTIFICATION_CANCELLATION_REQUEST;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
@@ -163,23 +162,7 @@ class TimelineUtilsTest {
     void checkIsNotificationCancellationRequested() {
         String iun = "IUN-checkIsNotificationCancellationRequested";
 
-        Set<TimelineElementInternal> setTimelineElement = new HashSet<>();
-
-        String timelineEventId = NOTIFICATION_CANCELLATION_REQUEST.buildEventId(
-                EventId.builder()
-                        .iun(iun)
-                        .build());
-
-        TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
-                .category(TimelineElementCategoryInt.NOTIFICATION_CANCELLATION_REQUEST)
-                .elementId(timelineEventId)
-                .details(NotificationCancellationRequestDetailsInt.builder()
-                        .build())
-                .build();
-
-        setTimelineElement.add(timelineElementInternal);
-
-        Mockito.when(timelineService.getTimelineByIunTimelineId(iun, timelineEventId, false)).thenReturn(setTimelineElement);
+        Mockito.when(timelineService.getNotificationCancellationRequested(anyString())).thenReturn(Optional.of(Instant.now()));
 
         boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun);
         Assertions.assertTrue(isNotificationCancellationRequested);
