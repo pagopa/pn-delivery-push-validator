@@ -79,7 +79,7 @@ class SchedulerServiceImplTest {
     void scheduleEvent2(){
         Action action = buildAction(ActionType.DOCUMENT_CREATION_RESPONSE);
         ActionDetails actionDetails = DocumentCreationResponseActionDetails.builder()
-                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED)
+                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue())
                 .key("key")
                 .timelineId("timelineId")
                 .build();
@@ -96,7 +96,7 @@ class SchedulerServiceImplTest {
     void scheduleEvent4(){
         Action action = buildAction(ActionType.DOCUMENT_CREATION_RESPONSE);
         ActionDetails actionDetails = DocumentCreationResponseActionDetails.builder()
-                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED)
+                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue())
                 .key("key")
                 .timelineId("timelineId")
                 .build();

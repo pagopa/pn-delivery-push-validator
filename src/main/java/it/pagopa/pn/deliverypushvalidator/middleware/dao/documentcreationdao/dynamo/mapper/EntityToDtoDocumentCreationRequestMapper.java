@@ -2,7 +2,6 @@ package it.pagopa.pn.deliverypushvalidator.middleware.dao.documentcreationdao.dy
 
 
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationRequest;
-import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.dao.documentcreationdao.dynamo.entity.DocumentCreationRequestEntity;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,7 @@ public class EntityToDtoDocumentCreationRequestMapper {
                 .key(entity.getKey())
                 .iun(entity.getIun())
                 .recIndex(entity.getRecIndex())
-                .documentCreationType(DocumentCreationTypeInt.valueOf(entity.getDocumentType()))
+                .documentCreationType(entity.getDocumentType())
                 .timelineId(entity.getTimelineId())
                 .build();
     }

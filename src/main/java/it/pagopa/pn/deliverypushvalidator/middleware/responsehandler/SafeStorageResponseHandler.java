@@ -46,7 +46,7 @@ public class SafeStorageResponseHandler {
             if(documentCreationRequestOpt.isPresent()){
                 DocumentCreationRequest creationRequest = documentCreationRequestOpt.get();
                 String iun = creationRequest.getIun();
-                if (timelineUtils.checkIsNotificationCancellationRequested(iun) && creationRequest.getDocumentCreationType() != DocumentCreationTypeInt.NOTIFICATION_CANCELLED){
+                if (timelineUtils.checkIsNotificationCancellationRequested(iun) && !creationRequest.getDocumentCreationType().equals(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue())){
                     log.warn("Process {} blocked: cancellation requested for iun {}", processName, iun);
                 } else {
                     log.debug("DocumentCreationTypeInt is {} and Key to search {}", creationRequest.getDocumentCreationType(), keyWithPrefix);

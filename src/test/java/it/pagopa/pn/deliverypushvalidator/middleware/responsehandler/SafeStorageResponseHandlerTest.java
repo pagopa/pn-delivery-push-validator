@@ -45,7 +45,7 @@ class SafeStorageResponseHandlerTest {
         Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
         Mockito.when(fileDownloadResponse.getKey()).thenReturn(fileKey);
 
-        DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).build();
+        DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).documentCreationType("TEST").build();
         Mockito.when(documentCreationRequestService.getDocumentCreationRequest(Mockito.anyString())).thenReturn(Optional.of(documentCreationRequest));
         //WHEN
         handler.handleSafeStorageResponse(fileDownloadResponse);
@@ -61,7 +61,7 @@ class SafeStorageResponseHandlerTest {
         Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
         Mockito.when(fileDownloadResponse.getKey()).thenReturn(fileKey);
 
-        DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED).build();
+        DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue()).build();
         Mockito.when(documentCreationRequestService.getDocumentCreationRequest(Mockito.anyString())).thenReturn(Optional.of(documentCreationRequest));
         //WHEN
         handler.handleSafeStorageResponse(fileDownloadResponse);
