@@ -34,7 +34,7 @@ class DocumentCreationRequestServiceImplTest {
                 .addDocumentCreationRequest(Mockito.argThat(request ->
                         request.getKey().equals(fileKey) &&
                                 request.getIun().equals(iun) &&
-                                request.getDocumentCreationType().equals(documentType) &&
+                                request.getDocumentCreationType().equals(documentType.getValue()) &&
                                 request.getTimelineId().equals(timelineId)
                 ));
     }
