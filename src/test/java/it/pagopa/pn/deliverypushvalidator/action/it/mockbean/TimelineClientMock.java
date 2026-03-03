@@ -18,12 +18,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
-    private final CancellationRequestResponse cancellationRequestResponse;
 
     final HashMap<String, Long> counter = new HashMap<>();
 
-    public TimelineClientMock(CancellationRequestResponse cancellationRequestResponse) {
-        this.cancellationRequestResponse = cancellationRequestResponse;
+    public TimelineClientMock() {
         timelineList = new CopyOnWriteArrayList<>();
     }
 
@@ -101,6 +99,8 @@ public class TimelineClientMock implements TimelineClient {
 
     @Override
     public CancellationRequestResponse getNotificationCancellationRequested(String iun) {
-        return cancellationRequestResponse;
+        CancellationRequestResponse response = new CancellationRequestResponse();
+        response.setTimestamp(Instant.now());
+        return response;
     }
 }
