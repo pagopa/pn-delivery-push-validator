@@ -5,11 +5,9 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.api.TimelineControllerApi;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NewTimelineElement;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineCategory;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElement;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.*;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.TimelineServiceMapper;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +97,19 @@ public class TimelineClientImpl implements TimelineClient {
     }
 
     @Override
-    public Instant getNotificationCancellationRequested(String iun) {
-        return timelineControllerApi.getCancellationRequest(iun).getTimestamp();
+    public CancellationRequestResponse getNotificationCancellationRequested(String iun) {
+        log.logInvokingExternalService(CLIENT_NAME, GET_NOTIFICATION_CANCELLATION_REQUESTED);
+        try {
+            return timelineControllerApi.getCancellationRequest(iun);
+        } catch (PnHttpResponseException pnHttpResponseException) {
+            if (pnHttpResponseException.getStatusCode() == org.springframework.http.HttpStatus.NOT_FOUND.value()
+                    && pnHttpResponseException.getProblem().getErrors().getFirst().getCode().equals(PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT)) {
+                log.debug("Cancellation request not found for iun: {}. Returning empty Optional.", iun);
+                return null;
+            }
+            else {
+                throw pnHttpResponseException;
+            }
+        }
     }
 }

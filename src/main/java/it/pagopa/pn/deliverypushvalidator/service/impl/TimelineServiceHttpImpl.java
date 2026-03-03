@@ -1,6 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
-import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
@@ -10,7 +9,6 @@ import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,7 +17,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT;
 
 @Service
 @Slf4j
@@ -109,17 +106,6 @@ public class TimelineServiceHttpImpl implements TimelineService {
     @Override
     public Optional<Instant> getNotificationCancellationRequested(String iun){
         log.debug("getNotificationCancellationRequested - IUN={}", iun);
-        try {
-            return Optional.ofNullable(timelineClient.getNotificationCancellationRequested(iun));
-        } catch (PnHttpResponseException pnHttpResponseException) {
-            if (pnHttpResponseException.getStatusCode() == HttpStatus.NOT_FOUND.value()
-                    && pnHttpResponseException.getProblem().getErrors().getFirst().getCode().equals(ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT)) {
-                log.debug("Cancellation request not found for iun: {}. Returning empty Optional.", iun);
-                return Optional.empty();
-            }
-            else {
-                throw pnHttpResponseException;
-            }
-        }
+        return Optional.ofNullable(timelineClient.getNotificationCancellationRequested(iun).getTimestamp());
     }
 }

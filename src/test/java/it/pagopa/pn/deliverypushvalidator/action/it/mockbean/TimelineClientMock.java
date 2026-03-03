@@ -5,6 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.RecipientRelatedTimelineElementDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.CancellationRequestResponse;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,11 +18,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
-    private Instant notificationCancellationRequestedTimestamp;
+    private final CancellationRequestResponse cancellationRequestResponse;
 
     final HashMap<String, Long> counter = new HashMap<>();
 
-    public TimelineClientMock() {
+    public TimelineClientMock(CancellationRequestResponse cancellationRequestResponse) {
+        this.cancellationRequestResponse = cancellationRequestResponse;
         timelineList = new CopyOnWriteArrayList<>();
     }
 
@@ -98,7 +100,7 @@ public class TimelineClientMock implements TimelineClient {
     }
 
     @Override
-    public Instant getNotificationCancellationRequested(String iun) {
-        return notificationCancellationRequestedTimestamp;
+    public CancellationRequestResponse getNotificationCancellationRequested(String iun) {
+        return cancellationRequestResponse;
     }
 }

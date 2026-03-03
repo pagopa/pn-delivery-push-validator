@@ -5,6 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.CancellationRequestResponse;
 
 import java.time.Instant;
 import java.util.List;
@@ -36,5 +37,5 @@ public interface TimelineClient {
 
     List<TimelineElementInternal> getTimeline(String iun, Boolean confidentialInfoRequired, Boolean strongly, String timelineId);
 
-    Instant getNotificationCancellationRequested(String iun);
+    CancellationRequestResponse getNotificationCancellationRequested(String iun);
 }
