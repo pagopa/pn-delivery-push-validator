@@ -171,10 +171,6 @@ Parameters:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
 
-  DocumentCreationRequestTableArn:
-    Type: String
-    Description: 'ARN of dynamodb table containing unreacheble notifications recipients'
-
   ConsumedQueueMessagePerMinuteValidator:
     Type: Number
     Default: 0
@@ -190,10 +186,6 @@ Parameters:
     Description: 'Application load balancer security group'
 
   ScheduledValidationActionsQueueName:
-    Type: String
-    Description: 'Send and pull ready-to-do actions th this queue'
-
-  ScheduledValidationActionsQueueARN:
     Type: String
     Description: 'Send and pull ready-to-do actions th this queue'
 
@@ -248,10 +240,6 @@ Parameters:
   ScheduledValidationActionsQueueAlarmARN:
     Type: String
     Description: delivery push validation actions queue dlq alarm ARN
-
-  ScheduledValidationActionsQueueAgeAlarmARN:
-    Type: String
-    Description: delivery push validation actions queue age alarm ARN
 
   DeliveryPushValidationInputsQueueName:
     Type: String
@@ -372,7 +360,7 @@ Resources:
             - !Ref SafeStorageToDeliveryPushQueueAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
             - !Ref ScheduledValidationActionsQueueAlarmARN
-            - !Ref ScheduledValidationActionsQueueAgeAlarmARN
+            - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ScheduledValidationActionsQueueName}-HasOldMessage
             - !Ref AddressManagerToDeliveryPushQueueAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
             - !Ref F24ToDeliveryPushQueueAlarmARN
@@ -381,7 +369,7 @@ Resources:
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
             - !Ref SafeStorageToDeliveryPushQueueARN
-            - !Ref ScheduledValidationActionsQueueARN
+            - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
             - !Ref AddressManagerToDeliveryPushQueueARN
             - !Ref F24ToDeliveryPushQueueARN
         LogGroupsNames: !Join
@@ -499,7 +487,7 @@ Resources:
               - sqs:SendMessageBatch
             Resource:
               - !Ref DeliveryPushValidationInputsQueueARN
-              - !Ref ScheduledValidationActionsQueueARN
+              - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
               - !Ref SafeStorageToDeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
               - !Ref F24ToDeliveryPushQueueARN
@@ -514,7 +502,7 @@ Resources:
               - 'dynamodb:GetItem'
               - 'dynamodb:PutItem'
             Resource:
-              - !Sub "${DocumentCreationRequestTableArn}"
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DocumentCreationRequestTableName}
 
   EventBusEnqueueRole:
     Type: AWS::IAM::Role
@@ -538,7 +526,7 @@ Resources:
                   - sqs:SendMessage
                 Effect: Allow
                 Resource:
-                  - !Ref ScheduledValidationActionsQueueARN
+                  - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
 
   PnCoreEventBusActionManagerToValidationActionsQueueRule:
     Type: AWS::Events::Rule
@@ -552,7 +540,24 @@ Resources:
           routingActionType: !Ref ValidationActionQueueDetailType
       Targets:
         - Id: !Sub '${ProjectName}-CoreEventBus-ActionManager2ValidationActionQueue'
-          Arn: !Ref ScheduledValidationActionsQueueARN
+          Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
           InputPath: $.detail.body
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
+
+  ScheduledActionsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${ScheduledValidationActionsQueueName}
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventBridgeToSendMessage
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
