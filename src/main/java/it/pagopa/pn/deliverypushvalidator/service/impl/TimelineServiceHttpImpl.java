@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -96,16 +95,8 @@ public class TimelineServiceHttpImpl implements TimelineService {
     }
 
     @Override
-    public Set<TimelineElementInternal> getTimelineByIunTimelineId(String iun, String timelineId, boolean confidentialInfoRequired) {
-        log.debug("getTimelineByIunTimelineId - IUN={}, timelineId={}, confidentialInfoRequired={}", iun, timelineId, confidentialInfoRequired);
-
-        return new HashSet<>(Optional.ofNullable(timelineClient.getTimeline(iun, confidentialInfoRequired, false, timelineId))
-                .orElseGet(Collections::emptyList));
-    }
-
-    @Override
-    public Optional<Instant> getNotificationCancellationRequested(String iun){
-        log.debug("getNotificationCancellationRequested - IUN={}", iun);
-        return Optional.ofNullable(timelineClient.getNotificationCancellationRequested(iun).getTimestamp());
+    public boolean isNotificationCancellationRequested(String iun) {
+        log.debug("isNotificationCancellationRequestedPresent - IUN={}", iun);
+        return timelineClient.getNotificationCancellationRequested(iun).isPresent();
     }
 }

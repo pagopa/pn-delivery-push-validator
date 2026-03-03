@@ -9,7 +9,6 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineser
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -18,16 +17,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class TimelineClientMock implements TimelineClient {
     private CopyOnWriteArrayList<TimelineElementInternal> timelineList;
-
+    private final HashMap<String, CancellationRequestResponse> notificationCancellationRequestMap;
     final HashMap<String, Long> counter = new HashMap<>();
 
     public TimelineClientMock() {
         timelineList = new CopyOnWriteArrayList<>();
+        notificationCancellationRequestMap = new HashMap<>();
     }
 
     public void clear() {
         this.timelineList = new CopyOnWriteArrayList<>();
         this.counter.clear();
+        this.notificationCancellationRequestMap.clear();
     }
 
     @Override
@@ -98,9 +99,11 @@ public class TimelineClientMock implements TimelineClient {
     }
 
     @Override
-    public CancellationRequestResponse getNotificationCancellationRequested(String iun) {
-        CancellationRequestResponse response = new CancellationRequestResponse();
-        response.setTimestamp(Instant.now());
-        return response;
+    public Optional<CancellationRequestResponse> getNotificationCancellationRequested(String iun) {
+        // Non esistono al momento test che richiedono di verificare la cancellazione di una notifica, quindi l'implementazione
+        // restituirà sempre un Optional vuoto. Se in futuro dovessero essere aggiunti test che richiedono di verificare la
+        // cancellazione di una notifica, sarà possibile popolare la mappa notificationCancellationRequestMap con i dati necessari
+        // per i test.
+        return Optional.ofNullable(notificationCancellationRequestMap.get(iun));
     }
 }

@@ -21,7 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
@@ -149,20 +148,10 @@ class TimelineUtilsTest {
     }
 
     @Test
-    void checkIsNotificationCancellationNotRequested() {
-        String iun = "IUN-checkIsNotificationCancellationNotRequested";
-
-        Mockito.when(timelineService.getTimelineByIunTimelineId(Mockito.eq(iun), Mockito.anyString(), Mockito.eq(false))).thenReturn(new HashSet<>());
-
-        boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun);
-        Assertions.assertFalse(isNotificationCancellationRequested);
-    }
-
-    @Test
     void checkIsNotificationCancellationRequested() {
         String iun = "IUN-checkIsNotificationCancellationRequested";
 
-        Mockito.when(timelineService.getNotificationCancellationRequested(anyString())).thenReturn(Optional.of(Instant.now()));
+        Mockito.when(timelineService.isNotificationCancellationRequested(Mockito.eq(iun))).thenReturn(true);
 
         boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun);
         Assertions.assertTrue(isNotificationCancellationRequested);
