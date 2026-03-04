@@ -96,7 +96,7 @@ public class TimelineServiceHttpImpl implements TimelineService {
 
     @Override
     public boolean isNotificationCancellationRequested(String iun) {
-        log.debug("isNotificationCancellationRequestedPresent - IUN={}", iun);
+        log.debug("isNotificationCancellationRequested - IUN={}", iun);
         return timelineClient.getNotificationCancellationRequested(iun).isPresent();
     }
 }
