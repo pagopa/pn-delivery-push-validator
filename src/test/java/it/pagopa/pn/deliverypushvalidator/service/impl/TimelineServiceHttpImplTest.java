@@ -6,6 +6,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.NotificationRequestAcceptedDetailsInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.CancellationRequestResponse;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -199,43 +200,6 @@ class TimelineServiceHttpImplTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void getTimelineByIunTimelineIdReturnsMappedSet() {
-        String iun = "iunTest";
-        String timelineId = "timelineIdTest";
-        boolean confidentialInfoRequired = true;
-        TimelineElementInternal timelineElementInternal = new TimelineElementInternal();
-
-        Mockito.when(timelineClient.getTimeline(
-                iun,
-                confidentialInfoRequired,
-                false,
-                timelineId
-        )).thenReturn(Collections.singletonList(timelineElementInternal));
-
-        Set<TimelineElementInternal> result = timelineServiceHttp.getTimelineByIunTimelineId(iun, timelineId, confidentialInfoRequired);
-
-        assertEquals(1, result.size());
-    }
-
-    @Test
-    void getTimelineByIunTimelineIdReturnsEmptySetWhenClientReturnsNull() {
-        String iun = "iunTest";
-        String timelineId = "timelineIdTest";
-        boolean confidentialInfoRequired = true;
-
-        Mockito.when(timelineClient.getTimeline(
-                iun,
-                confidentialInfoRequired,
-                false,
-                timelineId
-        )).thenReturn(null);
-
-        Set<TimelineElementInternal> result = timelineServiceHttp.getTimelineByIunTimelineId(iun, timelineId, confidentialInfoRequired);
-
-        assertTrue(result.isEmpty());
-    }
-
     private TimelineElementInternal getTimelineElementInternal() {
         Instant timestamp = Instant.ofEpochMilli(1633072800000L);
         TimelineElementInternal element = new TimelineElementInternal();
@@ -252,4 +216,32 @@ class TimelineServiceHttpImplTest {
         element.setEventTimestamp(timestamp);
         return element;
     }
+
+    @Test
+    void isNotificationCancellationRequestedReturnsTrueWhenPresent() {
+        String iun = "iun123";
+        Instant timestamp = Instant.now();
+        CancellationRequestResponse cancellationRequestResponse = new CancellationRequestResponse();
+        cancellationRequestResponse.setTimestamp(timestamp);
+
+        Mockito.when(timelineClient.getNotificationCancellationRequested(iun))
+                .thenReturn(Optional.of(cancellationRequestResponse));
+
+        boolean result = timelineServiceHttp.isNotificationCancellationRequested(iun);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isNotificationCancellationRequestedReturnsFalseWhenNotPresent() {
+        String iun = "iun123";
+
+        Mockito.when(timelineClient.getNotificationCancellationRequested(iun))
+                .thenReturn(Optional.empty());
+
+        boolean result = timelineServiceHttp.isNotificationCancellationRequested(iun);
+
+        assertFalse(result);
+    }
+
 }
