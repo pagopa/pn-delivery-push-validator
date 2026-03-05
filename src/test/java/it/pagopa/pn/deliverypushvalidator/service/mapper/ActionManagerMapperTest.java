@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
+import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 
-import static it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt.AAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
@@ -22,7 +22,7 @@ class ActionManagerMapperTest {
 
         DocumentCreationResponseActionDetails details = DocumentCreationResponseActionDetails.builder()
                 .key("key1")
-                .documentCreationType(AAR)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .timelineId("timeline1")
                 .build();
 

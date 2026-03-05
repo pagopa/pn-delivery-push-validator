@@ -26,7 +26,7 @@ class DocumentCreationRequestServiceImplTest {
         String fileKey = "fileKey";
         String iun = "iun";
         String timelineId = "timelineID";
-        DocumentCreationTypeInt documentType = DocumentCreationTypeInt.DIGITAL_DELIVERY;
+        DocumentCreationTypeInt documentType = DocumentCreationTypeInt.SENDER_ACK;
 
         documentCreationRequestService.addDocumentCreationRequest(fileKey, iun, documentType, timelineId);
 
@@ -34,7 +34,7 @@ class DocumentCreationRequestServiceImplTest {
                 .addDocumentCreationRequest(Mockito.argThat(request ->
                         request.getKey().equals(fileKey) &&
                                 request.getIun().equals(iun) &&
-                                request.getDocumentCreationType().equals(documentType) &&
+                                request.getDocumentCreationType().equals(documentType.getValue()) &&
                                 request.getTimelineId().equals(timelineId)
                 ));
     }

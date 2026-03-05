@@ -22,7 +22,7 @@ public class DocumentCreationRequestServiceImpl implements DocumentCreationReque
         DocumentCreationRequest request = DocumentCreationRequest.builder()
                 .key(fileKey)
                 .iun(iun)
-                .documentCreationType(documentType)
+                .documentCreationType(documentType.getValue())
                 .timelineId(timelineId)
                 .build();
 

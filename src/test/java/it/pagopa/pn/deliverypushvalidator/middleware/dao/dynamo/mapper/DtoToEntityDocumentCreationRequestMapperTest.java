@@ -25,7 +25,7 @@ class DtoToEntityDocumentCreationRequestMapperTest {
                 .timelineId("timelineId")
                 .recIndex(1)
                 .key("keyY")
-                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .build();
 
         DocumentCreationRequestEntity entity = mapper.dto2Entity(request);
@@ -33,7 +33,7 @@ class DtoToEntityDocumentCreationRequestMapperTest {
         Assertions.assertEquals(request.getIun(), entity.getIun());
         Assertions.assertEquals(request.getKey(), entity.getKey());
         Assertions.assertEquals(request.getTimelineId(), entity.getTimelineId());
-        Assertions.assertEquals(request.getDocumentCreationType(), DocumentCreationTypeInt.valueOf(entity.getDocumentType()) );
+        Assertions.assertEquals(request.getDocumentCreationType(), entity.getDocumentType() );
         Assertions.assertEquals(request.getRecIndex(), entity.getRecIndex());
     }
 }
