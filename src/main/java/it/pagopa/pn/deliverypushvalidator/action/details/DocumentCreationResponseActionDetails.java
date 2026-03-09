@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.action.details;
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DocumentCreationResponseActionDetails implements ActionDetails {
     private String key;
-    private DocumentCreationTypeInt documentCreationType;
+    private String documentCreationType;
     private String timelineId;
 }

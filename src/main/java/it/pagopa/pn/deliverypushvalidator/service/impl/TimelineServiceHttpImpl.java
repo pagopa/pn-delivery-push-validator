@@ -4,13 +4,8 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.NewTimelineElement;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineCategory;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElement;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.TimelineElementDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline.TimelineClient;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
-import it.pagopa.pn.deliverypushvalidator.service.mapper.TimelineServiceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -100,10 +95,8 @@ public class TimelineServiceHttpImpl implements TimelineService {
     }
 
     @Override
-    public Set<TimelineElementInternal> getTimelineByIunTimelineId(String iun, String timelineId, boolean confidentialInfoRequired) {
-        log.debug("getTimelineByIunTimelineId - IUN={}, timelineId={}, confidentialInfoRequired={}", iun, timelineId, confidentialInfoRequired);
-
-        return new HashSet<>(Optional.ofNullable(timelineClient.getTimeline(iun, confidentialInfoRequired, false, timelineId))
-                .orElseGet(Collections::emptyList));
+    public boolean isNotificationCancellationRequested(String iun) {
+        log.debug("isNotificationCancellationRequested - IUN={}", iun);
+        return timelineClient.getNotificationCancellationRequested(iun).isPresent();
     }
 }

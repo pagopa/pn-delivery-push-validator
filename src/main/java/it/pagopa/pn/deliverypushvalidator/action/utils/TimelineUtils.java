@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.*;
 
-import static it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId.NOTIFICATION_CANCELLATION_REQUEST;
 import static it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId.REQUEST_REFUSED;
 
 @Component
@@ -242,15 +241,10 @@ public class TimelineUtils {
     }
 
     public boolean checkIsNotificationCancellationRequested(String iun) {
-        String elementId = NOTIFICATION_CANCELLATION_REQUEST.buildEventId(
-                EventId.builder()
-                        .iun(iun)
-                        .build());
+        log.debug("checkIsNotificationCancellationRequested - iun={}", iun);
 
-        Set<TimelineElementInternal> notificationElements = timelineService.getTimelineByIunTimelineId(iun, elementId, false);
-
-        boolean isNotificationCancelled = notificationElements != null && !notificationElements.isEmpty();
-        log.debug("NotificationCancelled value is={}", isNotificationCancelled);
+        boolean isNotificationCancelled = timelineService.isNotificationCancellationRequested(iun);
+        log.debug("NotificationCancellationRequested value is={}", isNotificationCancelled);
 
         return isNotificationCancelled;
     }

@@ -17,9 +17,9 @@ public class DocumentCreationResponseHandler {
 
     public void handleResponseReceived( String iun, DocumentCreationResponseActionDetails details) {
         String fileKey = details.getKey();
-        DocumentCreationTypeInt documentCreationType = details.getDocumentCreationType();
+        String documentCreationType = details.getDocumentCreationType();
 
-        if (Objects.requireNonNull(documentCreationType) == DocumentCreationTypeInt.SENDER_ACK) {
+        if (Objects.requireNonNull(documentCreationType).equals(DocumentCreationTypeInt.SENDER_ACK.getValue())) {
             receivedLegalFactHandler.handleReceivedLegalFactCreationResponse(iun, fileKey);
         } else {
             log.warn("DocumentCreationResponseHandler: documentCreationType={} not supported for iun={}", documentCreationType, iun);

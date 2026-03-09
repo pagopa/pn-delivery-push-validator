@@ -40,7 +40,7 @@ class DocumentCreationResponseEventHandlerTest {
     void handleExecutesWhenNotificationNotCancelled() {
         DocumentCreationResponseActionDetails details = DocumentCreationResponseActionDetails.builder()
                 .key("file_key")
-                .documentCreationType(DocumentCreationTypeInt.AAR)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")
@@ -60,7 +60,7 @@ class DocumentCreationResponseEventHandlerTest {
     void handleDoesNotExecuteWhenNotificationCancelled() {
         DocumentCreationResponseActionDetails details = DocumentCreationResponseActionDetails.builder()
                 .key("file_key")
-                .documentCreationType(DocumentCreationTypeInt.AAR)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")
@@ -80,7 +80,7 @@ class DocumentCreationResponseEventHandlerTest {
     void handleLogsAndThrowsExceptionOnError() {
         DocumentCreationResponseActionDetails details = DocumentCreationResponseActionDetails.builder()
                 .key("file_key")
-                .documentCreationType(DocumentCreationTypeInt.AAR)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")

@@ -5,8 +5,10 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.timelineservice.model.CancellationRequestResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TimelineClient {
     String CLIENT_NAME = PnLogger.EXTERNAL_SERVICES.PN_TIMELINE_SERVICE;
@@ -17,7 +19,7 @@ public interface TimelineClient {
     String GET_TIMELINE_ELEMENT_DETAIL_FOR_SPECIFIC_RECIPIENT = "GET TIMELINE ELEMENT DETAIL FOR SPECIFIC RECIPIENT";
     String GET_TIMELINE_ELEMENT_FOR_SPECIFIC_RECIPIENT = "GET TIMELINE ELEMENT FOR SPECIFIC RECIPIENT";
     String GET_TIMELINE = "GET TIMELINE";
-    String GET_TIMELINE_AND_STATUS_HISTORY = "GET TIMELINE AND STATUS HISTORY";
+    String GET_NOTIFICATION_CANCELLATION_REQUESTED = "GET NOTIFICATION CANCELLATION REQUESTED";
 
     boolean addTimelineElement(TimelineElementInternal element, NotificationInt notification);
 
@@ -32,4 +34,6 @@ public interface TimelineClient {
     TimelineElementInternal getTimelineElementForSpecificRecipient(String iun, Integer recIndex, TimelineElementCategoryInt category);
 
     List<TimelineElementInternal> getTimeline(String iun, Boolean confidentialInfoRequired, Boolean strongly, String timelineId);
+
+    Optional<CancellationRequestResponse> getNotificationCancellationRequested(String iun);
 }
