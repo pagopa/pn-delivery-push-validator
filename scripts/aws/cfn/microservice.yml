@@ -189,6 +189,10 @@ Parameters:
     Type: String
     Description: 'Send and pull ready-to-do actions th this queue'
 
+  ScheduledValidationActionsDLQQueueName:
+    Type: String
+    Description: 'DLQ for scheduled validation actions queue'
+
   SafeStorageToDeliveryPushQueueName:
     Type: String
     Description: 'SafeStorage-to-delivery-push queue Name'
@@ -236,10 +240,6 @@ Parameters:
   AddressManagerToDeliveryPushQueueAgeAlarmARN:
     Type: String
     Description: AddressManager-to-delivery-push queue age alarm ARN
-
-  ScheduledValidationActionsQueueAlarmARN:
-    Type: String
-    Description: delivery push validation actions queue dlq alarm ARN
 
   DeliveryPushValidationInputsQueueName:
     Type: String
@@ -359,7 +359,7 @@ Resources:
             - !Ref DeliveryPushValidationInputsQueueAgeAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
-            - !Ref ScheduledValidationActionsQueueAlarmARN
+            - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ScheduledValidationActionsDLQQueueName}-HasMessage
             - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ScheduledValidationActionsQueueName}-HasOldMessage
             - !Ref AddressManagerToDeliveryPushQueueAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
