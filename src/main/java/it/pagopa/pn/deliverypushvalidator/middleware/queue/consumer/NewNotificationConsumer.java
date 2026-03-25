@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
+
 import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.setMdc;
 
 @Configuration
@@ -35,7 +36,7 @@ public class NewNotificationConsumer {
             startWorkflowHandler.startWorkflow(iun);
             log.logEndingProcess(processName);
         } catch (Exception ex) {
-            log.logEndingProcess(processName, false, ex.getMessage());
+            log.logEndingProcess(processName, false, ex.getMessage(),ex);
             HandleEventUtils.handleException(message.getHeaders(), ex);
             throw ex;
         }

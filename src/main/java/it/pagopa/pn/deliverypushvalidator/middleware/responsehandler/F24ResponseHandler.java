@@ -7,8 +7,8 @@ import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidF24Exception;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.f24.PnF24Client;
-import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import lombok.AllArgsConstructor;
@@ -66,7 +66,7 @@ public class F24ResponseHandler {
                 validationActionHandler.handleValidateF24Response(metadataValidationEndEvent);
                 log.logEndingProcess(processName);
             } catch (Exception ex){
-                log.logEndingProcess(processName, false, ex.getMessage());
+                log.logEndingProcess(processName, false, ex.getMessage(),ex);
                 throw ex;
             }
         }else{
