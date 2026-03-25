@@ -590,12 +590,27 @@ Resources:
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
 
-
   ScheduledActionsQueuePolicy:
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
         - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${ScheduledValidationActionsQueueName}
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventBridgeToSendMessage
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
+
+  PnNotificationCostServiceToDeliveryPushValidatorQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
         - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${PnNotificationCostToDeliveryPushValidatorQueueName}
       PolicyDocument:
         Statement:
@@ -604,11 +619,7 @@ Resources:
             Principal:
               Service: events.amazonaws.com
             Action: sqs:SendMessage
-            Resource:
-             - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
-             - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
+            Resource: !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
             Condition:
               ArnEquals:
-                aws:SourceArn: 
-                  - !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
-                  - !GetAtt PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule.Arn
+                aws:SourceArn: !GetAtt PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule.Arn
