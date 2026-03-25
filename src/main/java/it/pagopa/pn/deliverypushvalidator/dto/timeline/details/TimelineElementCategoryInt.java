@@ -15,7 +15,9 @@ public enum TimelineElementCategoryInt {
     GENERATED_F24(GeneratedF24DetailsInt.class,  TimelineElementCategoryInt.VERSION_23),
     REQUEST_REFUSED(RequestRefusedDetailsInt.class,  TimelineElementCategoryInt.VERSION_10),
     PUBLIC_REGISTRY_VALIDATION_CALL(PublicRegistryValidationCallDetailsInt.class, TimelineElementCategoryInt.VERSION_27),
-    PUBLIC_REGISTRY_VALIDATION_RESPONSE(PublicRegistryValidationResponseDetailsInt.class, TimelineElementCategoryInt.VERSION_27);
+    PUBLIC_REGISTRY_VALIDATION_RESPONSE(PublicRegistryValidationResponseDetailsInt.class, TimelineElementCategoryInt.VERSION_27),
+    NOTIFICATION_COST_VALIDATION_REQUEST(NotificationCostValidationRequestDetailsInt.class, TimelineElementCategoryInt.VERSION_28),
+    NOTIFICATION_COST_VALIDATION_RESPONSE(NotificationCostValidationResponseDetailsInt.class, TimelineElementCategoryInt.VERSION_28);
 
 
     private final Class<? extends TimelineElementDetailsInt> detailsJavaClass;
@@ -28,6 +30,7 @@ public enum TimelineElementCategoryInt {
     public static final int VERSION_20 = 20;
     public static final int VERSION_23 = 23;
     public static final int VERSION_27 = 27;
+    public static final int VERSION_28 = 28;
 
     TimelineElementCategoryInt(Class<? extends TimelineElementDetailsInt> detailsJavaClass, int version) {
         this(detailsJavaClass, PRIORITY_BEFORE, version);

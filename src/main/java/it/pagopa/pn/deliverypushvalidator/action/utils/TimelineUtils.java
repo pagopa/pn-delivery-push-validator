@@ -13,7 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId.REQUEST_REFUSED;
 
@@ -247,6 +250,36 @@ public class TimelineUtils {
         log.debug("NotificationCancellationRequested value is={}", isNotificationCancelled);
 
         return isNotificationCancelled;
+    }
+
+    public TimelineElementInternal buildNotificationCostValidationRequest(NotificationInt notification,String categoryType) {
+        log.debug("buildNotificationCostValidationRequest - IUN={} and categoryType={}", notification.getIun(), categoryType);
+
+        String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
+                EventId.builder()
+                        .iun(notification.getIun())
+                        .build());
+
+        NotificationCostValidationRequestDetailsInt details = NotificationCostValidationRequestDetailsInt.builder()
+                .categoryType(categoryType)
+                .build();
+
+        return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, elementId, details);
+    }
+
+    public TimelineElementInternal buildNotificationCostValidationResponse(NotificationInt notification,String categoryType) {
+        log.debug("buildNotificationCostValidationResponse - IUN={} and categoryType={}", notification.getIun(), categoryType);
+
+        String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_RESPONSE.buildEventId(
+                EventId.builder()
+                        .iun(notification.getIun())
+                        .build());
+
+        NotificationCostValidationResponseDetailsInt details = NotificationCostValidationResponseDetailsInt.builder()
+                .categoryType(categoryType)
+                .build();
+
+        return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, elementId, details);
     }
 
     public Optional<TimelineElementInternal> getValidatedF24(String iun){
