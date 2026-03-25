@@ -257,6 +257,22 @@ Parameters:
     Type: String
     Description: DeliveryPushValidationInputsQueue age alarm ARN
 
+  PnNotificationCostToDeliveryPushValidatorQueueARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue ARN'
+
+  PnNotificationCostToDeliveryPushValidatorQueueName:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue Name'
+
+  PnNotificationCostToDeliveryPushValidatorQueueAlarmARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue alarm ARN'
+
+  PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue age alarm ARN'
+
   SandboxSafeStorageBaseUrl:
     Type: String
     Description: 'Safe storage base url'
@@ -325,6 +341,7 @@ Resources:
         ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSHVALIDATOR_DELIVERYPUSHBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry18: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
         ContainerEnvEntry19: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_PNNOTIFICATIONCOSTTODELIVERYPUSHVALIDATOREVENTS=${PnNotificationCostToDeliveryPushValidatorQueueName}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -365,6 +382,8 @@ Resources:
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
             - !Ref F24ToDeliveryPushQueueAlarmARN
             - !Ref F24ToDeliveryPushQueueAgeAlarmARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueAlarmARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
@@ -372,6 +391,7 @@ Resources:
             - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
             - !Ref AddressManagerToDeliveryPushQueueARN
             - !Ref F24ToDeliveryPushQueueARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-delivery-push-validator'
@@ -491,6 +511,7 @@ Resources:
               - !Ref SafeStorageToDeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
               - !Ref F24ToDeliveryPushQueueARN
+              - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
           - Effect: Allow
             Action:
               - 'ssm:GetParameter'
@@ -527,6 +548,15 @@ Resources:
                 Effect: Allow
                 Resource:
                   - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+        - PolicyName: pn-notification-cost-service-to-delivery-push-validator-queue-eventbus-rule-policy
+          PolicyDocument:
+            Statement:
+              - Sid: putEvents
+                Action:
+                  - sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
 
   PnCoreEventBusActionManagerToValidationActionsQueueRule:
     Type: AWS::Events::Rule
@@ -545,11 +575,28 @@ Resources:
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
 
+  PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Route Notification Cost validation Events to pn-delivery-push-validator
+      RoleArn: !GetAtt "EventBusEnqueueRole.Arn"
+      EventBusName: !Sub '${ProjectName}-CoreEventBus'
+      EventPattern:
+        detail-type: [ "NotificationCostServiceOutcomeEvent" ]
+      Targets:
+        - Id: !Sub '${ProjectName}-CoreEventBus-NotificationCostToDeliveryPushValidator'
+          Arn: !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
+          InputPath: $.detail
+          DeadLetterConfig:
+            Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
+
+
   ScheduledActionsQueuePolicy:
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
         - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${ScheduledValidationActionsQueueName}
+        - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${PnNotificationCostToDeliveryPushValidatorQueueName}
       PolicyDocument:
         Statement:
           - Sid: AllowEventBridgeToSendMessage
@@ -557,7 +604,11 @@ Resources:
             Principal:
               Service: events.amazonaws.com
             Action: sqs:SendMessage
-            Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+            Resource:
+             - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+             - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
             Condition:
               ArnEquals:
-                aws:SourceArn: !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
+                aws:SourceArn: 
+                  - !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
+                  - !GetAtt PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule.Arn
