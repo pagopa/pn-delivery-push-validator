@@ -7,7 +7,6 @@ public enum TimelineEventId {
         public String buildEventId(EventId eventId) {
             return new TimelineEventIdBuilder()
                     .withCategory(this.getValue())
-                    .withIun(eventId.getIun())
                     .build();
         }
     },
@@ -17,7 +16,6 @@ public enum TimelineEventId {
         public String buildEventId(EventId eventId) {
             return new TimelineEventIdBuilder()
                     .withCategory(this.getValue())
-                    .withIun(eventId.getIun())
                     .build();
         }
     },

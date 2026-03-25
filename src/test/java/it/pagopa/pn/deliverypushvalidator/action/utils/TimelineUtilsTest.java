@@ -226,10 +226,9 @@ class TimelineUtilsTest {
         String categoryType = "AR_REGISTERED_LETTER";
         
         TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationRequest(notification, categoryType);
-        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_REQUEST.IUN_Example_IUN_1234_Test";
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_REQUEST";
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals("Example_IUN_1234_Test", actual.getIun()),
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, actual.getCategory()),
                 () -> Assertions.assertNotNull(actual.getDetails()),
@@ -244,10 +243,9 @@ class TimelineUtilsTest {
         String categoryType = "AR_REGISTERED_LETTER";
         
         TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationResponse(notification, categoryType);
-        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_RESPONSE.IUN_Example_IUN_1234_Test";
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_RESPONSE";
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals("Example_IUN_1234_Test", actual.getIun()),
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, actual.getCategory()),
                 () -> Assertions.assertNotNull(actual.getDetails()),

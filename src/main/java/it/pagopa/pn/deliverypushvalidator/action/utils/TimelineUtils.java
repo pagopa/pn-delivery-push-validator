@@ -257,12 +257,12 @@ public class TimelineUtils {
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
                 EventId.builder()
-                        .iun(notification.getIun())
                         .build());
 
         NotificationCostValidationRequestDetailsInt details = NotificationCostValidationRequestDetailsInt.builder()
                 .categoryType(categoryType)
                 .build();
+
 
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, elementId, details);
     }
@@ -272,12 +272,12 @@ public class TimelineUtils {
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_RESPONSE.buildEventId(
                 EventId.builder()
-                        .iun(notification.getIun())
                         .build());
 
         NotificationCostValidationResponseDetailsInt details = NotificationCostValidationResponseDetailsInt.builder()
                 .categoryType(categoryType)
                 .build();
+
 
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, elementId, details);
     }
