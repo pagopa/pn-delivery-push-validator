@@ -252,32 +252,28 @@ public class TimelineUtils {
         return isNotificationCancelled;
     }
 
-    public TimelineElementInternal buildNotificationCostValidationRequest(NotificationInt notification,String categoryType) {
-        log.debug("buildNotificationCostValidationRequest - IUN={} and categoryType={}", notification.getIun(), categoryType);
+    public TimelineElementInternal buildNotificationCostValidationRequest(NotificationInt notification) {
+        log.debug("buildNotificationCostValidationRequest - IUN={}", notification.getIun());
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
                 EventId.builder()
                         .build());
 
         NotificationCostValidationRequestDetailsInt details = NotificationCostValidationRequestDetailsInt.builder()
-                .categoryType(categoryType)
                 .build();
-
 
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, elementId, details);
     }
 
-    public TimelineElementInternal buildNotificationCostValidationResponse(NotificationInt notification,String categoryType) {
-        log.debug("buildNotificationCostValidationResponse - IUN={} and categoryType={}", notification.getIun(), categoryType);
+    public TimelineElementInternal buildNotificationCostValidationResponse(NotificationInt notification) {
+        log.debug("buildNotificationCostValidationResponse - IUN={}", notification.getIun());
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_RESPONSE.buildEventId(
                 EventId.builder()
                         .build());
 
         NotificationCostValidationResponseDetailsInt details = NotificationCostValidationResponseDetailsInt.builder()
-                .categoryType(categoryType)
                 .build();
-
 
         return buildTimeline(notification, TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, elementId, details);
     }
