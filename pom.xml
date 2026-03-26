@@ -731,7 +731,7 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>https://raw.githubusercontent.com/pagopa/pn-notification-cost-service/ebb0e77d31b03bd5d1915e2175295dff8e4bcaaa/docs/openapi/api-private.yaml</inputSpec>
+							<inputSpec>https://raw.githubusercontent.com/pagopa/pn-notification-cost-service/da262171c2742ee1a6f9468f80e9bee255249ea9/docs/openapi/api-private.yaml</inputSpec>
 							<templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
 							<generatorName>java</generatorName>
 							<library>webclient</library>
