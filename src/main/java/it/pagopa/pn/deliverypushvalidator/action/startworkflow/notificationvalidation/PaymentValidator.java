@@ -67,7 +67,7 @@ public class PaymentValidator {
     }
 
     private void startValidationAndUpdateFeeProcess(NotificationInt notification, Instant startWorkflowInstant) {
-        List<PaymentsInfoForRecipientInt> paymentsInfoForRecipients = PaymentUtils.getPaymentsInfoFromNotification(notification);
+        List<PaymentsInfoForRecipientInt> paymentsInfoForRecipients = PaymentUtils.getPaymentsInfoWithApplyCostFromNotification(notification);
 
         int notificationBaseCost = notificationProcessCostService.getNotificationBaseCost(notification.getPaFee());
 
