@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationRequest;
@@ -62,7 +61,7 @@ public class SafeStorageResponseHandler {
 
             log.logEndingProcess(processName);
         }catch (Exception ex){
-            log.logEndingProcess(processName, false, ex.getMessage());
+            log.logEndingProcess(processName, false, ex.getMessage(),ex);
             throw ex;
         }
 
