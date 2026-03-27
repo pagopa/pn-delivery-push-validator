@@ -1,7 +1,9 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice;
 
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.api.NotificationCostRecipientApi;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.*;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PaymentData;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.RecipientCostData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,13 +58,7 @@ class PnNotificationCostServiceClientImplTest {
         RecipientCostData recipientCostData = new RecipientCostData()
                 .recIndex(0)
                 .recipientInternalId("PF-4fc75df3-0913-407e-bdaa-e50329708b7d")
-                .senderPaId("paID")
-                .senderTaxId("taxId")
-                .payments(Collections.singletonList(paymentData))
-                .paFee(50)
-                .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
-                .pagoPaIntMode(PagoPaIntMode.SYNC)
-                .vat(22);
+                .payments(Collections.singletonList(paymentData));
 
         return new NewNotificationCostRequest()
                 .costRecipients(Collections.singletonList(recipientCostData));
