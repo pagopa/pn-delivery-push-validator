@@ -384,6 +384,7 @@ Resources:
             - !Ref F24ToDeliveryPushQueueAgeAlarmARN
             - !Ref PnNotificationCostToDeliveryPushValidatorQueueAlarmARN
             - !Ref PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
