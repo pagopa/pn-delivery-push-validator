@@ -27,6 +27,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCre
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.F24ResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.service.impl.*;
+import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
@@ -104,7 +105,10 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         SafeStorageConsumer.class,
         ValidationActionsConsumer.class,
         DocumentCreationResponseHandler.class,
-        DocumentCreationResponseEventHandler.class
+        DocumentCreationResponseEventHandler.class,
+        NotificationCostServiceImpl.class,
+        NotificationCostServiceClientMock.class,
+        NotificationCostServiceMapper.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
@@ -125,6 +129,8 @@ public class CommonTestConfiguration {
     PnDeliveryClientMock pnDeliveryClientMock;
     @Autowired
     NationalRegistriesClientMock nationalRegistriesClientMock;
+    @Autowired
+    NotificationCostServiceClientMock notificationCostServiceClientMock;
     @Autowired
     InstantNowSupplier instantNowSupplier;
     @Autowired
