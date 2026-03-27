@@ -1,11 +1,14 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
+import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static it.pagopa.pn.deliverypushvalidator.action.utils.PaymentUtils.getAllPaymentsInfoFromNotification;
 
@@ -43,20 +46,24 @@ public class NotificationCostServiceMapper {
     private static List<RecipientCostData> mapRecipients(NotificationInt notificationInt) {
         List<RecipientCostData> recipientCostDataList = new ArrayList<>();
 
+        Map<Integer, List<PaymentsInfoForRecipientInt>> paymentsByRecipient =
+                getAllPaymentsInfoFromNotification(notificationInt)
+                        .stream()
+                        .collect(Collectors.groupingBy(PaymentsInfoForRecipientInt::getRecIndex));
+
         for (int i = 0; i < notificationInt.getRecipients().size(); i++) {
             RecipientCostData recipient = new RecipientCostData();
             recipient.setRecIndex(i);
             recipient.setRecipientInternalId(notificationInt.getRecipients().get(i).getInternalId());
-            recipient.setPayments(mapPaymentsInfo(notificationInt, i));
+            recipient.setPayments(mapPaymentsInfo(paymentsByRecipient.getOrDefault(i, List.of())));
             recipientCostDataList.add(recipient);
         }
         return recipientCostDataList;
     }
 
-    private static List<PaymentData> mapPaymentsInfo(NotificationInt notificationInt, int recipientIndex) {
-        return getAllPaymentsInfoFromNotification(notificationInt)
+    private static List<PaymentData> mapPaymentsInfo(List<PaymentsInfoForRecipientInt> paymentsForRecipient) {
+        return paymentsForRecipient
                 .stream()
-                .filter(paymentInt -> paymentInt.getRecIndex().equals(recipientIndex))
                 .map(paymentInt -> {
                     PaymentData paymentData = new PaymentData();
                     paymentData.setIuv(paymentInt.getCreditorTaxId() + "##" + paymentInt.getNoticeCode());
