@@ -1,6 +1,25 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline;
 
 public enum TimelineEventId {
+
+    NOTIFICATION_COST_VALIDATION_REQUEST("NOTIFICATION_COST_VALIDATION_REQUEST") {
+        @Override
+        public String buildEventId(EventId eventId) {
+            return new TimelineEventIdBuilder()
+                    .withCategory(this.getValue())
+                    .build();
+        }
+    },
+
+    NOTIFICATION_COST_VALIDATION_RESPONSE("NOTIFICATION_COST_VALIDATION_RESPONSE") {
+        @Override
+        public String buildEventId(EventId eventId) {
+            return new TimelineEventIdBuilder()
+                    .withCategory(this.getValue())
+                    .build();
+        }
+    },
+
     SENDERACK_CREATION_REQUEST("SENDERACK_LEGALFACT_CREATION_REQUEST") {
         @Override
         public String buildEventId(EventId eventId) {

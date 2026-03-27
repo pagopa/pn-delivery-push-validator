@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
@@ -216,6 +217,36 @@ class TimelineUtilsTest {
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.REQUEST_REFUSED, result.getCategory()),
                 () -> Assertions.assertNotNull(result.getDetails()),
                 () -> Assertions.assertEquals(errors, ((RequestRefusedDetailsInt) result.getDetails()).getRefusalReasons())
+        );
+    }
+
+    @Test
+    void buildNotificationCostValidationRequest() {
+        NotificationInt notification = buildNotification();
+
+        TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationRequest(notification);
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_REQUEST";
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
+                () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, actual.getCategory()),
+                () -> Assertions.assertNotNull(actual.getDetails()),
+                () -> Assertions.assertInstanceOf(NotificationCostValidationRequestDetailsInt.class, actual.getDetails())
+        );
+    }
+
+    @Test
+    void buildNotificationCostValidationResponse() {
+        NotificationInt notification = buildNotification();
+        
+        TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationResponse(notification);
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_RESPONSE";
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
+                () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, actual.getCategory()),
+                () -> Assertions.assertNotNull(actual.getDetails()),
+                () -> Assertions.assertInstanceOf(NotificationCostValidationResponseDetailsInt.class, actual.getDetails())
         );
     }
 }
