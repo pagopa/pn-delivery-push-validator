@@ -13,7 +13,7 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.eq;
 
-class PnNotificationCostServiceClientImplTest {
+class NotificationCostServiceClientImplTest {
     private NotificationCostRecipientApi notificationCostRecipientApi;
 
     private NotificationCostServiceClientImpl client;
