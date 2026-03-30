@@ -54,7 +54,7 @@ class NotificationCostServiceImplTest {
     }
 
     @Test
-    void initializeNotificationCost_shouldCallClientAndAddTimelineElement() {
+    void initializeAndValidateNotificationCost_shouldCallClientAndAddTimelineElement() {
         // Given
         String iun = "TEST-IUN-123";
         NotificationInt notificationInt = buildNotificationInt(iun);
@@ -70,7 +70,7 @@ class NotificationCostServiceImplTest {
                 .thenReturn(Mono.just("success"));
 
         // When
-        notificationCostService.initializeNotificationCost(notificationInt);
+        notificationCostService.initializeAndValidateNotificationCost(notificationInt);
 
         // Then
         verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
@@ -80,7 +80,7 @@ class NotificationCostServiceImplTest {
     }
 
     @Test
-    void initializeNotificationCost_shouldHandleClientError() {
+    void initializeAndValidateNotificationCost_shouldHandleClientError() {
         // Given
         String iun = "TEST-IUN-ERROR";
         NotificationInt notificationInt = buildNotificationInt(iun);
@@ -98,7 +98,7 @@ class NotificationCostServiceImplTest {
                 .thenReturn(Mono.error(expectedException));
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> notificationCostService.initializeNotificationCost(notificationInt));
+        assertThrows(RuntimeException.class, () -> notificationCostService.initializeAndValidateNotificationCost(notificationInt));
 
         verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
         verify(notificationCostServiceMapper, times(1)).mapNotificationToRequest(notificationInt);
@@ -107,7 +107,7 @@ class NotificationCostServiceImplTest {
     }
 
     @Test
-    void initializeNotificationCost_shouldVerifyCorrectIunPassed() {
+    void initializeAndValidateNotificationCost_shouldVerifyCorrectIunPassed() {
         // Given
         String expectedIun = "EXPECTED-IUN-456";
         NotificationInt notificationInt = buildNotificationInt(expectedIun);
@@ -123,7 +123,7 @@ class NotificationCostServiceImplTest {
                 .thenReturn(Mono.just("success"));
 
         // When
-        notificationCostService.initializeNotificationCost(notificationInt);
+        notificationCostService.initializeAndValidateNotificationCost(notificationInt);
 
         // Then
         ArgumentCaptor<String> iunCaptor = ArgumentCaptor.forClass(String.class);

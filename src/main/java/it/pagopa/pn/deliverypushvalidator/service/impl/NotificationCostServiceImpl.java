@@ -22,7 +22,7 @@ public class NotificationCostServiceImpl implements NotificationCostService {
     private final TimelineService timelineService;
 
     @Override
-    public void initializeNotificationCost(NotificationInt notificationInt) {
+    public void initializeAndValidateNotificationCost(NotificationInt notificationInt) {
 
         TimelineElementInternal buildNotificationCostValidationRequest = timelineUtils.buildNotificationCostValidationRequest(notificationInt);
 

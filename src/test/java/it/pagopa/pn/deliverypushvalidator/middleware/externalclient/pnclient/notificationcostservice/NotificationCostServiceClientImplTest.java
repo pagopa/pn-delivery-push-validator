@@ -27,7 +27,7 @@ class NotificationCostServiceClientImplTest {
     }
 
     @Test
-    void initializeNotificationCost() {
+    void initializeAndValidateNotificationCost() {
         // Given
         String iun = "testIun";
         String expectedResponse = "cost-uuid-123";
