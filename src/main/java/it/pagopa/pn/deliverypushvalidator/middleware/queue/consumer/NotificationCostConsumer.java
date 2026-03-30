@@ -8,12 +8,12 @@ import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.not
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.messaging.Message;
 
 import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.setMdc;
 
-@Configuration
+@Component
 @AllArgsConstructor
 @CustomLog
 public class NotificationCostConsumer {
