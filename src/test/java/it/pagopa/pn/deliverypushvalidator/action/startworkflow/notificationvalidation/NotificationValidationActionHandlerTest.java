@@ -872,7 +872,7 @@ class NotificationValidationActionHandlerTest {
 
         Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
-        Mockito.doNothing().when(notificationCostService).initializeNotificationCost(notification);
+        Mockito.doNothing().when(notificationCostService).initializeAndValidateNotificationCost(notification);
 
         //WHEN
         Assertions.assertDoesNotThrow(() ->
@@ -882,7 +882,7 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(notificationService).getNotificationByIun(iun);
         Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
-        Mockito.verify(notificationCostService).initializeNotificationCost(notification);
+        Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),

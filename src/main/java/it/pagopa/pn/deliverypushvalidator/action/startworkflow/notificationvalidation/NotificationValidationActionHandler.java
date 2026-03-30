@@ -228,12 +228,13 @@ public class NotificationValidationActionHandler {
         try {
             addressValidator.handleAddressValidation(iun, normalizeItemsResult);
             normalizeAddressHandler.handleNormalizedAddressResponse(notification, normalizeItemsResult);
+            notificationCostService.initializeAndValidateNotificationCost(notification);
+            logEvent.generateSuccess().log();
 
         } catch (PnValidationNotValidAddressException ex){
             logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun(), ex).log();
             handleValidationError(notification, ex);
         }
-        notificationCostService.initializeNotificationCost(notification);
         //Todo: verranno spostate a partire dal task successivo PN-19075
         log.debug("Notification validated successfully - iun={}", iun);
 
@@ -241,7 +242,6 @@ public class NotificationValidationActionHandler {
         log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
         schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
 
-        logEvent.generateSuccess().log();
     }
 
     /**

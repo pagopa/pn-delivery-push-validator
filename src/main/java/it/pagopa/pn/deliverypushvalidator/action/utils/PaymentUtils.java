@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -49,7 +48,7 @@ public class PaymentUtils {
                                         .recIndex(recIndex)
                                         .noticeCode(pagoPa.getNoticeCode())
                                         .creditorTaxId(pagoPa.getCreditorTaxId())
-                                        .applyCost(Objects.requireNonNull(pagoPa.getApplyCost()))
+                                        .applyCost(Boolean.TRUE.equals(pagoPa.getApplyCost()))
                                         .build());
                             }
                         });
