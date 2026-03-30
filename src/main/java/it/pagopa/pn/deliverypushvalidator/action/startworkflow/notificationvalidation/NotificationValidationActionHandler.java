@@ -45,6 +45,7 @@ public class NotificationValidationActionHandler {
     private static final int FOURTH_VALIDATION_STEP = 4;
     private static final int FIFTH_VALIDATION_STEP = 5;
     private static final String NOTIFICATION_IS_NOT_VALID_MSG = "Notification is not valid - iun={} ex={}";
+    private static final String NOTIFICATION_IS_NOT_VALID_MSG_WITHOUT_EX = "Notification is not valid - iun={}";
     private final AttachmentUtils attachmentUtils;
     private final TaxIdPivaValidator taxIdPivaValidator;
     private final TimelineService timelineService;
@@ -267,7 +268,7 @@ public class NotificationValidationActionHandler {
                 logEvent.generateSuccess().log();
             }
             case KO -> {
-                logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun()).log();
+                logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG_WITHOUT_EX, notification.getIun()).log();
                 throw new PnInternalException(
                         String.format("Error Notification Cost Validation for iun=%s, status=%s", iun, event.getStatus()),
                         PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTIFICATION_COST_ERROR
