@@ -79,6 +79,19 @@ public class TestUtils {
         return getNotificationRejected(iun, timelineService).isPresent();
     }
 
+    public static boolean checkIsPresentNotificationCostValidationResponse(String iun, TimelineService timelineService) {
+        Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
+                iun,
+                TimelineEventId.NOTIFICATION_COST_VALIDATION_RESPONSE.buildEventId(
+                        EventId.builder()
+                                .iun(iun)
+                                .build())
+        );
+
+        return timelineElementOpt.isPresent();
+    }
+
+
     public static Optional<TimelineElementInternal> getNotificationRejected(String iun, TimelineService timelineService) {
         return timelineService.getTimelineElement(
                 iun,
@@ -418,7 +431,8 @@ public class TestUtils {
                                                DocumentCreationRequestDaoMock documentCreationRequestDaoMock,
                                                AddressManagerClientMock addressManagerClientMock,
                                                ActionPoolMock actionPoolMock,
-                                               TimelineClientMock timelineClientMock
+                                               TimelineClientMock timelineClientMock,
+                                               NotificationCostServiceClientMock notificationCostServiceClientMock
     ) {
 
         log.info("CLEARING MOCKS");
@@ -433,6 +447,7 @@ public class TestUtils {
         addressManagerClientMock.clear();
         actionPoolMock.clear();
         timelineClientMock.clear();
+        notificationCostServiceClientMock.clear();
         
         ConsoleAppenderCustom.initializeLog();
     }

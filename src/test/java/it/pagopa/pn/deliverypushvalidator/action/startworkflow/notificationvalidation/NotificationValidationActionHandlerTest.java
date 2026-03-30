@@ -2,7 +2,10 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvali
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationIssue;
+import it.pagopa.pn.api.dto.events.notificationcost.utils.ValidationStatus;
+import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.log.PnAuditLogEvent;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
@@ -883,6 +886,45 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
         Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
+        Mockito.verify(auditLogEvent).generateSuccess();
+        Mockito.verify(auditLogEvent).log();
+    }
+
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void handleValidateNotificationCostOK() {
+        //GIVEN
+        String iun = "testIun";
+        NotificationInt notification = TestUtils.getNotification();
+
+        Mockito.when(notificationService.getNotificationByIun(iun))
+                .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
+        Mockito.when(auditLogService.buildAuditLogEvent(
+                        Mockito.eq(notification.getIun()),
+                        Mockito.eq(PnAuditLogEventType.AUD_NT_VALID),
+                        Mockito.anyString(),
+                        any()))
+                .thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateSuccess()).thenReturn(auditLogEvent);
+
+        TimelineElementInternal timelineElement = TimelineElementInternal.builder().build();
+        Mockito.when(timelineUtils.buildNotificationCostValidationResponse(notification))
+                .thenReturn(timelineElement);
+
+        PnNotificationCostValidationEventPayload event = PnNotificationCostValidationEventPayload.builder()
+                .iun(iun)
+                .status(ValidationStatus.OK)
+                .build();
+
+        //WHEN
+        Assertions.assertDoesNotThrow(() ->
+                handler.handleValidateNotificationCost(iun, event));
+
+        //THEN
+        Mockito.verify(notificationService).getNotificationByIun(iun);
+        Mockito.verify(timelineService).addTimelineElement(timelineElement, notification);
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
@@ -890,4 +932,45 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(auditLogEvent).generateSuccess();
         Mockito.verify(auditLogEvent).log();
     }
+
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void handleValidateNotificationCostKO() {
+        //GIVEN
+        String iun = "testIun";
+        NotificationInt notification = TestUtils.getNotification();
+
+        Mockito.when(notificationService.getNotificationByIun(iun))
+                .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
+        Mockito.when(auditLogService.buildAuditLogEvent(
+                        Mockito.eq(notification.getIun()),
+                        Mockito.eq(PnAuditLogEventType.AUD_NT_VALID),
+                        Mockito.anyString(),
+                        any()))
+                .thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
+
+        PnNotificationCostValidationEventPayload event = PnNotificationCostValidationEventPayload.builder()
+                .iun(iun)
+                .status(ValidationStatus.KO)
+                .build();
+
+        //WHEN
+        PnInternalException exception = Assertions.assertThrows(PnInternalException.class, () ->
+                handler.handleValidateNotificationCost(iun, event));
+
+        //THEN
+        Assertions.assertEquals("Internal Server Error", exception.getMessage());
+        Assertions.assertEquals(PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTIFICATION_COST_ERROR,
+                exception.getProblem().getErrors().getFirst().getCode());
+        Mockito.verify(notificationService).getNotificationByIun(iun);
+        Mockito.verify(auditLogEvent).generateWarning(Mockito.anyString(), any());
+        Mockito.verify(auditLogEvent).log();
+        Mockito.verify(timelineService, Mockito.never()).addTimelineElement(any(), any());
+        Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(
+                any(), any(), any());
+    }
+
 }

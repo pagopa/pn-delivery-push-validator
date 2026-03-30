@@ -1,6 +1,8 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
+import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.commons.log.PnAuditLogEvent;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
@@ -16,6 +18,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsR
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -40,6 +43,7 @@ public class NotificationValidationActionHandler {
     private static final int SECOND_VALIDATION_STEP = 2;
     private static final int THIRD_VALIDATION_STEP = 3;
     private static final int FOURTH_VALIDATION_STEP = 4;
+    private static final int FIFTH_VALIDATION_STEP = 5;
     private static final String NOTIFICATION_IS_NOT_VALID_MSG = "Notification is not valid - iun={} ex={}";
     private final AttachmentUtils attachmentUtils;
     private final TaxIdPivaValidator taxIdPivaValidator;
@@ -138,8 +142,15 @@ public class NotificationValidationActionHandler {
     }
 
     @NotNull
+    /*
+     * Validation workflow is split into 5 sequential steps.
+     * The fifth step (FIFTH_VALIDATION_STEP) is dedicated to notification cost validation;
+     * the previous steps cover the other notification validation checks (see the
+     * validation step constants in the action details for the exact mapping).
+     * The "step {} of 5" message is used to track progress through this workflow.
+     */
     private PnAuditLogEvent generateAuditLog(NotificationInt notification, int validationStep) {
-        String message = "Notification validation step {} of 4.";
+        String message = "Notification validation step {} of 5.";
 
         if(! cfg.isCheckCfEnabled()){
             message += " TaxId validation will be skipped";
@@ -155,7 +166,7 @@ public class NotificationValidationActionHandler {
 
     @NotNull
     private PnAuditLogEvent generateSkipAuditLog(NotificationInt notification, int validationStep, String detail) {
-        String message = "Notification validation step {} of 4." + detail;
+        String message = "Notification validation step {} of 5." + detail;
 
         return auditLogService.buildAuditLogEvent(
                 notification.getIun(),
@@ -235,13 +246,34 @@ public class NotificationValidationActionHandler {
             logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun(), ex).log();
             handleValidationError(notification, ex);
         }
-        //Todo: verranno spostate a partire dal task successivo PN-19075
-        log.debug("Notification validated successfully - iun={}", iun);
+    }
 
-        Instant schedulingDate = Instant.now();
-        log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
+    public void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event) {
+        NotificationInt notification = notificationService.getNotificationByIun(iun);
+        PnAuditLogEvent logEvent = generateAuditLog(notification, FIFTH_VALIDATION_STEP);
+        processNotificationCostValidationResponse(iun, event, notification, logEvent);
 
+    }
+
+    private void processNotificationCostValidationResponse(String iun, PnNotificationCostValidationEventPayload event, NotificationInt notification, PnAuditLogEvent logEvent) {
+        switch (event.getStatus()) {
+            case OK -> {
+                TimelineElementInternal buildNotificationCostValidationResponse = timelineUtils.buildNotificationCostValidationResponse(notification);
+                timelineService.addTimelineElement(buildNotificationCostValidationResponse, notification);
+                log.debug("Notification validated successfully - iun={}", iun);
+                Instant schedulingDate = Instant.now();
+                log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
+                schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
+                logEvent.generateSuccess().log();
+            }
+            case KO -> {
+                logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun()).log();
+                throw new PnInternalException(
+                        String.format("Error Notification Cost Validation for iun=%s, status=%s", iun, event.getStatus()),
+                        PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTIFICATION_COST_ERROR
+                );
+            }
+        }
     }
 
     /**
