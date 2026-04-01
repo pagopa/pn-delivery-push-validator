@@ -96,6 +96,12 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
                         TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
                 )
         );
@@ -269,6 +275,12 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
                         TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
                 )
         );
@@ -306,6 +318,12 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
 
         //Start del workflow
         startWorkflowHandler.startWorkflow(iun);
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(

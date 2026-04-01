@@ -165,7 +165,8 @@ public class CommonTestConfiguration {
                 documentCreationRequestDaoMock,
                 addressManagerClientMock,
                 actionPoolMock,
-                timelineClientMock
+                timelineClientMock,
+                notificationCostServiceClientMock
         );
     }
 
