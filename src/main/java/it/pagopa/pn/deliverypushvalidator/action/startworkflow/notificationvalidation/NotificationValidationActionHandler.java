@@ -47,6 +47,7 @@ public class NotificationValidationActionHandler {
     private final TimelineUtils timelineUtils;
     private final NotificationService notificationService;
     private final NotificationValidationScheduler notificationValidationScheduler;
+    private final NotificationCostService notificationCostService;
     private final AddressValidator addressValidator;
     private final AuditLogService auditLogService;
     private final NormalizeAddressHandler normalizeAddressHandler;
@@ -227,18 +228,19 @@ public class NotificationValidationActionHandler {
         try {
             addressValidator.handleAddressValidation(iun, normalizeItemsResult);
             normalizeAddressHandler.handleNormalizedAddressResponse(notification, normalizeItemsResult);
-            
-            log.debug("Notification validated successfully - iun={}", iun);
-            
-            Instant schedulingDate = Instant.now();
-            log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
-            schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
-
+            notificationCostService.initializeAndValidateNotificationCost(notification);
             logEvent.generateSuccess().log();
+
         } catch (PnValidationNotValidAddressException ex){
             logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun(), ex).log();
             handleValidationError(notification, ex);
         }
+        //Todo: verranno spostate a partire dal task successivo PN-19075
+        log.debug("Notification validated successfully - iun={}", iun);
+
+        Instant schedulingDate = Instant.now();
+        log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
 
     }
 

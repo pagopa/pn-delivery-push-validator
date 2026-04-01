@@ -3,6 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.action.utils;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.PaymentsInfoForRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.UpdateNotificationCostResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.PagoPaInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnPaymentUpdateRetryException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,38 +11,52 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Slf4j
 public class PaymentUtils {
     private PaymentUtils(){}
-    
+
     @NotNull
-    public static List<PaymentsInfoForRecipientInt> getPaymentsInfoFromNotification(NotificationInt notification) {
+    public static List<PaymentsInfoForRecipientInt> getAllPaymentsInfoFromNotification(NotificationInt notification) {
+        return getPaymentsInfoFiltered(notification, payment -> true);
+    }
+
+    @NotNull
+    public static List<PaymentsInfoForRecipientInt> getPaymentsInfoWithApplyCostFromNotification(NotificationInt notification) {
+        return getPaymentsInfoFiltered(notification,
+                p -> p.getPagoPA() != null && Boolean.TRUE.equals(p.getPagoPA().getApplyCost()));
+    }
+
+    private static List<PaymentsInfoForRecipientInt> getPaymentsInfoFiltered(
+            NotificationInt notification,
+            Predicate<NotificationPaymentInfoInt> filter) {
+
         List<PaymentsInfoForRecipientInt> paymentsInfoForRecipients = new ArrayList<>();
 
         notification.getRecipients().forEach(recipient -> {
             int recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
             log.debug("Start add validation for recipient index {}", recIndex);
-            
-            if(recipient.getPayments() != null){
-                recipient.getPayments().forEach( payment ->{
-                    final PagoPaInt pagoPaPayment = payment.getPagoPA();
-                    if(pagoPaPayment != null && Boolean.TRUE.equals(pagoPaPayment.getApplyCost())){
-                        log.debug("Add validation for creditorTaxId={} noticeCode={} recIndex={}", pagoPaPayment.getCreditorTaxId(), pagoPaPayment.getNoticeCode(), recIndex);
-                        PaymentsInfoForRecipientInt paymentsInfoForRecipient = PaymentsInfoForRecipientInt.builder()
-                                .recIndex(recIndex)
-                                .noticeCode(pagoPaPayment.getNoticeCode())
-                                .creditorTaxId(pagoPaPayment.getCreditorTaxId())
-                                .build();
-
-                        paymentsInfoForRecipients.add(paymentsInfoForRecipient);
-                    }
-                });
-            }else {
+            if (recipient.getPayments() != null) {
+                recipient.getPayments().stream()
+                        .filter(filter)
+                        .forEach(payment -> {
+                            final PagoPaInt pagoPa = payment.getPagoPA();
+                            if (pagoPa != null) {
+                                log.debug("Add validation for creditorTaxId={} noticeCode={} recIndex={}", pagoPa.getCreditorTaxId(), pagoPa.getNoticeCode(), recIndex);
+                                paymentsInfoForRecipients.add(PaymentsInfoForRecipientInt.builder()
+                                        .recIndex(recIndex)
+                                        .noticeCode(pagoPa.getNoticeCode())
+                                        .creditorTaxId(pagoPa.getCreditorTaxId())
+                                        .applyCost(Boolean.TRUE.equals(pagoPa.getApplyCost()))
+                                        .build());
+                            }
+                        });
+            } else {
                 log.debug("Don't need to add payments for iun={} recIndex={}", notification.getIun(), recIndex);
             }
-
         });
+
         return paymentsInfoForRecipients;
     }
 

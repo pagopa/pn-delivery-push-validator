@@ -8,17 +8,20 @@ import it.pagopa.pn.commons.log.PnAuditLogEvent;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.LookupAddressHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.NormalizeAddressHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterConsumer;
+import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.*;
@@ -33,6 +36,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -79,6 +83,9 @@ class NotificationValidationActionHandlerTest {
     @Mock
     private LookupAddressHandler lookupAddressHandler;
 
+    @Mock
+    private NotificationCostService notificationCostService;
+
 
     @BeforeEach
     void setup() {
@@ -87,7 +94,7 @@ class NotificationValidationActionHandlerTest {
         SendMoreThan20GramsParameterConsumer sendMoreThan20GramsParameterConsumer = new SendMoreThan20GramsParameterConsumer(parameterConsumerMock, cfg);
         handler = new NotificationValidationActionHandler(attachmentUtils, taxIdPivaValidator,
                 timelineService, timelineUtils, notificationService,
-                notificationValidationScheduler, addressValidator, auditLogService, normalizeAddressHandler,
+                notificationValidationScheduler, notificationCostService ,addressValidator, auditLogService, normalizeAddressHandler,
                 schedulerService, cfg, f24Validator, paymentValidator,
                 //quickWorkAroundForPN-9116
                 sendMoreThan20GramsParameterConsumer,
@@ -824,5 +831,63 @@ class NotificationValidationActionHandlerTest {
                 .build();
 
         Assertions.assertDoesNotThrow(()-> handler.handleValidateF24Response(pnF24MetadataValidationEndEventPayload));
+    }
+
+    //Todo: Questi test verranno modificati a partire dal task PN-19075
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void handleValidateAndNormalizeAddressResponseSuccess() {
+        //GIVEN
+        String iun = "testIun";
+        NotificationInt notification = TestUtils.getNotification();
+
+        Mockito.when(notificationService.getNotificationByIun(iun))
+                .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
+        Mockito.when(auditLogService.buildAuditLogEvent(
+                        Mockito.eq(notification.getIun()),
+                        Mockito.eq(PnAuditLogEventType.AUD_NT_VALID),
+                        Mockito.anyString(),
+                        any()))
+                .thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateSuccess()).thenReturn(auditLogEvent);
+
+        List<NormalizeResultInt> listNormResult = new ArrayList<>();
+        NormalizeResultInt result1 = NormalizeResultInt.builder()
+                .normalizedAddress(PhysicalAddressInt.builder()
+                        .addressDetails("Via Roma 1")
+                        .province("MI")
+                        .municipality("Milano")
+                        .zip("20100")
+                        .build())
+                .id("0")
+                .build();
+        listNormResult.add(result1);
+
+        NormalizeItemsResultInt normalizeItemsResult = NormalizeItemsResultInt.builder()
+                .correlationId("testCorrId")
+                .resultItems(listNormResult)
+                .build();
+
+        Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.doNothing().when(notificationCostService).initializeAndValidateNotificationCost(notification);
+
+        //WHEN
+        Assertions.assertDoesNotThrow(() ->
+                handler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult));
+
+        //THEN
+        Mockito.verify(notificationService).getNotificationByIun(iun);
+        Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
+        Mockito.verify(schedulerService).scheduleEvent(
+                Mockito.eq(iun),
+                Mockito.any(Instant.class),
+                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+        Mockito.verify(auditLogEvent).generateSuccess();
+        Mockito.verify(auditLogEvent).log();
     }
 }
