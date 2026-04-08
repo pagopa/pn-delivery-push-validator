@@ -32,7 +32,7 @@ class EntityToDtoDocumentCreationRequestMapperTest {
         Assertions.assertEquals(entity.getIun(), request.getIun());
         Assertions.assertEquals(entity.getKey(), request.getKey());
         Assertions.assertEquals(entity.getTimelineId(), request.getTimelineId());
-        Assertions.assertEquals(DocumentCreationTypeInt.valueOf(entity.getDocumentType()), request.getDocumentCreationType() );
+        Assertions.assertEquals(entity.getDocumentType(), request.getDocumentCreationType() );
         Assertions.assertEquals(entity.getRecIndex(), request.getRecIndex());
 
     }

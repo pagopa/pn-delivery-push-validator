@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.timeline;
 
+import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
@@ -16,10 +17,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TimelineClientImplTest {
@@ -61,7 +67,8 @@ class TimelineClientImplTest {
         Mockito.when(timelineServiceMapper.getNewTimelineElement(timelineElementInternal, notificationInt))
                 .thenReturn(newTimelineElement);
 
-        Mockito.doNothing().when(timelineControllerApi).addTimelineElement(Mockito.any());
+        Mockito.when(timelineControllerApi.addTimelineElement(Mockito.any()))
+                .thenReturn(new TimelineElementIdResponse());
 
         boolean result = timelineServiceClient.addTimelineElement(timelineElementInternal, notificationInt);
 
@@ -264,5 +271,63 @@ class TimelineClientImplTest {
         assertThrows(RuntimeException.class, () ->
                 timelineServiceClient.getTimeline(iun, confidentialInfoRequired, strongly, timelineId)
         );
+    }
+
+    @Test
+    void getNotificationCancellationRequested_returnsOptionalWithResponse() {
+        String iun = "iun123";
+        Instant expectedInstant = Instant.now();
+        CancellationRequestResponse cancellationRequestResponse = new CancellationRequestResponse();
+        cancellationRequestResponse.setTimestamp(expectedInstant);
+
+
+        when(timelineControllerApi.getCancellationRequest(iun))
+                .thenReturn(cancellationRequestResponse);
+
+        Optional<CancellationRequestResponse> result = timelineServiceClient.getNotificationCancellationRequested(iun);
+
+        assertTrue(result.isPresent());
+        assertEquals(cancellationRequestResponse, result.get());
+        Mockito.verify(timelineControllerApi).getCancellationRequest(iun);
+    }
+
+    @Test
+    void getNotificationCancellationRequested_returnsOptionalEmpty() {
+        String iun = "iun123";
+        it.pagopa.pn.common.rest.error.v1.dto.ProblemError problemError = new it.pagopa.pn.common.rest.error.v1.dto.ProblemError();
+        problemError.setCode(ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT);
+        problemError.setDetail("");
+        problemError.setElement("");
+
+        it.pagopa.pn.common.rest.error.v1.dto.Problem problem = new Problem();
+        problem.setErrors(Collections.singletonList(problemError));
+        PnHttpResponseException exception = Mockito.mock(PnHttpResponseException.class);
+
+        Mockito.when(exception.getStatusCode()).thenReturn(org.springframework.http.HttpStatus.NOT_FOUND.value());
+        Mockito.when(exception.getProblem()).thenReturn(problem);
+
+
+        when(timelineControllerApi.getCancellationRequest(iun))
+                .thenThrow(exception);
+
+        Optional<CancellationRequestResponse> result = timelineServiceClient.getNotificationCancellationRequested(iun);
+
+        assertTrue(result.isEmpty());
+        Mockito.verify(timelineControllerApi).getCancellationRequest(iun);
+    }
+
+    @Test
+    void getNotificationCancellationRequested_throwsException() {
+        String iun = "iun123";
+        PnHttpResponseException exception = Mockito.mock(PnHttpResponseException.class);
+        Mockito.when(exception.getStatusCode()).thenReturn(org.springframework.http.HttpStatus.BAD_REQUEST.value());
+
+        when(timelineControllerApi.getCancellationRequest(iun))
+                .thenThrow(exception);
+
+        assertThrows(PnHttpResponseException.class, () ->
+                timelineServiceClient.getNotificationCancellationRequested(iun)
+        );
+        Mockito.verify(timelineControllerApi).getCancellationRequest(iun);
     }
 }

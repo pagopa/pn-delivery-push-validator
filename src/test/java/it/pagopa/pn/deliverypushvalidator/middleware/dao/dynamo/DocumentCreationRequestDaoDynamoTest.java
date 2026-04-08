@@ -38,7 +38,7 @@ class DocumentCreationRequestDaoDynamoTest {
     void addDocumentCreationRequest() {
         //GIVEN
         DocumentCreationRequest request = DocumentCreationRequest.builder()
-                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK)
+                .documentCreationType(DocumentCreationTypeInt.SENDER_ACK.getValue())
                 .key("key")
                 .recIndex(0)
                 .timelineId("timelineId")

@@ -6,14 +6,12 @@
     "MaxTasksNumberValidator": "1",
     "AutoscalingThresholdValidator": "650",
     "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
-    "DocumentCreationRequestTableArn": "arn:aws:dynamodb:eu-south-1:830192246553:table/pn-DocumentCreationRequestTable",
     "ScheduledValidationActionsQueueName": "pn-delivery_push_validation_actions",
-    "ScheduledValidationActionsQueueARN": "arn:aws:sqs:eu-south-1:830192246553:pn-delivery_push_validation_actions",
-    "ScheduledValidationActionsQueueAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_actions-DLQ-HasMessage",
-    "ScheduledValidationActionsQueueAgeAlarmARN": "arn:aws:cloudwatch:eu-south-1:830192246553:alarm:pn-delivery_push_validation_actions-HasOldMessage",
+    "ScheduledValidationActionsDLQQueueName": "pn-delivery_push_validation_actions-DLQ",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
     "PnCronAnalyzer": "-",
     "WireTapLogActivation": "false",
-    "MountEfs": "false"
+    "MountEfs": "false",
+    "ValidationActionQueueDetailType": "NOTIFICATION_VALIDATION,NOTIFICATION_REFUSED,SCHEDULE_RECEIVED_LEGALFACT_GENERATION,DOCUMENT_CREATION_RESPONSE_VALIDATION"
   }
 }

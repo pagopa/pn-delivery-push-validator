@@ -80,7 +80,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private boolean checkIsDocumentForNotificationCancelled(ActionDetails actionDetails) {
         DocumentCreationResponseActionDetails documentCreationDetails = getDocumentCreationResponseActionDetails(actionDetails);
-        return documentCreationDetails != null && documentCreationDetails.getDocumentCreationType() == DocumentCreationTypeInt.NOTIFICATION_CANCELLED;
+        return documentCreationDetails != null && DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue().equals(documentCreationDetails.getDocumentCreationType());
     }
 
     private DocumentCreationResponseActionDetails getDocumentCreationResponseActionDetails(ActionDetails actionDetails) {

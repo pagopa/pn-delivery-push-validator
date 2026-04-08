@@ -23,7 +23,7 @@ class DocumentCreationResponseHandlerTest {
     void handleResponseReceived_senderAck_callsHandler() {
         DocumentCreationResponseActionDetails details = mock(DocumentCreationResponseActionDetails.class);
         when(details.getKey()).thenReturn("fileKey");
-        when(details.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.SENDER_ACK);
+        when(details.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.SENDER_ACK.getValue());
 
         handler.handleResponseReceived("iunTest", details);
 
@@ -35,7 +35,7 @@ class DocumentCreationResponseHandlerTest {
    void handleResponseReceived_otherType_doesNotCallHandler() {
        DocumentCreationResponseActionDetails details = mock(DocumentCreationResponseActionDetails.class);
        when(details.getKey()).thenReturn("fileKey");
-       when(details.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.NOTIFICATION_CANCELLED);
+       when(details.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue());
 
        handler.handleResponseReceived("iunTest", details);
 

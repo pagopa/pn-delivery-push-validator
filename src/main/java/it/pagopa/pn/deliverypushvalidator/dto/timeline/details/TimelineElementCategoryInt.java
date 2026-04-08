@@ -14,7 +14,6 @@ public enum TimelineElementCategoryInt {
     GENERATE_F24_REQUEST(ValidateF24Int.class, TimelineElementCategoryInt.VERSION_23),
     GENERATED_F24(GeneratedF24DetailsInt.class,  TimelineElementCategoryInt.VERSION_23),
     REQUEST_REFUSED(RequestRefusedDetailsInt.class,  TimelineElementCategoryInt.VERSION_10),
-    NOTIFICATION_CANCELLATION_REQUEST(NotificationCancellationRequestDetailsInt.class, TimelineElementCategoryInt.VERSION_20),
     PUBLIC_REGISTRY_VALIDATION_CALL(PublicRegistryValidationCallDetailsInt.class, TimelineElementCategoryInt.VERSION_27),
     PUBLIC_REGISTRY_VALIDATION_RESPONSE(PublicRegistryValidationResponseDetailsInt.class, TimelineElementCategoryInt.VERSION_27);
 
