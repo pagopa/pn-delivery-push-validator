@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
+import java.time.Instant;
 
 @Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
@@ -47,6 +48,7 @@ public class PnDeliveryPushValidatorConfigs {
     private boolean sendMoreThan20GramsDefaultValue;
     private boolean additionalLangsEnabled;
     private String technicalRefusalCostMode;
+    private Instant notificationCostServiceStartDate;
 
     @Data
     public static class Topics {

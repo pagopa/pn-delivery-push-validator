@@ -7,6 +7,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.not
 import it.pagopa.pn.deliverypushvalidator.service.NotificationCostService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class NotificationCostServiceImpl implements NotificationCostService {
     private final TimelineUtils timelineUtils;
     private final NotificationCostServiceMapper notificationCostServiceMapper;
     private final TimelineService timelineService;
+    private final NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
 
     @Override
     public void initializeAndValidateNotificationCost(NotificationInt notificationInt) {
@@ -29,11 +31,15 @@ public class NotificationCostServiceImpl implements NotificationCostService {
         log.debug("Invoke initializeNotificationCost elementId: {}", buildNotificationCostValidationRequest.getElementId());
 
         try {
-            notificationCostServiceClient.initializeNotificationCost(notificationInt.getIun(),
-                            notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
-                    .block();
+            if(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt)){
+                notificationCostServiceClient.initializeNotificationCost(notificationInt.getIun(),
+                                notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
+                        .block();
 
-            timelineService.addTimelineElement(buildNotificationCostValidationRequest, notificationInt);
+                timelineService.addTimelineElement(buildNotificationCostValidationRequest, notificationInt);
+            } else {
+                log.info("NotificationCostService is not enabled for iun: {}. Skipping initialization.", notificationInt.getIun());
+            }
 
         } catch (Exception e) {
             log.error("Failed to initialize notification cost for iun: {}", notificationInt.getIun(), e);

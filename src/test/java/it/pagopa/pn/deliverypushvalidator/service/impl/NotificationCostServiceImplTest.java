@@ -11,6 +11,7 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificatio
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice.NotificationCostServiceClient;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NotificationCostServiceImplTest {
 
-
     @Mock
     private NotificationCostServiceClient notificationCostServiceClient;
     @Mock
@@ -40,6 +40,8 @@ class NotificationCostServiceImplTest {
     private NotificationCostServiceMapper notificationCostServiceMapper;
     @Mock
     private TimelineService timelineService;
+    @Mock
+    private NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
 
     private NotificationCostServiceImpl notificationCostService;
 
@@ -49,7 +51,8 @@ class NotificationCostServiceImplTest {
                 notificationCostServiceClient,
                 timelineUtils,
                 notificationCostServiceMapper,
-                timelineService
+                timelineService,
+                notificationCostServiceFeatureFlagUtils
         );
     }
 
@@ -64,6 +67,8 @@ class NotificationCostServiceImplTest {
 
         when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
                 .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(true);
         when(notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
                 .thenReturn(request);
         when(notificationCostServiceClient.initializeNotificationCost(iun, request))
@@ -74,6 +79,7 @@ class NotificationCostServiceImplTest {
 
         // Then
         verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
         verify(notificationCostServiceMapper, times(1)).mapNotificationToRequest(notificationInt);
         verify(notificationCostServiceClient, times(1)).initializeNotificationCost(iun, request);
         verify(timelineService, times(1)).addTimelineElement(timelineElement, notificationInt);
@@ -92,6 +98,8 @@ class NotificationCostServiceImplTest {
 
         when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
                 .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(true);
         when(notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
                 .thenReturn(request);
         when(notificationCostServiceClient.initializeNotificationCost(iun, request))
@@ -101,6 +109,7 @@ class NotificationCostServiceImplTest {
         assertThrows(RuntimeException.class, () -> notificationCostService.initializeAndValidateNotificationCost(notificationInt));
 
         verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
         verify(notificationCostServiceMapper, times(1)).mapNotificationToRequest(notificationInt);
         verify(notificationCostServiceClient, times(1)).initializeNotificationCost(iun, request);
         verify(timelineService, never()).addTimelineElement(any(), any());
@@ -117,6 +126,8 @@ class NotificationCostServiceImplTest {
 
         when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
                 .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(true);
         when(notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
                 .thenReturn(request);
         when(notificationCostServiceClient.initializeNotificationCost(expectedIun, request))
@@ -129,6 +140,137 @@ class NotificationCostServiceImplTest {
         ArgumentCaptor<String> iunCaptor = ArgumentCaptor.forClass(String.class);
         verify(notificationCostServiceClient).initializeNotificationCost(iunCaptor.capture(), eq(request));
         assertEquals(expectedIun, iunCaptor.getValue());
+    }
+
+    @Test
+    void initializeAndValidateNotificationCost_whenFeatureFlagDisabled_shouldSkipInitialization() {
+        // Given
+        String iun = "TEST-IUN-DISABLED";
+        NotificationInt notificationInt = buildNotificationInt(iun);
+
+        TimelineElementInternal timelineElement = buildTimelineElement(iun);
+
+        when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
+                .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(false);
+
+        // When
+        notificationCostService.initializeAndValidateNotificationCost(notificationInt);
+
+        // Then
+        verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
+        verify(notificationCostServiceMapper, never()).mapNotificationToRequest(any());
+        verify(notificationCostServiceClient, never()).initializeNotificationCost(any(), any());
+        verify(timelineService, never()).addTimelineElement(any(), any());
+    }
+
+    @Test
+    void initializeAndValidateNotificationCost_whenFeatureFlagDisabledDueToNullStartDate_shouldSkipInitialization() {
+        // Given
+        String iun = "TEST-IUN-NULL-CONFIG";
+        NotificationInt notificationInt = buildNotificationInt(iun);
+
+        TimelineElementInternal timelineElement = buildTimelineElement(iun);
+
+        when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
+                .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(false); // Returns false when start date is null
+
+        // When
+        notificationCostService.initializeAndValidateNotificationCost(notificationInt);
+
+        // Then
+        verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
+        verify(notificationCostServiceMapper, never()).mapNotificationToRequest(any());
+        verify(notificationCostServiceClient, never()).initializeNotificationCost(any(), any());
+        verify(timelineService, never()).addTimelineElement(any(), any());
+    }
+
+    @Test
+    void initializeAndValidateNotificationCost_whenFeatureFlagThrowsException_shouldPropagateException() {
+        // Given
+        String iun = "TEST-IUN-FF-ERROR";
+        NotificationInt notificationInt = buildNotificationInt(iun);
+
+        TimelineElementInternal timelineElement = buildTimelineElement(iun);
+        NullPointerException expectedException = new NullPointerException("Notification sentAt cannot be null");
+
+        when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
+                .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenThrow(expectedException);
+
+        // When & Then
+        assertThrows(NullPointerException.class, () ->
+                notificationCostService.initializeAndValidateNotificationCost(notificationInt));
+
+        verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
+        verify(notificationCostServiceMapper, never()).mapNotificationToRequest(any());
+        verify(notificationCostServiceClient, never()).initializeNotificationCost(any(), any());
+        verify(timelineService, never()).addTimelineElement(any(), any());
+    }
+
+    @Test
+    void initializeAndValidateNotificationCost_whenMapperFails_shouldPropagateException() {
+        // Given
+        String iun = "TEST-IUN-MAPPER-ERROR";
+        NotificationInt notificationInt = buildNotificationInt(iun);
+
+        TimelineElementInternal timelineElement = buildTimelineElement(iun);
+        IllegalStateException expectedException = new IllegalStateException("Mapping error");
+
+        when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
+                .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(true);
+        when(notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
+                .thenThrow(expectedException);
+
+        // When & Then
+        assertThrows(IllegalStateException.class, () ->
+                notificationCostService.initializeAndValidateNotificationCost(notificationInt));
+
+        verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
+        verify(notificationCostServiceMapper, times(1)).mapNotificationToRequest(notificationInt);
+        verify(notificationCostServiceClient, never()).initializeNotificationCost(any(), any());
+        verify(timelineService, never()).addTimelineElement(any(), any());
+    }
+
+    @Test
+    void initializeAndValidateNotificationCost_whenTimelineServiceFails_shouldNotThrowException() {
+        // Given
+        String iun = "TEST-IUN-TIMELINE-ERROR";
+        NotificationInt notificationInt = buildNotificationInt(iun);
+
+        TimelineElementInternal timelineElement = buildTimelineElement(iun);
+        NewNotificationCostRequest request = new NewNotificationCostRequest();
+        RuntimeException timelineException = new RuntimeException("Timeline error");
+
+        when(timelineUtils.buildNotificationCostValidationRequest(notificationInt))
+                .thenReturn(timelineElement);
+        when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notificationInt))
+                .thenReturn(true);
+        when(notificationCostServiceMapper.mapNotificationToRequest(notificationInt))
+                .thenReturn(request);
+        when(notificationCostServiceClient.initializeNotificationCost(iun, request))
+                .thenReturn(Mono.just("success"));
+        doThrow(timelineException).when(timelineService).addTimelineElement(timelineElement, notificationInt);
+
+        // When & Then
+        assertThrows(RuntimeException.class, () ->
+                notificationCostService.initializeAndValidateNotificationCost(notificationInt));
+
+        verify(timelineUtils, times(1)).buildNotificationCostValidationRequest(notificationInt);
+        verify(notificationCostServiceFeatureFlagUtils, times(1)).checkNotificationCostServiceStartDate(notificationInt);
+        verify(notificationCostServiceMapper, times(1)).mapNotificationToRequest(notificationInt);
+        verify(notificationCostServiceClient, times(1)).initializeNotificationCost(iun, request);
+        verify(timelineService, times(1)).addTimelineElement(timelineElement, notificationInt);
     }
 
     private NotificationInt buildNotificationInt(String iun) {
