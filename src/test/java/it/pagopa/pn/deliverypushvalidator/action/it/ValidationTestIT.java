@@ -509,14 +509,12 @@ class ValidationTestIT extends CommonTestConfiguration{
         //Start del workflow
         startWorkflowHandler.startWorkflow(iun);
 
-        // PRIMA: Verifica che sia presente la validazione del costo
         await().untilAsserted(() ->
                 Assertions.assertTrue(
                         TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
                 )
         );
 
-        // POI: Verifica che sia presente il REQUEST_ACCEPTED
         String timelineId = TimelineEventId.REQUEST_ACCEPTED.buildEventId(
                 EventId.builder()
                         .iun(iun)
@@ -527,7 +525,6 @@ class ValidationTestIT extends CommonTestConfiguration{
                 Assertions.assertTrue(timelineService.getTimelineElement(iun, timelineId).isPresent())
         );
 
-        // Oppure usa il metodo helper
         await().untilAsserted(() ->
                 Assertions.assertTrue(
                         TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
