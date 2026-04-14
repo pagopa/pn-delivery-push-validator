@@ -28,6 +28,7 @@ import it.pagopa.pn.deliverypushvalidator.exception.*;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.*;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,6 +90,9 @@ class NotificationValidationActionHandlerTest {
     @Mock
     private NotificationCostService notificationCostService;
 
+    @Mock
+    private NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
+
 
     @BeforeEach
     void setup() {
@@ -101,7 +105,7 @@ class NotificationValidationActionHandlerTest {
                 schedulerService, cfg, f24Validator, paymentValidator,
                 //quickWorkAroundForPN-9116
                 sendMoreThan20GramsParameterConsumer,
-                safeStorageService, documentComposition, lookupAddressHandler);
+                safeStorageService, documentComposition, lookupAddressHandler,notificationCostServiceFeatureFlagUtils);
     }
 
     @ExtendWith(SpringExtension.class)
@@ -836,10 +840,9 @@ class NotificationValidationActionHandlerTest {
         Assertions.assertDoesNotThrow(()-> handler.handleValidateF24Response(pnF24MetadataValidationEndEventPayload));
     }
 
-    //Todo: Questi test verranno modificati a partire dal task PN-19075
     @ExtendWith(SpringExtension.class)
     @Test
-    void handleValidateAndNormalizeAddressResponseSuccess() {
+    void handleValidateAndNormalizeAddressResponse_withNotificationCostServiceEnabled() {
         //GIVEN
         String iun = "testIun";
         NotificationInt notification = TestUtils.getNotification();
@@ -875,6 +878,8 @@ class NotificationValidationActionHandlerTest {
 
         Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification))
+                .thenReturn(true);
         Mockito.doNothing().when(notificationCostService).initializeAndValidateNotificationCost(notification);
 
         //WHEN
@@ -885,9 +890,69 @@ class NotificationValidationActionHandlerTest {
         Mockito.verify(notificationService).getNotificationByIun(iun);
         Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.verify(notificationCostServiceFeatureFlagUtils).checkNotificationCostServiceStartDate(notification);
         Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
-        Mockito.verify(auditLogEvent).generateSuccess();
-        Mockito.verify(auditLogEvent).log();
+        Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(
+                any(), any(), Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+        Mockito.verify(auditLogEvent, times(1)).generateSuccess(); // Solo alla fine del metodo
+    }
+
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void handleValidateAndNormalizeAddressResponse_withNotificationCostServiceDisabled() {
+        //GIVEN
+        String iun = "testIun";
+        NotificationInt notification = TestUtils.getNotification();
+
+        Mockito.when(notificationService.getNotificationByIun(iun))
+                .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = Mockito.mock(PnAuditLogEvent.class);
+        Mockito.when(auditLogService.buildAuditLogEvent(
+                        Mockito.eq(notification.getIun()),
+                        Mockito.eq(PnAuditLogEventType.AUD_NT_VALID),
+                        Mockito.anyString(),
+                        any()))
+                .thenReturn(auditLogEvent);
+        Mockito.when(auditLogEvent.generateSuccess()).thenReturn(auditLogEvent);
+
+        List<NormalizeResultInt> listNormResult = new ArrayList<>();
+        NormalizeResultInt result1 = NormalizeResultInt.builder()
+                .normalizedAddress(PhysicalAddressInt.builder()
+                        .addressDetails("Via Roma 1")
+                        .province("MI")
+                        .municipality("Milano")
+                        .zip("20100")
+                        .build())
+                .id("0")
+                .build();
+        listNormResult.add(result1);
+
+        NormalizeItemsResultInt normalizeItemsResult = NormalizeItemsResultInt.builder()
+                .correlationId("testCorrId")
+                .resultItems(listNormResult)
+                .build();
+
+        Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification))
+                .thenReturn(false);
+
+        //WHEN
+        Assertions.assertDoesNotThrow(() ->
+                handler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult));
+
+        //THEN
+        Mockito.verify(notificationService).getNotificationByIun(iun);
+        Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.verify(notificationCostServiceFeatureFlagUtils).checkNotificationCostServiceStartDate(notification);
+        Mockito.verify(notificationCostService, Mockito.never()).initializeAndValidateNotificationCost(notification);
+        Mockito.verify(schedulerService).scheduleEvent(
+                Mockito.eq(iun),
+                Mockito.any(Instant.class),
+                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+        Mockito.verify(auditLogEvent, times(2)).generateSuccess();
     }
 
     @ExtendWith(SpringExtension.class)

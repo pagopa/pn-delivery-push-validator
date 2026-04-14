@@ -29,6 +29,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorage
 import it.pagopa.pn.deliverypushvalidator.service.impl.*;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,7 +109,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         DocumentCreationResponseEventHandler.class,
         NotificationCostServiceImpl.class,
         NotificationCostServiceClientMock.class,
-        NotificationCostServiceMapper.class
+        NotificationCostServiceMapper.class,
+        NotificationCostServiceFeatureFlagUtils.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
@@ -187,6 +189,9 @@ public class CommonTestConfiguration {
         
         //Set send fee
         Mockito.when(cfg.getPagoPaNotificationBaseCost()).thenReturn(100);
+
+        //Set startDate for NotificationCostService
+        Mockito.when(cfg.getNotificationCostServiceStartDate()).thenReturn(Instant.now().minus(Duration.ofDays(1)));
 
 
         Mockito.when(cfg.getTemplatesEngineBaseUrl()).thenReturn("http://localhost:8090");
