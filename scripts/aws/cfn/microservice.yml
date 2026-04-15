@@ -343,7 +343,7 @@ Resources:
         ContainerEnvEntry19: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
         ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_PNNOTIFICATIONCOSTTODELIVERYPUSHVALIDATOREVENTS=${PnNotificationCostToDeliveryPushValidatorQueueName}'
         ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
-        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICESTARTDATE={{resolve:ssm:/config/notification-cost-service/start-date}}'
+        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICESTARTDATE={{resolve:ssm:/config/notification-cost-service/notification-processing-start-date}}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
