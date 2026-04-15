@@ -6,8 +6,6 @@
     "MaxTasksNumberValidator": "1",
     "AutoscalingThresholdValidator": "650",
     "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
-    "ScheduledValidationActionsQueueName": "pn-delivery_push_validation_actions",
-    "ScheduledValidationActionsDLQQueueName": "pn-delivery_push_validation_actions-DLQ",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
     "PnCronAnalyzer": "-",
     "WireTapLogActivation": "false",
