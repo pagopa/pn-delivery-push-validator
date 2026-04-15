@@ -1,7 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.legalfact;
 
-import it.pagopa.pn.deliverypushvalidator.action.it.CommonTestConfiguration;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.TemplatesClientMock;
+import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
@@ -13,13 +13,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import java.time.Instant;
 import java.util.List;
 
-@SpringBootTest
-class LegalFactGeneratorTemplatesTest extends CommonTestConfiguration {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = LegalFactGeneratorTemplatesTest.TestConfig.class)
+class LegalFactGeneratorTemplatesTest {
 
     @Autowired
     LegalFactGenerator legalFactGeneratorTemplatesTest;
@@ -77,7 +83,7 @@ class LegalFactGeneratorTemplatesTest extends CommonTestConfiguration {
         return NotificationDocumentInt.builder()
                 .contentType("PDF_TEST_TEST")
                 .digests(NotificationDocumentInt.Digests.builder()
-                        .sha256("string")
+                        .sha256("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
                         .build())
                 .build();
     }
@@ -88,5 +94,33 @@ class LegalFactGeneratorTemplatesTest extends CommonTestConfiguration {
                 .paId("paId_TEST")
                 .paTaxId("paTaxId_TEST_TEST")
                 .build();
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        LegalFactGenerator legalFactGeneratorTemplates(CustomInstantWriter instantWriter,
+                                                       PhysicalAddressWriter physicalAddressWriter,
+                                                       PnDeliveryPushValidatorConfigs configs,
+                                                       TemplatesClient templatesClient) {
+            return new LegalFactGeneratorTemplates(instantWriter, physicalAddressWriter, configs, templatesClient);
+        }
+
+        @Bean
+        CustomInstantWriter customInstantWriter() {
+            return new CustomInstantWriter();
+        }
+
+        @Bean
+        PhysicalAddressWriter physicalAddressWriter() {
+            return new PhysicalAddressWriter();
+        }
+
+        @Bean
+        PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs() {
+            PnDeliveryPushValidatorConfigs configs = Mockito.mock(PnDeliveryPushValidatorConfigs.class);
+            Mockito.when(configs.isAdditionalLangsEnabled()).thenReturn(false);
+            return configs;
+        }
     }
 }
