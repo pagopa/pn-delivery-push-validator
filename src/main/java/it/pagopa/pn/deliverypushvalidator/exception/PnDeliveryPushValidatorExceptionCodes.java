@@ -72,7 +72,11 @@ public class PnDeliveryPushValidatorExceptionCodes extends PnExceptionsCodes {
 
         ADDRESS_NOT_FOUND("ADDRESS_NOT_FOUND", false),
 
-        ADDRESS_SEARCH_FAILED("ADDRESS_SEARCH_FAILED", true);
+        ADDRESS_SEARCH_FAILED("ADDRESS_SEARCH_FAILED", true),
+
+        CAMPAIGN_NOT_VALID("CAMPAIGN_NOT_VALID", false),
+
+        MESSAGE_NOT_VALID("MESSAGE_NOT_VALID", false);
 
 
         private final String value;

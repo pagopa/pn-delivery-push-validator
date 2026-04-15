@@ -35,9 +35,32 @@ public class LookupAddressHandler {
     private final NationalRegistriesService nationalRegistriesService;
 
     public void performValidation(NotificationInt notification) {
+        performValidation(notification, true);
+    }
+
+    public void performValidation(NotificationInt notification, boolean isBlocking) {
         List<NationalRegistriesResponse> responses = nationalRegistriesService.getMultiplePhysicalAddress(notification);
-        validateAddresses(responses);
+        if (isBlocking) {
+            validateAddresses(responses);
+        } else {
+            validateAddressesNonBlocking(responses, notification);
+        }
         saveAddresses(responses, notification);
+    }
+
+    private void validateAddressesNonBlocking(List<NationalRegistriesResponse> responses, NotificationInt notification) {
+        log.info("Non-blocking address validation for INFORMAL notification - iun={}", notification.getIun());
+        for (NationalRegistriesResponse response : responses) {
+            if (StringUtils.isNotBlank(response.getError())) {
+                log.warn("Address search for recipient index {} encountered an error (non-blocking) - iun={}",
+                        response.getRecIndex(), notification.getIun());
+            } else if (response.getPhysicalAddress() == null) {
+                log.warn("Address not found for recipient index {} (non-blocking) - iun={}",
+                        response.getRecIndex(), notification.getIun());
+            }
+        }
+        // Remove responses with errors or missing addresses before saving (non-blocking: skip them)
+        responses.removeIf(r -> StringUtils.isNotBlank(r.getError()) || r.getPhysicalAddress() == null);
     }
 
     private void validateAddresses(List<NationalRegistriesResponse> responses) {

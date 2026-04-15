@@ -6,7 +6,6 @@ import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.log.PnAuditLogEvent;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
-import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.LookupAddressHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.NormalizeAddressHandler;
@@ -20,7 +19,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
-import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,19 +77,30 @@ class NotificationValidationActionHandlerTest {
     @Mock
     private LookupAddressHandler lookupAddressHandler;
 
+    private LegalNotificationValidationStrategy legalStrategy;
+    private InformalNotificationValidationStrategy informalStrategy;
+    @Mock
+    private NotificationRefusedSchedulerHelper refusedSchedulerHelper;
+    @Mock
+    private it.pagopa.pn.deliverypushvalidator.validation.CampaignValidator campaignValidator;
+    @Mock
+    private it.pagopa.pn.deliverypushvalidator.validation.MessageValidator messageValidator;
 
     @BeforeEach
     void setup() {
         //quickWorkAroundForPN-9116
         ParameterConsumer parameterConsumerMock = Mockito.mock(ParameterConsumer.class);
         SendMoreThan20GramsParameterConsumer sendMoreThan20GramsParameterConsumer = new SendMoreThan20GramsParameterConsumer(parameterConsumerMock, cfg);
-        handler = new NotificationValidationActionHandler(attachmentUtils, taxIdPivaValidator,
+        legalStrategy = new LegalNotificationValidationStrategy(attachmentUtils, taxIdPivaValidator,
                 timelineService, timelineUtils, notificationService,
                 notificationValidationScheduler, addressValidator, auditLogService, normalizeAddressHandler,
                 schedulerService, cfg, f24Validator, paymentValidator,
-                //quickWorkAroundForPN-9116
                 sendMoreThan20GramsParameterConsumer,
-                safeStorageService, documentComposition, lookupAddressHandler);
+                safeStorageService, documentComposition, lookupAddressHandler, refusedSchedulerHelper);
+        informalStrategy = new InformalNotificationValidationStrategy(attachmentUtils, campaignValidator, messageValidator,
+                timelineUtils, notificationService, notificationValidationScheduler, addressValidator, auditLogService,
+                normalizeAddressHandler, schedulerService, cfg, lookupAddressHandler, refusedSchedulerHelper);
+        handler = new NotificationValidationActionHandler(notificationService, refusedSchedulerHelper, legalStrategy, informalStrategy);
     }
 
     @ExtendWith(SpringExtension.class)
@@ -483,8 +492,7 @@ class NotificationValidationActionHandlerTest {
 
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
-                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+        Mockito.verify(refusedSchedulerHelper).scheduleNotificationRefused(Mockito.eq(notification.getIun()), any());
         Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
@@ -515,8 +523,7 @@ class NotificationValidationActionHandlerTest {
 
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
-                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+        Mockito.verify(refusedSchedulerHelper).scheduleNotificationRefused(Mockito.eq(notification.getIun()), any());
         Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
@@ -783,8 +790,7 @@ class NotificationValidationActionHandlerTest {
 
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
-                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+        Mockito.verify(refusedSchedulerHelper).scheduleNotificationRefused(Mockito.eq(notification.getIun()), any());
         Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
     }
@@ -815,7 +821,7 @@ class NotificationValidationActionHandlerTest {
         when(addressValidator.requestValidateAndNormalizeAddresses(notification)).thenReturn(Mono.empty());
 
         PnLookupAddressValidationFailedException exception = new PnLookupAddressValidationFailedException(errors);
-        Mockito.doThrow(exception).when(lookupAddressHandler).performValidation(notification);
+        Mockito.doThrow(exception).when(lookupAddressHandler).performValidation(notification, true);
 
         PnF24MetadataValidationEndEventPayload pnF24MetadataValidationEndEventPayload = PnF24MetadataValidationEndEventPayload.builder()
                 .setId(notification.getIun())

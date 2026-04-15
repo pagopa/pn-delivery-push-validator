@@ -45,6 +45,10 @@ public class AddressValidator {
     }
 
     public void handleAddressValidation(String iun, NormalizeItemsResultInt normalizeItemsResult){
+        handleAddressValidation(iun, normalizeItemsResult, true);
+    }
+
+    public void handleAddressValidation(String iun, NormalizeItemsResultInt normalizeItemsResult, boolean isBlocking){
         log.logChecking(VALIDATE_ADDRESS_PROCESS);
 
         normalizeItemsResult.getResultItems().forEach( normalizeResult ->{
@@ -57,10 +61,13 @@ public class AddressValidator {
                         normalizeResult.getId()
                 );
 
-                log.logCheckingOutcome(VALIDATE_ADDRESS_PROCESS, false, errorMessage);
-
-                log.warn(errorMessage);
-                throw new PnValidationNotValidAddressException(errorMessage);
+                if (isBlocking) {
+                    log.logCheckingOutcome(VALIDATE_ADDRESS_PROCESS, false, errorMessage);
+                    log.warn(errorMessage);
+                    throw new PnValidationNotValidAddressException(errorMessage);
+                } else {
+                    log.warn("Non-blocking address validation error (INFORMAL): {}", errorMessage);
+                }
             }
         });
 

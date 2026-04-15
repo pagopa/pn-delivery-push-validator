@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.action.utils;
 
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
@@ -50,6 +51,7 @@ public class TimelineUtils {
                 .details(details)
                 .paId(notification.getSender().getPaId())
                 .notificationSentAt(notification.getSentAt())
+                .type(NotificationType.resolveOrDefault(notification.getType()).name())
                 .build();
     }
 

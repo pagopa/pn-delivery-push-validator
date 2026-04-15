@@ -69,6 +69,14 @@ public enum ActionType {
       return String.format("%s_post_accepted_processing",
               action.getIun());
     }
+  },
+
+  POST_INFORMAL_VALIDATION_COMPLETED(NotHandledDetails.class) {
+    @Override
+    public String buildActionId(Action action) {
+      return String.format("%s_post_informal_validation",
+              action.getIun());
+    }
   };
 
   private final Class<? extends ActionDetails> detailsJavaClass;

@@ -16,4 +16,5 @@ public class NotificationRecipientAddressesDtoInt {
     private DigitalAddressInt digitalAddress;
     private PhysicalAddressInt physicalAddress;
     private Integer recIndex;
+    private Boolean addressNormalized;
 }

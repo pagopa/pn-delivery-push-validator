@@ -32,6 +32,7 @@ public class TimelineServiceMapper {
         if (timelineElement == null) {
             return null;
         }
+        // TODO: leggere type dal modello timeline quando il campo sarà disponibile nelle API
         TimelineElementCategoryInt category = TimelineElementCategoryInt.valueOf(timelineElement.getCategory().getValue());
 
         return TimelineElementInternal.builder()
@@ -58,6 +59,7 @@ public class TimelineServiceMapper {
     }
 
     private TimelineElement toTimelineElement(TimelineElementInternal timelineElementInternal) {
+        // TODO: propagare timelineElementInternal.getType() verso le API timeline quando il modello sarà aggiornato
         return new TimelineElement()
                 .iun(timelineElementInternal.getIun())
                 .elementId(timelineElementInternal.getElementId())

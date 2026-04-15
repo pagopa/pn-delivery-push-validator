@@ -32,7 +32,11 @@ public class NormalizeAddressHandler {
     private final ConfidentialInformationService confidentialInformationService;
     
     public void handleNormalizedAddressResponse(NotificationInt notification, NormalizeItemsResultInt normalizeItemsResult){
-        log.debug("Start handleNormalizedAddressResponse - iun={}", notification.getIun());
+        handleNormalizedAddressResponse(notification, normalizeItemsResult, true);
+    }
+
+    public void handleNormalizedAddressResponse(NotificationInt notification, NormalizeItemsResultInt normalizeItemsResult, boolean isBlocking){
+        log.debug("Start handleNormalizedAddressResponse - iun={} isBlocking={}", notification.getIun(), isBlocking);
 
         List<NotificationRecipientAddressesDtoInt> listNormalizedAddress = new ArrayList<>();
         //Sorted for datavault
@@ -42,18 +46,35 @@ public class NormalizeAddressHandler {
 
             if(result.getNormalizedAddress() != null){
                 addNormalizeAddress(notification, listNormalizedAddress, result, recIndex, recipient);
+            } else if (!isBlocking) {
+                // INFORMAL: save with addressNormalized=false when normalization fails
+                log.warn("Normalization failed for recIndex={} (non-blocking INFORMAL) - iun={}", recIndex, notification.getIun());
+                NotificationRecipientAddressesDtoInt notNormalizedAddress = NotificationRecipientAddressesDtoInt.builder()
+                        .denomination(recipient.getDenomination())
+                        .digitalAddress(recipient.getDigitalDomicile())
+                        .physicalAddress(recipient.getPhysicalAddress())
+                        .recIndex(recIndex)
+                        .addressNormalized(false)
+                        .build();
+                listNormalizedAddress.add(notNormalizedAddress);
             }
         });
         
-        if( listNormalizedAddress.size() == notification.getRecipients().size() ){
-            log.debug("Update confidential information with normalize address- iun={}", notification.getIun());
-
+        if (isBlocking) {
+            if( listNormalizedAddress.size() == notification.getRecipients().size() ){
+                log.debug("Update confidential information with normalize address- iun={}", notification.getIun());
+                MDCUtils.addMDCToContextAndExecute(
+                        confidentialInformationService.updateNotificationAddresses(notification.getIun(), true, listNormalizedAddress)
+                ).block();
+            } else {
+                handleError(notification, listNormalizedAddress);
+            }
+        } else {
+            // INFORMAL: always persist whatever we collected (partial results are OK)
+            log.debug("Update confidential information with normalize address (non-blocking) - iun={}", notification.getIun());
             MDCUtils.addMDCToContextAndExecute(
                     confidentialInformationService.updateNotificationAddresses(notification.getIun(), true, listNormalizedAddress)
             ).block();
-            
-        } else {
-            handleError(notification, listNormalizedAddress);
         }
 
         log.info("Ending validate and normalize address Process - iun={}", notification.getIun());

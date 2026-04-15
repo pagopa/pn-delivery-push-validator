@@ -29,6 +29,7 @@ public class TimelineElementInternal implements Comparable<TimelineElementIntern
     private Instant notificationSentAt;
     private Instant ingestionTimestamp; //Questo campo viene valorizzato solo ed esclusivamente in uscita per api e webhook dal mapper
     private Instant eventTimestamp; //Questo campo viene valorizzato solo ed esclusivamente in uscita per api e webhook dal mapper
+    private String type; // LEGAL or INFORMAL — per distinguere gli elementi delle legali da quelli delle bonarie nel Data Lake
 
     @Override
     public int compareTo(@NotNull TimelineElementInternal o) {
