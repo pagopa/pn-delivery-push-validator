@@ -269,9 +269,25 @@ Parameters:
     Type: String
     Description: DeliveryPushValidationInputsQueue age alarm ARN
 
+  PnDeliveryPushInformalValidationInputsQueueName:
+    Type: String
+    Description: DeliveryPushInformalValidationInputsQueue queue name
+
   PnDeliveryPushInformalValidationInputsQueueARN:
     Type: String
     Description: DeliveryPushInformalValidationInputsQueue queue ARN
+
+  PnDeliveryPushInformalValidationInputsQueueAlarmARN:
+    Type: String
+    Description: DeliveryPushInformalValidationInputsQueue alarm ARN
+
+  PnDeliveryPushInformalValidationInputsQueueAgeAlarmARN:
+    Type: String
+    Description: DeliveryPushInformalValidationInputsQueue age alarm ARN
+
+  PnDeliveryPushInformalValidationInputsQueueURL:
+    Type: String
+    Description: DeliveryPushInformalValidationInputsQueue queue URL
 
   SandboxSafeStorageBaseUrl:
     Type: String
@@ -341,6 +357,7 @@ Resources:
         ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSHVALIDATOR_DELIVERYPUSHBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry18: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
         ContainerEnvEntry19: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
+        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_DELIVERYINFORMALVALIDATIONEVENTS=${PnDeliveryPushInformalValidationInputsQueueName}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -373,6 +390,8 @@ Resources:
           - - !GetAtt DeliveryPushValidatorMicroservice.Outputs.FatalLogsMetricAlarmArn
             - !Ref DeliveryPushValidationInputsQueueAlarmARN
             - !Ref DeliveryPushValidationInputsQueueAgeAlarmARN
+            - !Ref PnDeliveryPushInformalValidationInputsQueueAlarmARN
+            - !Ref PnDeliveryPushInformalValidationInputsQueueAgeAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
             - !Ref ScheduledValidationActionsQueueAlarmARN
@@ -384,6 +403,7 @@ Resources:
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
+            - !Ref PnDeliveryPushInformalValidationInputsQueueARN
             - !Ref SafeStorageToDeliveryPushQueueARN
             - !Ref ScheduledValidationActionsQueueARN
             - !Ref AddressManagerToDeliveryPushQueueARN
@@ -460,6 +480,17 @@ Resources:
           MetricStat:
             Metric:
               Dimensions:
+                - Name: QueueName
+                  Value: !Ref "PnDeliveryPushInformalValidationInputsQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m7
+          MetricStat:
+            Metric:
+              Dimensions:
                 - Name: TargetGroup
                   Value: !GetAtt DeliveryPushValidatorMicroservice.Outputs.TargetGroupName
                 - Name: LoadBalancer
@@ -470,7 +501,7 @@ Resources:
             Stat: Average
           ReturnData: False
         - Id: code
-          Expression: !Sub "IF(m6==0, 101, (100*(m1+m2+m3+m4+m5)) / (${ConsumedQueueMessagePerMinuteValidator} * m6) )"
+          Expression: !Sub "IF(m7==0, 101, (100*(m1+m2+m3+m4+m5+m6)) / (${ConsumedQueueMessagePerMinuteValidator} * m7) )"
           Label: !Sub "${ProjectName}-delivery-push-queue-validator-custom-metric"
           ReturnData: False
         - Id: e1
@@ -503,6 +534,7 @@ Resources:
               - sqs:SendMessageBatch
             Resource:
               - !Ref DeliveryPushValidationInputsQueueARN
+              - !Ref PnDeliveryPushInformalValidationInputsQueueARN
               - !Ref ScheduledValidationActionsQueueARN
               - !Ref SafeStorageToDeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
@@ -573,7 +605,7 @@ Resources:
     Type: AWS::SQS::QueuePolicy
     Properties:
      Queues:
-      - !Ref PnDeliveryPushInformalValidationInputsQueueARN
+      - !Ref PnDeliveryPushInformalValidationInputsQueueURL
      PolicyDocument:
       Statement:
         - Sid: AllowEventBridgeToSendMessage
