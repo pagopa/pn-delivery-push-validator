@@ -257,6 +257,10 @@ Parameters:
     Type: String
     Description: DeliveryPushValidationInputsQueue age alarm ARN
 
+  PnDeliveryPushInformalValidationInputsQueueARN:
+    Type: String
+    Description: DeliveryPushInformalValidationInputsQueue queue ARN
+
   SandboxSafeStorageBaseUrl:
     Type: String
     Description: 'Safe storage base url'
@@ -527,6 +531,48 @@ Resources:
                 Effect: Allow
                 Resource:
                   - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+        - PolicyName: !Sub ${ProjectName}-delivery-insert-trigger-eb-lambda-to-delivery_push_informal_validation_inputs-eventbus-rule-policy
+          PolicyDocument:
+            Statement:
+              - Sid: putEvents
+                Action:
+                  - sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  - !Ref PnDeliveryPushInformalValidationInputsQueueARN
+
+  PnCoreEventBusToDeliveryPushInformalValidationQueue:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Route informal notification validation Events to pn-delivery-push-validator
+      RoleArn: !GetAtt "EventBusEnqueueRole.Arn"
+      EventBusName: !Sub '${ProjectName}-CoreEventBus'
+      EventPattern:
+        detail-type: [ "PnDeliveryInformalValidationOutcomeEvent" ]
+      Targets:
+        - Id: !Sub '${ProjectName}-CoreEventBus-InformalNotificationToDeliveryPushValidator'
+          Arn: !Ref PnDeliveryPushInformalValidationInputsQueueARN
+          InputPath: $.detail
+          DeadLetterConfig:
+            Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
+
+  DeliveryPushInformalQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+     Queues:
+      - !Ref PnDeliveryPushInformalValidationInputsQueueARN
+     PolicyDocument:
+      Statement:
+        - Sid: AllowEventBridgeToSendMessage
+          Effect: Allow
+          Principal:
+            Service: events.amazonaws.com
+          Action: sqs:SendMessage
+          Resource: !Ref PnDeliveryPushInformalValidationInputsQueueARN
+          Condition:
+            ArnEquals:
+              aws:SourceArn: !GetAtt PnCoreEventBusToDeliveryPushInformalValidationQueue.Arn
+
 
   PnCoreEventBusActionManagerToValidationActionsQueueRule:
     Type: AWS::Events::Rule
