@@ -187,11 +187,23 @@ Parameters:
 
   ScheduledValidationActionsQueueName:
     Type: String
-    Description: 'Send and pull ready-to-do actions th this queue'
+    Description: pn-delivery-push validation actions queue name
 
-  ScheduledValidationActionsDLQQueueName:
+  ScheduledValidationActionsQueueURL:
     Type: String
-    Description: 'DLQ for scheduled validation actions queue'
+    Description: pn-delivery-push validation actions queue URL
+
+  ScheduledValidationActionsQueueARN:
+    Type: String
+    Description: pn-delivery-push validation actions queue ARN
+
+  ScheduledValidationActionsQueueAlarmARN:
+    Type: String
+    Description: pn-delivery-push validation actions queue dlq alarm queue
+
+  ScheduledValidationActionsQueueAgeAlarmARN:
+    Type: String
+    Description: pn-delivery-push validation actions queue age alarm ARN
 
   SafeStorageToDeliveryPushQueueName:
     Type: String
@@ -363,8 +375,8 @@ Resources:
             - !Ref DeliveryPushValidationInputsQueueAgeAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAlarmARN
             - !Ref SafeStorageToDeliveryPushQueueAgeAlarmARN
-            - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ScheduledValidationActionsDLQQueueName}-HasMessage
-            - !Sub arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ScheduledValidationActionsQueueName}-HasOldMessage
+            - !Ref ScheduledValidationActionsQueueAlarmARN
+            - !Ref ScheduledValidationActionsQueueAgeAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAlarmARN
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
             - !Ref F24ToDeliveryPushQueueAlarmARN
@@ -373,7 +385,7 @@ Resources:
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
             - !Ref SafeStorageToDeliveryPushQueueARN
-            - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+            - !Ref ScheduledValidationActionsQueueARN
             - !Ref AddressManagerToDeliveryPushQueueARN
             - !Ref F24ToDeliveryPushQueueARN
         LogGroupsNames: !Join
@@ -491,7 +503,7 @@ Resources:
               - sqs:SendMessageBatch
             Resource:
               - !Ref DeliveryPushValidationInputsQueueARN
-              - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+              - !Ref ScheduledValidationActionsQueueARN
               - !Ref SafeStorageToDeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
               - !Ref F24ToDeliveryPushQueueARN
@@ -530,6 +542,7 @@ Resources:
                   - sqs:SendMessage
                 Effect: Allow
                 Resource:
+                  - !Ref ScheduledValidationActionsQueueARN
                   - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
         - PolicyName: !Sub ${ProjectName}-delivery-insert-trigger-eb-lambda-to-delivery_push_informal_validation_inputs-eventbus-rule-policy
           PolicyDocument:
@@ -586,7 +599,7 @@ Resources:
           routingActionType: !Ref ValidationActionQueueDetailType
       Targets:
         - Id: !Sub '${ProjectName}-CoreEventBus-ActionManager2ValidationActionQueue'
-          Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+          Arn: !Ref ScheduledValidationActionsQueueARN
           InputPath: $.detail.body
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
@@ -595,7 +608,7 @@ Resources:
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
-        - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${ScheduledValidationActionsQueueName}
+        - !Ref ScheduledValidationActionsQueueURL
       PolicyDocument:
         Statement:
           - Sid: AllowEventBridgeToSendMessage
@@ -603,7 +616,7 @@ Resources:
             Principal:
               Service: events.amazonaws.com
             Action: sqs:SendMessage
-            Resource: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+            Resource: !Ref ScheduledValidationActionsQueueARN
             Condition:
               ArnEquals:
                 aws:SourceArn: !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
