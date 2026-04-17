@@ -285,6 +285,10 @@ Parameters:
     Type: String
     Description: 'pn-notification-cost-to-delivery-push-validator queue age alarm ARN'
 
+  PnNotificationCostToDeliveryPushValidatorQueueURL:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue URL'
+
   SandboxSafeStorageBaseUrl:
     Type: String
     Description: 'Safe storage base url'
@@ -398,7 +402,6 @@ Resources:
             - !Ref F24ToDeliveryPushQueueAgeAlarmARN
             - !Ref PnNotificationCostToDeliveryPushValidatorQueueAlarmARN
             - !Ref PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN
-            - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
@@ -638,7 +641,7 @@ Resources:
     Type: AWS::SQS::QueuePolicy
     Properties:
       Queues:
-        - !Sub https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/${PnNotificationCostToDeliveryPushValidatorQueueName}
+        - !Ref PnNotificationCostToDeliveryPushValidatorQueueURL
       PolicyDocument:
         Statement:
           - Sid: AllowEventBridgeToSendMessage
