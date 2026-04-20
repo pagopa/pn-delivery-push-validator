@@ -27,7 +27,9 @@ import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCre
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.F24ResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorageResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.service.impl.*;
+import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,7 +106,11 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         SafeStorageConsumer.class,
         ValidationActionsConsumer.class,
         DocumentCreationResponseHandler.class,
-        DocumentCreationResponseEventHandler.class
+        DocumentCreationResponseEventHandler.class,
+        NotificationCostServiceImpl.class,
+        NotificationCostServiceClientMock.class,
+        NotificationCostServiceMapper.class,
+        NotificationCostServiceFeatureFlagUtils.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
@@ -125,6 +131,8 @@ public class CommonTestConfiguration {
     PnDeliveryClientMock pnDeliveryClientMock;
     @Autowired
     NationalRegistriesClientMock nationalRegistriesClientMock;
+    @Autowired
+    NotificationCostServiceClientMock notificationCostServiceClientMock;
     @Autowired
     InstantNowSupplier instantNowSupplier;
     @Autowired
@@ -159,7 +167,8 @@ public class CommonTestConfiguration {
                 documentCreationRequestDaoMock,
                 addressManagerClientMock,
                 actionPoolMock,
-                timelineClientMock
+                timelineClientMock,
+                notificationCostServiceClientMock
         );
     }
 
@@ -180,6 +189,9 @@ public class CommonTestConfiguration {
         
         //Set send fee
         Mockito.when(cfg.getPagoPaNotificationBaseCost()).thenReturn(100);
+
+        //Set startDate for NotificationCostService
+        Mockito.when(cfg.getNotificationCostServiceStartDate()).thenReturn(Instant.now().minus(Duration.ofDays(1)));
 
 
         Mockito.when(cfg.getTemplatesEngineBaseUrl()).thenReturn("http://localhost:8090");

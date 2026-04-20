@@ -51,7 +51,7 @@ public class NotificationRefusedActionHandler {
     }
 
     private void handleUpdateNotificationCost(Instant schedulingTime, NotificationInt notification) {
-        List<PaymentsInfoForRecipientInt> paymentsInfoForRecipients = PaymentUtils.getPaymentsInfoFromNotification(notification);
+        List<PaymentsInfoForRecipientInt> paymentsInfoForRecipients = PaymentUtils.getPaymentsInfoWithApplyCostFromNotification(notification);
         
         if( !paymentsInfoForRecipients.isEmpty() ){
             UpdateNotificationCostResponseInt updateNotificationCostResponse = notificationProcessCostService.setNotificationStepCost(

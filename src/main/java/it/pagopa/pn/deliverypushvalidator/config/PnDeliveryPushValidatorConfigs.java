@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
+import java.time.Instant;
 
 @Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
@@ -37,6 +38,7 @@ public class PnDeliveryPushValidatorConfigs {
     private String deliveryBaseUrl;
     private String safeStorageBaseUrl;
     private String deliveryPushBaseUrl;
+    private String notificationCostServiceBaseUrl;
     private boolean checkCfEnabled;
     private DataSize checkPdfSize;
     private boolean checkPdfValidEnabled;
@@ -46,6 +48,7 @@ public class PnDeliveryPushValidatorConfigs {
     private boolean sendMoreThan20GramsDefaultValue;
     private boolean additionalLangsEnabled;
     private String technicalRefusalCostMode;
+    private Instant notificationCostServiceStartDate;
 
     @Data
     public static class Topics {
@@ -54,6 +57,7 @@ public class PnDeliveryPushValidatorConfigs {
         private String addressManagerEvents;
         private String safeStorageEvents;
         private String f24Events;
+        private String pnNotificationCostToDeliveryPushValidatorEvents;
     }
 
 
