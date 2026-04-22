@@ -49,6 +49,8 @@ class ValidationTestIT extends CommonTestConfiguration{
     SafeStorageClientMock safeStorageClientMock;
     @Autowired
     PnDeliveryClientMock pnDeliveryClientMock;
+    @Autowired
+    NotificationCostServiceClientMock notificationCostServiceClientMock;
     
     @Test
     void differentShaRefusedTest() throws PnIdConflictException {
@@ -435,6 +437,12 @@ class ValidationTestIT extends CommonTestConfiguration{
         //Start del workflow
         startWorkflowHandler.startWorkflow(iun);
 
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
         String timelineId = TimelineEventId.REQUEST_ACCEPTED.buildEventId(
                 EventId.builder()
                         .iun(iun)
@@ -452,6 +460,78 @@ class ValidationTestIT extends CommonTestConfiguration{
 
         TestUtils.checkGeneratedLegalFacts(notification,generatedLegalFactsInfo,legalFactGenerator);
     }
+
+    @Test
+    void testNotificationValidationComplete() throws PnIdConflictException {
+        String iun = TestUtils.getRandomIun();
+
+        String fileDocPayment = "keyPagoPaForm_doc00";
+        List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
+        List<TestUtils.DocumentWithContent> listPaymentDocumentWithContent = TestUtils.getDocumentWithContents(fileDocPayment, paymentDocuments);
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent,notificationDocumentList, safeStorageClientMock);
+        paymentDocuments = TestUtils.firstFileUploadFromNotification(listPaymentDocumentWithContent, paymentDocuments, safeStorageClientMock);
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withPhysicalAddress(
+                        PhysicalAddressBuilder.builder()
+                                .withAddress(EXTCHANNEL_SEND_SUCCESS + "_Via Nuova")
+                                .build()
+                )
+                .withPayments(Collections.singletonList(
+                        NotificationPaymentInfoInt.builder()
+                                .pagoPA(PagoPaInt.builder()
+                                        .creditorTaxId("creditorTaxId_"+ UUID.randomUUID())
+                                        .noticeCode("noticeCode_"+UUID.randomUUID())
+                                        .applyCost(true)
+                                        .attachment(paymentDocuments.getFirst())
+                                        .build())
+                                .build()
+                ))
+                .build();
+
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withIun(iun)
+                .withPaId("paId01")
+                .withNotificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .withPagoPaIntMode(PagoPaIntMode.ASYNC)
+                .withPaFee(100)
+                .withNotificationRecipient(recipient)
+                .build();
+
+
+        pnDeliveryClientMock.addNotification(notification);
+
+        //Start del workflow
+        startWorkflowHandler.startWorkflow(iun);
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        String timelineId = TimelineEventId.REQUEST_ACCEPTED.buildEventId(
+                EventId.builder()
+                        .iun(iun)
+                        .build()
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(timelineService.getTimelineElement(iun, timelineId).isPresent())
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
+                )
+        );
+    }
+
 
     @Test
     void notificationDeliveryModeAsyncWithoutPayment() throws PnIdConflictException {

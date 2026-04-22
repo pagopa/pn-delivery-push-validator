@@ -269,6 +269,26 @@ Parameters:
     Type: String
     Description: DeliveryPushValidationInputsQueue age alarm ARN
 
+  PnNotificationCostToDeliveryPushValidatorQueueARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue ARN'
+
+  PnNotificationCostToDeliveryPushValidatorQueueName:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue Name'
+
+  PnNotificationCostToDeliveryPushValidatorQueueAlarmARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue alarm ARN'
+
+  PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue age alarm ARN'
+
+  PnNotificationCostToDeliveryPushValidatorQueueURL:
+    Type: String
+    Description: 'pn-notification-cost-to-delivery-push-validator queue URL'
+
   PnDeliveryPushInformalValidationInputsQueueName:
     Type: String
     Description: DeliveryPushInformalValidationInputsQueue queue name
@@ -357,7 +377,10 @@ Resources:
         ContainerEnvEntry17: !Sub 'PN_DELIVERYPUSHVALIDATOR_DELIVERYPUSHBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry18: !Sub 'PN_CRON_ANALYZER=${PnCronAnalyzer}'
         ContainerEnvEntry19: !Sub 'WIRE_TAP_LOG=${WireTapLogActivation}'
-        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_DELIVERYINFORMALVALIDATIONEVENTS=${PnDeliveryPushInformalValidationInputsQueueName}'
+        ContainerEnvEntry20: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_PNNOTIFICATIONCOSTTODELIVERYPUSHVALIDATOREVENTS=${PnNotificationCostToDeliveryPushValidatorQueueName}'
+        ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
+        ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICESTARTDATE={{resolve:ssm:/config/notification-cost-service/notification-processing-start-date}}'
+        ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_DELIVERYINFORMALVALIDATIONEVENTS=${PnDeliveryPushInformalValidationInputsQueueName}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -400,6 +423,8 @@ Resources:
             - !Ref AddressManagerToDeliveryPushQueueAgeAlarmARN
             - !Ref F24ToDeliveryPushQueueAlarmARN
             - !Ref F24ToDeliveryPushQueueAgeAlarmARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueAlarmARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN
         QueueArns: !Join
           - ','
           - - !Ref DeliveryPushValidationInputsQueueARN
@@ -408,6 +433,7 @@ Resources:
             - !Ref ScheduledValidationActionsQueueARN
             - !Ref AddressManagerToDeliveryPushQueueARN
             - !Ref F24ToDeliveryPushQueueARN
+            - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
         LogGroupsNames: !Join
           - ','
           - - !Sub '/aws/ecs/${ProjectName}-delivery-push-validator'
@@ -481,13 +507,24 @@ Resources:
             Metric:
               Dimensions:
                 - Name: QueueName
-                  Value: !Ref "PnDeliveryPushInformalValidationInputsQueueName"
+                  Value: !Ref "PnNotificationCostToDeliveryPushValidatorQueueName"
               Namespace: "AWS/SQS"
               MetricName: "ApproximateNumberOfMessagesVisible"
             Period: !Ref AutoscalingCheckPeriod
             Stat: Average
           ReturnData: False
         - Id: m7
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: QueueName
+                  Value: !Ref "PnDeliveryPushInformalValidationInputsQueueName"
+              Namespace: "AWS/SQS"
+              MetricName: "ApproximateNumberOfMessagesVisible"
+            Period: !Ref AutoscalingCheckPeriod
+            Stat: Average
+          ReturnData: False
+        - Id: m8
           MetricStat:
             Metric:
               Dimensions:
@@ -501,7 +538,7 @@ Resources:
             Stat: Average
           ReturnData: False
         - Id: code
-          Expression: !Sub "IF(m7==0, 101, (100*(m1+m2+m3+m4+m5+m6)) / (${ConsumedQueueMessagePerMinuteValidator} * m7) )"
+          Expression: !Sub "IF(m8==0, 101, (100*(m1+m2+m3+m4+m5+m6+m7)) / (${ConsumedQueueMessagePerMinuteValidator} * m8) )"
           Label: !Sub "${ProjectName}-delivery-push-queue-validator-custom-metric"
           ReturnData: False
         - Id: e1
@@ -539,6 +576,7 @@ Resources:
               - !Ref SafeStorageToDeliveryPushQueueARN
               - !Ref AddressManagerToDeliveryPushQueueARN
               - !Ref F24ToDeliveryPushQueueARN
+              - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
           - Effect: Allow
             Action:
               - 'ssm:GetParameter'
@@ -575,6 +613,16 @@ Resources:
                 Effect: Allow
                 Resource:
                   - !Ref ScheduledValidationActionsQueueARN
+                  - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
+        - PolicyName: pn-notification-cost-service-to-delivery-push-validator-queue-eventbus-rule-policy
+          PolicyDocument:
+            Statement:
+              - Sid: putEvents
+                Action:
+                  - sqs:SendMessage
+                Effect: Allow
+                Resource:
+                  - !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
                   - !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${ScheduledValidationActionsQueueName}
         - PolicyName: !Sub ${ProjectName}-delivery-insert-trigger-eb-lambda-to-delivery_push_informal_validation_inputs-eventbus-rule-policy
           PolicyDocument:
@@ -636,6 +684,21 @@ Resources:
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
 
+  PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Route Notification Cost validation Events to pn-delivery-push-validator
+      RoleArn: !GetAtt "EventBusEnqueueRole.Arn"
+      EventBusName: !Sub '${ProjectName}-CoreEventBus'
+      EventPattern:
+        detail-type: [ "NotificationCostServiceOutcomeEvent" ]
+      Targets:
+        - Id: !Sub '${ProjectName}-CoreEventBus-NotificationCostToDeliveryPushValidator'
+          Arn: !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
+          InputPath: $.detail
+          DeadLetterConfig:
+            Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
+
   ScheduledActionsQueuePolicy:
     Type: AWS::SQS::QueuePolicy
     Properties:
@@ -652,3 +715,20 @@ Resources:
             Condition:
               ArnEquals:
                 aws:SourceArn: !GetAtt PnCoreEventBusActionManagerToValidationActionsQueueRule.Arn
+
+  PnNotificationCostServiceToDeliveryPushValidatorQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref PnNotificationCostToDeliveryPushValidatorQueueURL
+      PolicyDocument:
+        Statement:
+          - Sid: AllowEventBridgeToSendMessage
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !Ref PnNotificationCostToDeliveryPushValidatorQueueARN
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt PnCoreEventBusToDeliveryPushValidatorNotificationCostValidationResponseQueueRule.Arn

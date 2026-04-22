@@ -48,6 +48,18 @@ Resources:
         LogsKinesisSourceStreamArn: !Ref LogsKinesisSourceStreamArn
         LogGroupRetention: !Ref LogRetention
 
+  PnNotificationCostToDeliveryPushValidatorQueue:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/sqs-queue.yaml"
+      Parameters:
+        QueueName: !Sub '${ProjectName}-notification_cost_service_to_delivery_push_validator'
+        HasDLQ: "true"
+        AlarmSNSTopicName: !Ref AlarmSNSTopicName
+        VisibilityTimeout: 60
+
   # Internal queues
   ScheduledValidationActionsQueue:
     Type: AWS::CloudFormation::Stack
@@ -112,3 +124,23 @@ Outputs:
   ScheduledValidationActionsQueueAgeAlarmARN:
     Value: !GetAtt ScheduledValidationActionsQueue.Outputs.SqsAgeAlarmArn
     Description: pn-delivery-push validation actions queue age alarm ARN
+
+  PnNotificationCostToDeliveryPushValidatorQueueName:
+    Value: !GetAtt PnNotificationCostToDeliveryPushValidatorQueue.Outputs.QueueName
+    Description: pn-notification-cost-to-delivery-push-validator queue name
+
+  PnNotificationCostToDeliveryPushValidatorQueueURL:
+    Value: !GetAtt PnNotificationCostToDeliveryPushValidatorQueue.Outputs.QueueURL
+    Description: pn-notification-cost-to-delivery-push-validator queue URL
+
+  PnNotificationCostToDeliveryPushValidatorQueueARN:
+    Value: !GetAtt PnNotificationCostToDeliveryPushValidatorQueue.Outputs.QueueARN
+    Description: pn-notification-cost-to-delivery-push-validator queue ARN
+
+  PnNotificationCostToDeliveryPushValidatorQueueAlarmARN:
+    Value: !GetAtt PnNotificationCostToDeliveryPushValidatorQueue.Outputs.SqsDLQAlarmArn
+    Description: pn-notification-cost-to-delivery-push-validator alarm ARN
+
+  PnNotificationCostToDeliveryPushValidatorQueueAgeAlarmARN:
+    Value: !GetAtt PnNotificationCostToDeliveryPushValidatorQueue.Outputs.SqsAgeAlarmArn
+    Description: pn-notification-cost-to-delivery-push-validator age alarm ARN
