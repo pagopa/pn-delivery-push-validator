@@ -16,13 +16,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class InformalValidationConsumerTest {
+class NewInformalValidationConsumerTest {
 
-    private InformalValidationConsumer consumer;
+    private NewInformalValidationConsumer consumer;
 
     @BeforeEach
     void setUp() {
-        consumer = new InformalValidationConsumer();
+        consumer = new NewInformalValidationConsumer();
     }
 
 

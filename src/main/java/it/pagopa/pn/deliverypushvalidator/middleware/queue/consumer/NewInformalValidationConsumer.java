@@ -15,7 +15,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 @Configuration
 @CustomLog
 @RequiredArgsConstructor
-public class InformalValidationConsumer {
+public class NewInformalValidationConsumer {
 
     private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
 
@@ -31,7 +31,7 @@ public class InformalValidationConsumer {
             log.info("Informal validation process for iun {} started", iun);
             //log.logEndingProcess(processName);
         } catch (Exception ex) {
-            log.logEndingProcess(processName, false, ex.getMessage());
+            log.logEndingProcess(processName, false, ex.getMessage(), ex);
             HandleEventUtils.handleException(message.getHeaders(), ex);
             throw ex;
         }
