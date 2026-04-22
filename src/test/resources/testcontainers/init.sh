@@ -2,7 +2,7 @@
 
 echo "### CREATE QUEUES ###"
 
-queues="local-delivery-push-inputs.fifo local-safe-storage-inputs local-validation-actions-inputs local-address-manager-inputs local-f24-inputs"
+queues="local-delivery-push-inputs.fifo local-safe-storage-inputs local-validation-actions-inputs local-address-manager-inputs local-f24-inputs local-informal-validation-inputs"
 
 for qn in  $( echo $queues | tr " " "\n" ) ; do
 
