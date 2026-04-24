@@ -58,6 +58,7 @@ public class PnDeliveryPushValidatorConfigs {
         private String safeStorageEvents;
         private String f24Events;
         private String pnNotificationCostToDeliveryPushValidatorEvents;
+        private String informalValidationInputEvents;
     }
 
 
