@@ -74,10 +74,39 @@ Resources:
         MaxReceiveCount: 10
         DelaySeconds: 1
 
+  PnDeliveryPushInformalValidationInputsQueue:
+    Type: AWS::CloudFormation::Stack
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "${TemplateBucketBaseUrl}/fragments/sqs-queue.yaml"
+      Parameters:
+        QueueName: !Sub '${ProjectName}-delivery_push_informal_validation_inputs'
+        HasDLQ: "true"
+        DelaySeconds: 10
+        AlarmSNSTopicName: !Ref AlarmSNSTopicName
+
 Outputs:
   # Log groups
   EcsValidatorLogGroup:
     Value: !GetAtt PnDeliveryPushValidatorServiceLogGroup.Outputs.LogGroupName
+  # SQS Queues
+  PnDeliveryPushInformalValidationInputsQueueName:
+    Value: !GetAtt PnDeliveryPushInformalValidationInputsQueue.Outputs.QueueName
+    Description: pn-delivery_push_informal_validation_inputs queue name
+  PnDeliveryPushInformalValidationInputsQueueURL:
+    Value: !GetAtt PnDeliveryPushInformalValidationInputsQueue.Outputs.QueueURL
+    Description: pn-delivery_push_informal_validation_inputs queue URL
+  PnDeliveryPushInformalValidationInputsQueueARN:
+    Value: !GetAtt PnDeliveryPushInformalValidationInputsQueue.Outputs.QueueARN
+    Description: pn-delivery_push_informal_validation_inputs queue ARN
+  PnDeliveryPushInformalValidationInputsQueueAlarmARN:
+    Value: !GetAtt PnDeliveryPushInformalValidationInputsQueue.Outputs.SqsDLQAlarmArn
+    Description: pn-delivery_push_informal_validation_inputs alarm ARN
+  PnDeliveryPushInformalValidationInputsQueueAgeAlarmARN:
+    Value: !GetAtt PnDeliveryPushInformalValidationInputsQueue.Outputs.SqsAgeAlarmArn
+    Description: pn-delivery_push_informal_validation_inputs age alarm ARN
+
 
   # Scheduled Actions
   ScheduledValidationActionsQueueName:
