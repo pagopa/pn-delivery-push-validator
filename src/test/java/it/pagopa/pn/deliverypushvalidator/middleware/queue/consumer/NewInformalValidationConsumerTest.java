@@ -36,10 +36,7 @@ class NewInformalValidationConsumerTest {
         Message<PnDeliveryNewNotificationEvent.Payload> message =
                 MessageBuilder.withPayload(payload).build();
 
-        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class);
-             MockedStatic<it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils> channelMock =
-                     mockStatic(it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.class)) {
-
+        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class)) {
             assertDoesNotThrow(() ->
                     consumer.informalValidationInputsEventConsumer(message)
             );
@@ -61,10 +58,7 @@ class NewInformalValidationConsumerTest {
         doThrow(new RuntimeException("workflow error"))
                 .when(startWorkflowHandler).startInformalWorkflow("TEST_IUN");
 
-        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class);
-             MockedStatic<it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils> channelMock =
-                     mockStatic(it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.class)) {
-
+        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class)) {
             assertThrows(RuntimeException.class, () ->
                     consumer.informalValidationInputsEventConsumer(message)
             );
@@ -82,10 +76,7 @@ class NewInformalValidationConsumerTest {
         Message<PnDeliveryNewNotificationEvent.Payload> message =
                 MessageBuilder.withPayload(payload).build();
 
-        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class);
-             MockedStatic<it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils> channelMock =
-                     mockStatic(it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.class)) {
-
+        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class)) {
             assertThrows(RuntimeException.class, () ->
                     consumer.informalValidationInputsEventConsumer(message)
             );
