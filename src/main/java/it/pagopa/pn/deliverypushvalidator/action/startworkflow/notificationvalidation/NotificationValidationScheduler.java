@@ -5,6 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationA
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -138,5 +139,18 @@ public class NotificationValidationScheduler {
 
         log.debug("Scheduling Notification refused schedulingDate={} - iun={}", schedulingDate, iun);
         schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_REFUSED, details);
+    }
+
+    public void scheduleInformalNotificationValidation(String iun) {
+        Instant schedulingDate = Instant.now();
+
+        NotificationValidationActionDetails details = NotificationValidationActionDetails.builder()
+                .retryAttempt(0)
+                .startWorkflowTime(Instant.now())
+                .communicationType(CommunicationType.INFORMAL)
+                .build();
+
+        log.info("Scheduling informal notification validation schedulingDate={} - iun={}", schedulingDate, iun);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_VALIDATION, details);
     }
 }

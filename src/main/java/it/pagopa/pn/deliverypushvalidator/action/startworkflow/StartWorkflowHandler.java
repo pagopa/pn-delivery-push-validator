@@ -20,5 +20,8 @@ public class StartWorkflowHandler {
     public void startWorkflow(String iun) { 
         notificationValidationScheduler.scheduleNotificationValidation(iun);
     }
+    public void startInformalWorkflow(String iun) {
+        notificationValidationScheduler.scheduleInformalNotificationValidation(iun);
+    }
 
 }

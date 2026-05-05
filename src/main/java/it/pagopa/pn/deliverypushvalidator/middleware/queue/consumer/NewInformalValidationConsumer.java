@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
+import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
@@ -18,6 +19,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 public class NewInformalValidationConsumer {
 
     private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
+    private StartWorkflowHandler startWorkflowHandler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.informalValidationInputEvents}")
     public void informalValidationInputsEventConsumer(Message<PnDeliveryNewNotificationEvent.Payload> message) {
@@ -27,9 +29,10 @@ public class NewInformalValidationConsumer {
             log.info("Handle message from {} with content {}", PnDeliveryClient.CLIENT_NAME, message);
             String iun = message.getPayload().getIun();
             HandleEventUtils.addIunToMdc(iun);
-            //log.logStartingProcess(processName);
+            log.logStartingProcess(processName);
             log.info("Informal validation process for iun {} started", iun);
-            //log.logEndingProcess(processName);
+            startWorkflowHandler.startInformalWorkflow(iun);
+            log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(), ex);
             HandleEventUtils.handleException(message.getHeaders(), ex);

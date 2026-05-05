@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.details;
 
 
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,4 +17,5 @@ import java.time.Instant;
 public class NotificationValidationActionDetails implements ActionDetails {
   private int retryAttempt;
   private Instant startWorkflowTime;
+  private CommunicationType communicationType;
 }

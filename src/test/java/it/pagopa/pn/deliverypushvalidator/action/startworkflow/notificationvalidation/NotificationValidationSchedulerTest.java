@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationScheduler.DEFAULT_INTERVAL;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class NotificationValidationSchedulerTest {
@@ -150,5 +151,42 @@ class NotificationValidationSchedulerTest {
         //THEN
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
                 Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+    }
+
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void scheduleInformalNotificationValidation() {
+        //GIVEN
+        String iun = "test-informal";
+
+        //WHEN
+        notificationValidationScheduler.scheduleInformalNotificationValidation(iun);
+
+        //THEN
+        Mockito.verify(schedulerService).scheduleEvent(
+                Mockito.eq(iun),
+                Mockito.any(Instant.class),
+                Mockito.eq(ActionType.NOTIFICATION_VALIDATION),
+                Mockito.any()
+        );
+    }
+
+    @ExtendWith(SpringExtension.class)
+    @Test
+    void scheduleInformalNotificationValidation_schedulerThrowsException() {
+        //GIVEN
+        String iun = "test-informal";
+        Mockito.doThrow(new RuntimeException("scheduler error"))
+                .when(schedulerService).scheduleEvent(
+                        Mockito.eq(iun),
+                        Mockito.any(Instant.class),
+                        Mockito.eq(ActionType.NOTIFICATION_VALIDATION),
+                        Mockito.any()
+                );
+
+        //WHEN + THEN
+        assertThrows(RuntimeException.class, () ->
+                notificationValidationScheduler.scheduleInformalNotificationValidation(iun)
+        );
     }
 }

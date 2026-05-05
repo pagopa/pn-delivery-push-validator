@@ -1,10 +1,12 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
+import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
@@ -18,12 +20,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NewInformalValidationConsumerTest {
 
-    private NewInformalValidationConsumer consumer;
+    @Mock
+    private StartWorkflowHandler startWorkflowHandler;
 
-    @BeforeEach
-    void setUp() {
-        consumer = new NewInformalValidationConsumer();
-    }
+    @InjectMocks
+    private NewInformalValidationConsumer consumer;
 
 
     @Test
@@ -44,11 +45,36 @@ class NewInformalValidationConsumerTest {
             );
 
             utilsMock.verify(() -> HandleEventUtils.addIunToMdc("TEST_IUN"));
+            verify(startWorkflowHandler).startInformalWorkflow("TEST_IUN");
         }
     }
 
     @Test
-    void testInformalValidationInputsEventConsumer_exception() {
+    void testInformalValidationInputsEventConsumer_exceptionOnStartWorkflow() {
+        // Arrange
+        PnDeliveryNewNotificationEvent.Payload payload = mock(PnDeliveryNewNotificationEvent.Payload.class);
+        when(payload.getIun()).thenReturn("TEST_IUN");
+
+        Message<PnDeliveryNewNotificationEvent.Payload> message =
+                MessageBuilder.withPayload(payload).build();
+
+        doThrow(new RuntimeException("workflow error"))
+                .when(startWorkflowHandler).startInformalWorkflow("TEST_IUN");
+
+        try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class);
+             MockedStatic<it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils> channelMock =
+                     mockStatic(it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelUtils.class)) {
+
+            assertThrows(RuntimeException.class, () ->
+                    consumer.informalValidationInputsEventConsumer(message)
+            );
+
+            utilsMock.verify(() -> HandleEventUtils.handleException(any(), any()));
+        }
+    }
+
+    @Test
+    void testInformalValidationInputsEventConsumer_exceptionOnGetIun() {
         // Arrange
         PnDeliveryNewNotificationEvent.Payload payload = mock(PnDeliveryNewNotificationEvent.Payload.class);
         when(payload.getIun()).thenThrow(new RuntimeException("boom"));
@@ -64,9 +90,8 @@ class NewInformalValidationConsumerTest {
                     consumer.informalValidationInputsEventConsumer(message)
             );
 
-            utilsMock.verify(() ->
-                    HandleEventUtils.handleException(any(), any())
-            );
+            utilsMock.verify(() -> HandleEventUtils.handleException(any(), any()));
+            verify(startWorkflowHandler, never()).startInformalWorkflow(any());
         }
     }
 }
