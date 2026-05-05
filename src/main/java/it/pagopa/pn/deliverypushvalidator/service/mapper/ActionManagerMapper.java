@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.actionmanager.model.ActionType;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.actionmanager.model.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.actionmanager.model.NewAction;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 
@@ -27,6 +28,7 @@ public class ActionManagerMapper {
                 .type(ActionType.valueOf(action.getType().name()))
                 .recipientIndex(action.getRecipientIndex())
                 .timelineId(action.getTimelineId())
+                .communicationType(mapCommunicationType(action.getCommunicationType()))
                 .details(getDetailsJson(action));
     }
 
@@ -39,5 +41,9 @@ public class ActionManagerMapper {
             }
         }
         return "";
+    }
+
+    private CommunicationType mapCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType type) {
+        return type != null ? CommunicationType.valueOf(type.name()) : null;
     }
 }

@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool;
 
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import lombok.*;
 
 import java.time.Instant;
@@ -26,6 +27,8 @@ public class Action {
     private String timelineId;
 
     private String timeslot;
+
+    private CommunicationType communicationType;
 
     private ActionDetails details;
 }
