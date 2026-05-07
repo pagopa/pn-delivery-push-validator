@@ -4,6 +4,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import lombok.CustomLog;
@@ -31,7 +32,7 @@ public class NewInformalValidationConsumer {
             HandleEventUtils.addIunToMdc(iun);
             log.logStartingProcess(processName);
             log.info("Informal validation process for iun {} started", iun);
-            startWorkflowHandler.startInformalWorkflow(iun);
+            startWorkflowHandler.startWorkflow(iun, CommunicationType.INFORMAL);
             log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(), ex);

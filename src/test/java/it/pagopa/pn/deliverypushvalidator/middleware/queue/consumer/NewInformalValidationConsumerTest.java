@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,7 @@ class NewInformalValidationConsumerTest {
             );
 
             utilsMock.verify(() -> HandleEventUtils.addIunToMdc("TEST_IUN"));
-            verify(startWorkflowHandler).startInformalWorkflow("TEST_IUN");
+            verify(startWorkflowHandler).startWorkflow("TEST_IUN", CommunicationType.INFORMAL);
         }
     }
 
@@ -56,7 +57,7 @@ class NewInformalValidationConsumerTest {
                 MessageBuilder.withPayload(payload).build();
 
         doThrow(new RuntimeException("workflow error"))
-                .when(startWorkflowHandler).startInformalWorkflow("TEST_IUN");
+                .when(startWorkflowHandler).startWorkflow("TEST_IUN", CommunicationType.INFORMAL);
 
         try (MockedStatic<HandleEventUtils> utilsMock = mockStatic(HandleEventUtils.class)) {
             assertThrows(RuntimeException.class, () ->
@@ -82,7 +83,7 @@ class NewInformalValidationConsumerTest {
             );
 
             utilsMock.verify(() -> HandleEventUtils.handleException(any(), any()));
-            verify(startWorkflowHandler, never()).startInformalWorkflow(any());
+            verify(startWorkflowHandler, never()).startWorkflow(any(), any());
         }
     }
 }

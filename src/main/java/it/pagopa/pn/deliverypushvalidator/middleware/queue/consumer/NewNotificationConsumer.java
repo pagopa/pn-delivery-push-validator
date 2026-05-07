@@ -33,7 +33,7 @@ public class NewNotificationConsumer {
             String iun = pnDeliveryNewNotificationEvent.getPayload().getIun();
             HandleEventUtils.addIunToMdc(iun);
             log.logStartingProcess(processName);
-            startWorkflowHandler.startWorkflow(iun);
+            startWorkflowHandler.startWorkflow(iun, null);
             log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(),ex);
