@@ -3,13 +3,17 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
+import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 class NotificationMapperTest {
 
@@ -72,6 +76,256 @@ class NotificationMapperTest {
         Assertions.assertEquals("IUN_INF_01", actual.getIun());
         Assertions.assertEquals("Subject informal", actual.getSubject());
         Assertions.assertEquals(1, actual.getRecipients().size());
+    }
+
+    @Test
+    void externalInformalToInternal_withPhysicalAddress() {
+        // Il destinatario ha physicalAddress completamente valorizzato: tutti i campi devono essere mappati correttamente
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_03")
+                .paProtocolNumber("protocol_inf_03")
+                .subject("Subject informal with address")
+                .senderPaId("pa_04")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID03")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Mario Rossi")
+                                .physicalAddress(
+                                        new NotificationPhysicalAddress()
+                                                .at("c/o Condominio")
+                                                .address("Via Roma 1")
+                                                .addressDetails("Scala B")
+                                                .municipality("Roma")
+                                                .municipalityDetails("RM")
+                                                .province("RM")
+                                                .zip("00100")
+                                                .foreignState("Italia")
+                                )
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertEquals(1, actual.getRecipients().size());
+        NotificationRecipientInt recipient = actual.getRecipients().getFirst();
+        PhysicalAddressInt physicalAddress = recipient.getPhysicalAddress();
+
+        Assertions.assertNotNull(physicalAddress, "Il physicalAddress non deve essere null");
+        Assertions.assertEquals("Mario Rossi", physicalAddress.getFullname());
+        Assertions.assertEquals("c/o Condominio", physicalAddress.getAt());
+        Assertions.assertEquals("Via Roma 1", physicalAddress.getAddress());
+        Assertions.assertEquals("Scala B", physicalAddress.getAddressDetails());
+        Assertions.assertEquals("Roma", physicalAddress.getMunicipality());
+        Assertions.assertEquals("RM", physicalAddress.getMunicipalityDetails());
+        Assertions.assertEquals("RM", physicalAddress.getProvince());
+        Assertions.assertEquals("00100", physicalAddress.getZip());
+        Assertions.assertEquals("Italia", physicalAddress.getForeignState());
+    }
+
+    @Test
+    void externalInformalToInternal_withNullPhysicalAddress() {
+        // Il destinatario non ha physicalAddress: deve essere mappato senza eccezioni e physicalAddress deve essere null
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_02")
+                .paProtocolNumber("protocol_inf_02")
+                .subject("Subject informal null address")
+                .senderPaId("pa_03")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID02")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Nome Cognome")
+                                .digitalDomicile(
+                                        new NotificationDigitalAddress()
+                                                .address("pec@example.com")
+                                                .type(NotificationDigitalAddress.TypeEnum.PEC)
+                                )
+                        // physicalAddress non impostato → null
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertEquals(1, actual.getRecipients().size());
+        NotificationRecipientInt recipient = actual.getRecipients().getFirst();
+        Assertions.assertNull(recipient.getPhysicalAddress(),
+                "Il physicalAddress deve essere null quando non viene fornito");
+        Assertions.assertNotNull(recipient.getDigitalDomicile(),
+                "Il digitalDomicile deve essere valorizzato");
+    }
+
+    @Test
+    void mapNotificationPaymentInfo_withPagoPaAndAttachment() {
+        // Pagamento con PagoPa e attachment valorizzati
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_PAY_01")
+                .paProtocolNumber("prot_pay_01")
+                .subject("Subject payment")
+                .senderPaId("pa_pay")
+                .senderTaxId("taxIdPay")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID_PAY")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Pagatore")
+                                .payments(Collections.singletonList(
+                                        new InformalNotificationPaymentItem()
+                                                .pagoPa(new PagoPaPaymentBase()
+                                                        .creditorTaxId("77777777777")
+                                                        .noticeCode("302000100000019421")
+                                                        .attachment(new NotificationPaymentAttachment()
+                                                                .ref(new NotificationAttachmentBodyRef()
+                                                                        .key("key_att")
+                                                                        .versionToken("v1"))
+                                                                .digests(new NotificationAttachmentDigests()
+                                                                        .sha256("sha256_att"))))
+                                ))
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        List<NotificationPaymentInfoInt> payments = actual.getRecipients().getFirst().getPayments();
+        Assertions.assertEquals(1, payments.size());
+        NotificationPaymentInfoInt payment = payments.getFirst();
+        Assertions.assertNotNull(payment.getPagoPA());
+        Assertions.assertEquals("77777777777", payment.getPagoPA().getCreditorTaxId());
+        Assertions.assertEquals("302000100000019421", payment.getPagoPA().getNoticeCode());
+        Assertions.assertNotNull(payment.getPagoPA().getAttachment());
+        Assertions.assertEquals("key_att", payment.getPagoPA().getAttachment().getRef().getKey());
+        Assertions.assertEquals("sha256_att", payment.getPagoPA().getAttachment().getDigests().getSha256());
+    }
+
+    @Test
+    void mapNotificationPaymentInfo_withNullPagoPa() {
+        // Pagamento con pagoPa null: deve produrre un NotificationPaymentInfoInt con pagoPA null
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_PAY_02")
+                .paProtocolNumber("prot_pay_02")
+                .subject("Subject payment null pagopa")
+                .senderPaId("pa_pay2")
+                .senderTaxId("taxIdPay2")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID_PAY2")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Pagatore2")
+                                .payments(Collections.singletonList(
+                                        new InformalNotificationPaymentItem()
+                                        // pagoPa non impostato → null
+                                ))
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        List<NotificationPaymentInfoInt> payments = actual.getRecipients().getFirst().getPayments();
+        Assertions.assertEquals(1, payments.size());
+        Assertions.assertNull(payments.getFirst().getPagoPA(),
+                "PagoPA deve essere null quando non viene fornito");
+    }
+
+    @Test
+    void mapNotificationPaymentInfo_withNullAttachment() {
+        // Pagamento con PagoPa presente ma senza attachment
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_PAY_03")
+                .paProtocolNumber("prot_pay_03")
+                .subject("Subject payment no attachment")
+                .senderPaId("pa_pay3")
+                .senderTaxId("taxIdPay3")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID_PAY3")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Pagatore3")
+                                .payments(Collections.singletonList(
+                                        new InformalNotificationPaymentItem()
+                                                .pagoPa(new PagoPaPaymentBase()
+                                                        .creditorTaxId("88888888888")
+                                                        .noticeCode("302000100000019422")
+                                                        // attachment non impostato → null
+                                                )
+                                ))
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        List<NotificationPaymentInfoInt> payments = actual.getRecipients().getFirst().getPayments();
+        Assertions.assertEquals(1, payments.size());
+        Assertions.assertNotNull(payments.getFirst().getPagoPA());
+        Assertions.assertNull(payments.getFirst().getPagoPA().getAttachment(),
+                "L'attachment deve essere null quando non viene fornito");
+    }
+
+    @Test
+    void mapNotificationPaymentInfo_withEmptyPayments() {
+        // Lista payments vuota: deve restituire lista vuota
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_PAY_04")
+                .paProtocolNumber("prot_pay_04")
+                .subject("Subject payment empty")
+                .senderPaId("pa_pay4")
+                .senderTaxId("taxIdPay4")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("TAXID_PAY4")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Pagatore4")
+                                .payments(Collections.emptyList())
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        List<NotificationPaymentInfoInt> payments = actual.getRecipients().getFirst().getPayments();
+        Assertions.assertNotNull(payments);
+        Assertions.assertTrue(payments.isEmpty(), "La lista dei pagamenti deve essere vuota");
+    }
+
+    @Test
+    void externalInformalToInternal_withNullRecipients() {
+        // recipients == null: deve restituire lista vuota senza eccezioni
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_NULL")
+                .paProtocolNumber("protocol_null")
+                .subject("Subject null recipients")
+                .senderPaId("pa_null")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(null);
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertNotNull(actual.getRecipients(), "La lista dei destinatari non deve essere null");
+        Assertions.assertTrue(actual.getRecipients().isEmpty(),
+                "La lista dei destinatari deve essere vuota quando recipients è null");
+    }
+
+    @Test
+    void externalToInternal_withNullRecipients() {
+        // recipients == null nel mapping formale: deve restituire lista vuota senza eccezioni
+        SentNotificationV25 sent = new SentNotificationV25()
+                .iun("IUN_FORMAL_NULL")
+                .paProtocolNumber("protocol_formal_null")
+                .subject("Subject formal null recipients")
+                .senderPaId("pa_formal_null")
+                .physicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
+                .amount(0)
+                .paymentExpirationDate("2025-12-31")
+                .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .recipients(null)
+                .documents(Collections.emptyList());
+
+        NotificationInt actual = NotificationMapper.externalToInternal(sent);
+
+        Assertions.assertNotNull(actual.getRecipients(), "La lista dei destinatari non deve essere null");
+        Assertions.assertTrue(actual.getRecipients().isEmpty(),
+                "La lista dei destinatari deve essere vuota quando recipients è null");
     }
 
     private SentNotificationV25 getExternalNotification() {

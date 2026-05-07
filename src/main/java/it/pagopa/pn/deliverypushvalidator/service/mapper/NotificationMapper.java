@@ -21,7 +21,7 @@ public class NotificationMapper {
     public static NotificationInt externalToInternal(SentNotificationV25 sentNotification) {
 
         List<NotificationRecipientInt> listNotificationRecipientInt = mapNotificationRecipient(sentNotification.getRecipients());
-        List<NotificationDocumentInt> listNotificationDocumentIntInt = mapNotificationDocument(sentNotification.getDocuments());
+        List<NotificationDocumentInt> listNotificationDocumentInt = mapNotificationDocument(sentNotification.getDocuments());
 
         ServiceLevelTypeInt lvl =  ServiceLevelTypeInt.valueOf( sentNotification.getPhysicalCommunicationType().name());
         
@@ -46,7 +46,7 @@ public class NotificationMapper {
                 )
                 .paFee(sentNotification.getPaFee())
                 .vat(sentNotification.getVat())
-                .documents(listNotificationDocumentIntInt)
+                .documents(listNotificationDocumentInt)
                 .recipients(listNotificationRecipientInt)
                 .notificationFeePolicy(NotificationFeePolicy.fromValue(sentNotification.getNotificationFeePolicy().getValue()))
                 .amount(sentNotification.getAmount())
