@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationScheduler.DEFAULT_INTERVAL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -174,6 +175,7 @@ class NotificationValidationSchedulerTest {
                 Mockito.any(ActionDetails.class),
                 communicationTypeCaptor.capture()
         );
+        assertEquals(CommunicationType.INFORMAL, communicationTypeCaptor.getValue());
     }
 
     @ExtendWith(SpringExtension.class)
