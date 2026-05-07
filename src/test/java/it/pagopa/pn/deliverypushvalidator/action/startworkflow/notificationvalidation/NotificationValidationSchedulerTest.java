@@ -161,7 +161,6 @@ class NotificationValidationSchedulerTest {
     void scheduleInformalNotificationValidation() {
         //GIVEN
         String iun = "test-informal";
-        CommunicationType communicationType = CommunicationType.INFORMAL;
 
         //WHEN
         ArgumentCaptor<CommunicationType> communicationTypeCaptor = ArgumentCaptor.forClass(CommunicationType.class);
