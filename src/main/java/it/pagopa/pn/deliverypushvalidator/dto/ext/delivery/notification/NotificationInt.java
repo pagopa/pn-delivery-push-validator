@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification;
 
-import it.pagopa.pn.api.dto.events.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
 import lombok.*;
 import java.time.Instant;
