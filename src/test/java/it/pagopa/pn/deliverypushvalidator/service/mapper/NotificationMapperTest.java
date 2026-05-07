@@ -51,6 +51,29 @@ class NotificationMapperTest {
         Assertions.assertEquals( expected, actual );
     }
 
+    @Test
+    void externalInformalToInternal() {
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_01")
+                .paProtocolNumber("protocol_inf_01")
+                .subject("Subject informal")
+                .senderPaId("pa_02")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(Collections.singletonList(
+                        new InformalNotificationRecipientV1()
+                                .taxId("Codice Fiscale 01")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Nome Cognome")
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertEquals("IUN_INF_01", actual.getIun());
+        Assertions.assertEquals("Subject informal", actual.getSubject());
+        Assertions.assertEquals(1, actual.getRecipients().size());
+    }
+
     private SentNotificationV25 getExternalNotification() {
         return new SentNotificationV25()
                 .iun("IUN_01")
