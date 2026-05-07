@@ -23,4 +23,5 @@ public class NotificationRecipientInt {
     private PhysicalAddressInt physicalAddress;
     private List<NotificationPaymentInfoInt> payments;
     private RecipientTypeInt recipientType;
+    private String messageId;
 }

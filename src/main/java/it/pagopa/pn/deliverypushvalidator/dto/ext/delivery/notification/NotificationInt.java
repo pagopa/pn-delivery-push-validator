@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification;
 
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
 import lombok.*;
 import java.time.Instant;
@@ -31,4 +32,6 @@ public class NotificationInt {
     private List<String> additionalLanguages;
     private UsedServicesInt usedServices;
     private String idempotenceToken;
+    private String campaignId;
+    private CommunicationType communicationType;
 }
