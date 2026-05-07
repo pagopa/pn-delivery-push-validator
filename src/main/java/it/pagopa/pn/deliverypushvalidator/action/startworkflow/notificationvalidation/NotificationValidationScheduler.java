@@ -138,6 +138,6 @@ public class NotificationValidationScheduler {
                 .build();
 
         log.debug("Scheduling Notification refused schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_REFUSED, details);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_REFUSED, details, communicationType);
     }
 }

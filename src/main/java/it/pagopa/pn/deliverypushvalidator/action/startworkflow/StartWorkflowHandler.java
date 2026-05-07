@@ -21,4 +21,5 @@ public class StartWorkflowHandler {
     public void startWorkflow(String iun, CommunicationType communicationType ) {
         notificationValidationScheduler.scheduleNotificationValidation(iun, communicationType);
     }
+
 }

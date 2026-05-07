@@ -131,7 +131,7 @@ class NotificationValidationSchedulerTest {
 
         //THEN
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
-                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class), Mockito.isNull());
     }
 
     @ExtendWith(SpringExtension.class)
@@ -153,7 +153,7 @@ class NotificationValidationSchedulerTest {
 
         //THEN
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
-                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class));
+                Mockito.eq(ActionType.NOTIFICATION_REFUSED), Mockito.any(NotificationRefusedActionDetails.class), Mockito.isNull());
     }
 
     @ExtendWith(SpringExtension.class)
