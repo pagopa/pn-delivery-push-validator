@@ -35,9 +35,4 @@ public class ActionsPoolImpl implements ActionsPool {
                 nowUtc.getHour(),
                 nowUtc.getMinute());
     }
-
-    @Override
-    public void unscheduleFutureAction(String actionId) {
-        actionService.unSchedule(actionId);
-    }
 }

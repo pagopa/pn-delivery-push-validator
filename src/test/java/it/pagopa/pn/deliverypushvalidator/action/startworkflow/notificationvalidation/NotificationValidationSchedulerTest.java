@@ -1,16 +1,19 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
-import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -45,7 +48,7 @@ class NotificationValidationSchedulerTest {
         //WHEN
         notificationValidationScheduler.scheduleNotificationValidation(iun);
         //THEN
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(iun), Mockito.any(Instant.class), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any());
+        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(iun), Mockito.any(Instant.class), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any(ActionDetails.class));
     }
 
     @ExtendWith(SpringExtension.class)
@@ -67,7 +70,7 @@ class NotificationValidationSchedulerTest {
         //THEN
         Instant schedulingDate = now.plus(intervalsDuration[retryAttempt]);
         
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any());
+        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any(ActionDetails.class));
     }
 
     @ExtendWith(SpringExtension.class)
@@ -87,7 +90,7 @@ class NotificationValidationSchedulerTest {
 
         //THEN
         Instant schedulingDate = now.plus(intervalsDuration[retryAttempt - 1]);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any());
+        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any(ActionDetails.class));
     }
 
     @ExtendWith(SpringExtension.class)
@@ -107,7 +110,7 @@ class NotificationValidationSchedulerTest {
 
         //THEN
         Instant schedulingDate = now.plus(DEFAULT_INTERVAL);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any());
+        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.eq(schedulingDate), Mockito.eq(ActionType.NOTIFICATION_VALIDATION), Mockito.any(ActionDetails.class));
     }
 
     @ExtendWith(SpringExtension.class)
@@ -158,8 +161,10 @@ class NotificationValidationSchedulerTest {
     void scheduleInformalNotificationValidation() {
         //GIVEN
         String iun = "test-informal";
+        CommunicationType communicationType = CommunicationType.INFORMAL;
 
         //WHEN
+        ArgumentCaptor<CommunicationType> communicationTypeCaptor = ArgumentCaptor.forClass(CommunicationType.class);
         notificationValidationScheduler.scheduleInformalNotificationValidation(iun);
 
         //THEN
@@ -167,7 +172,8 @@ class NotificationValidationSchedulerTest {
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
                 Mockito.eq(ActionType.NOTIFICATION_VALIDATION),
-                Mockito.any()
+                Mockito.any(ActionDetails.class),
+                communicationTypeCaptor.capture()
         );
     }
 
@@ -181,7 +187,8 @@ class NotificationValidationSchedulerTest {
                         Mockito.eq(iun),
                         Mockito.any(Instant.class),
                         Mockito.eq(ActionType.NOTIFICATION_VALIDATION),
-                        Mockito.any()
+                        Mockito.any(ActionDetails.class),
+                        Mockito.any(CommunicationType.class)
                 );
 
         //WHEN + THEN

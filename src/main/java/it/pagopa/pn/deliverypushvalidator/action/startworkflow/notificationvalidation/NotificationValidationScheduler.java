@@ -147,10 +147,9 @@ public class NotificationValidationScheduler {
         NotificationValidationActionDetails details = NotificationValidationActionDetails.builder()
                 .retryAttempt(0)
                 .startWorkflowTime(Instant.now())
-                .communicationType(CommunicationType.INFORMAL)
                 .build();
 
         log.info("Scheduling informal notification validation schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_VALIDATION, details);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_VALIDATION, details, CommunicationType.INFORMAL);
     }
 }
