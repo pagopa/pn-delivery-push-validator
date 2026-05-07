@@ -4,6 +4,7 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientT
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
@@ -69,13 +70,62 @@ class NotificationMapperTest {
                                 .taxId("Codice Fiscale 01")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
+                                .digitalDomicile(
+                                        new NotificationDigitalAddress()
+                                                .address("pec@example.com")
+                                                .type(NotificationDigitalAddress.TypeEnum.PEC)
+                                )
+                                .physicalAddress(
+                                        new NotificationPhysicalAddress()
+                                                .address("Via Roma 10")
+                                                .municipality("Roma")
+                                                .zip("00100")
+                                )
+                                .payments(Collections.singletonList(
+                                        new InformalNotificationPaymentItem()
+                                                .pagoPa(new PagoPaPaymentBase()
+                                                        .creditorTaxId("77777777777")
+                                                        .noticeCode("302000100000019421"))
+                                ))
+                ))
+                .documents(Collections.singletonList(
+                        new NotificationDocument()
+                                .ref(new NotificationAttachmentBodyRef()
+                                        .key("doc_inf_01")
+                                        .versionToken("v_doc_inf_01"))
+                                .digests(new NotificationAttachmentDigests()
+                                        .sha256("sha256_doc_inf_01"))
                 ));
 
         NotificationInt actual = NotificationMapper.externalToInternal(informal);
 
         Assertions.assertEquals("IUN_INF_01", actual.getIun());
         Assertions.assertEquals("Subject informal", actual.getSubject());
+        Assertions.assertEquals("pa_02", actual.getSender().getPaId());
+        Assertions.assertEquals("taxId", actual.getSender().getPaTaxId());
+        Assertions.assertEquals("Comune", actual.getSender().getPaDenomination());
         Assertions.assertEquals(1, actual.getRecipients().size());
+
+        NotificationRecipientInt recipient = actual.getRecipients().getFirst();
+        Assertions.assertEquals("Codice Fiscale 01", recipient.getTaxId());
+        Assertions.assertEquals(RecipientTypeInt.PF, recipient.getRecipientType());
+        Assertions.assertNotNull(recipient.getDigitalDomicile());
+        Assertions.assertEquals("pec@example.com", recipient.getDigitalDomicile().getAddress());
+        Assertions.assertNotNull(recipient.getPhysicalAddress());
+        Assertions.assertEquals("Via Roma 10", recipient.getPhysicalAddress().getAddress());
+        Assertions.assertEquals("Roma", recipient.getPhysicalAddress().getMunicipality());
+
+        List<NotificationPaymentInfoInt> payments = recipient.getPayments();
+        Assertions.assertNotNull(payments);
+        Assertions.assertEquals(1, payments.size());
+        Assertions.assertEquals("77777777777", payments.getFirst().getPagoPA().getCreditorTaxId());
+        Assertions.assertEquals("302000100000019421", payments.getFirst().getPagoPA().getNoticeCode());
+
+        Assertions.assertNotNull(actual.getDocuments());
+        Assertions.assertEquals(1, actual.getDocuments().size());
+        Assertions.assertEquals("doc_inf_01", actual.getDocuments().getFirst().getRef().getKey());
+        Assertions.assertEquals("v_doc_inf_01", actual.getDocuments().getFirst().getRef().getVersionToken());
+        Assertions.assertEquals("sha256_doc_inf_01", actual.getDocuments().getFirst().getDigests().getSha256());
     }
 
     @Test
@@ -259,8 +309,8 @@ class NotificationMapperTest {
     }
 
     @Test
-    void externalInformalToInternal_withNullRecipients() {
-        // recipients == null: deve restituire lista vuota senza eccezioni
+    void externalInformalToInternal_withNullRecipientsAndDocuments() {
+        // recipients/documents == null: deve restituire liste vuote senza eccezioni
         InformalSentNotificationV1 informal = new InformalSentNotificationV1()
                 .iun("IUN_INF_NULL")
                 .paProtocolNumber("protocol_null")
@@ -268,13 +318,39 @@ class NotificationMapperTest {
                 .senderPaId("pa_null")
                 .senderTaxId("taxId")
                 .senderDenomination("Comune")
-                .recipients(null);
+                .recipients(null)
+                .documents(null);
 
         NotificationInt actual = NotificationMapper.externalToInternal(informal);
 
         Assertions.assertNotNull(actual.getRecipients(), "La lista dei destinatari non deve essere null");
         Assertions.assertTrue(actual.getRecipients().isEmpty(),
                 "La lista dei destinatari deve essere vuota quando recipients è null");
+        Assertions.assertNotNull(actual.getDocuments(), "La lista dei documenti non deve essere null");
+        Assertions.assertTrue(actual.getDocuments().isEmpty(),
+                "La lista dei documenti deve essere vuota quando documents è null");
+    }
+
+    @Test
+    void externalInformalToInternal_withEmptyRecipientsAndDocuments() {
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_EMPTY")
+                .paProtocolNumber("protocol_empty")
+                .subject("Subject empty recipients and docs")
+                .senderPaId("pa_empty")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(Collections.emptyList())
+                .documents(Collections.emptyList());
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertNotNull(actual.getRecipients());
+        Assertions.assertTrue(actual.getRecipients().isEmpty(),
+                "La lista dei destinatari deve essere vuota quando recipients è empty");
+        Assertions.assertNotNull(actual.getDocuments());
+        Assertions.assertTrue(actual.getDocuments().isEmpty(),
+                "La lista dei documenti deve essere vuota quando documents è empty");
     }
 
     @Test
