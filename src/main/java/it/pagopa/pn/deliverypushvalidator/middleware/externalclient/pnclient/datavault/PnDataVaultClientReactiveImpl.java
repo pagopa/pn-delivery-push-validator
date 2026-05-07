@@ -4,6 +4,7 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.pnclients.CommonBaseClient;
 
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
+import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.NotificationsApi;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.RecipientsApi;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.MessagesApi;
@@ -14,9 +15,11 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_r
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.MessageResponseDto;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -70,19 +73,23 @@ public class PnDataVaultClientReactiveImpl extends CommonBaseClient implements P
     }
 
     @Override
-    @Retryable(
-            retryFor = {PnInternalException.class},
-            backoff = @Backoff(random = true, delay = 500, maxDelay = 1000, multiplier = 2)
-    )
     public Mono<MessageResponseDto> getMessageById(UUID messageId, UUID senderId) {
         log.logInvokingExternalService(CLIENT_NAME, GET_MESSAGE_BY_ID);
         log.debug("Start call getMessageById - messageId={}, senderId={}", messageId, senderId);
 
         return messagesApi.getMessageById(messageId, senderId)
                 .doOnSuccess(res -> log.debug("Successfully retrieved message with id={}", messageId))
-                .onErrorResume(err -> {
+                .onErrorMap(err -> {
+                    if (err instanceof WebClientResponseException webErr
+                            && webErr.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
+                        log.warn("Message not found for messageId={}, senderId={}", messageId, senderId);
+                        return new PnMessageNotFoundException(
+                                "Message not found for messageId=%s and senderId=%s".formatted(messageId, senderId),
+                                err
+                        );
+                    }
                     log.error("Exception invoking getMessageById with messageId={}, senderId={} err ", messageId, senderId, err);
-                    return Mono.error(new PnInternalException("Exception invoking getMessageById ", PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DATAVAULT_FAILED, err));
+                    return new PnInternalException("Exception invoking getMessageById ", PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DATAVAULT_FAILED, err);
                 });
     }
 }
