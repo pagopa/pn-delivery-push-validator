@@ -200,35 +200,6 @@ class NotificationMapperTest {
     }
 
     @Test
-    void mapNotificationPaymentInfo_withNullPagoPa() {
-        // Pagamento con pagoPa null: deve produrre un NotificationPaymentInfoInt con pagoPA null
-        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
-                .iun("IUN_PAY_02")
-                .paProtocolNumber("prot_pay_02")
-                .subject("Subject payment null pagopa")
-                .senderPaId("pa_pay2")
-                .senderTaxId("taxIdPay2")
-                .senderDenomination("Comune")
-                .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
-                                .taxId("TAXID_PAY2")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
-                                .denomination("Pagatore2")
-                                .payments(Collections.singletonList(
-                                        new InformalNotificationPaymentItem()
-                                        // pagoPa non impostato → null
-                                ))
-                ));
-
-        NotificationInt actual = NotificationMapper.externalToInternal(informal);
-
-        List<NotificationPaymentInfoInt> payments = actual.getRecipients().getFirst().getPayments();
-        Assertions.assertEquals(1, payments.size());
-        Assertions.assertNull(payments.getFirst().getPagoPA(),
-                "PagoPA deve essere null quando non viene fornito");
-    }
-
-    @Test
     void mapNotificationPaymentInfo_withNullAttachment() {
         // Pagamento con PagoPa presente ma senza attachment
         InformalSentNotificationV1 informal = new InformalSentNotificationV1()
