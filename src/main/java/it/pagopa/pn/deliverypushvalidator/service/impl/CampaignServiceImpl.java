@@ -14,7 +14,8 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final MVPCampaignsParameterConsumer mvpCampaignsParameterConsumer;
 
-    public Campaign getCampaignByCampaignIdAndSenderId(String campaignId, String senderId ) {
+    @Override
+    public Campaign getCampaignByCampaignIdAndSenderId(String campaignId, String senderId) {
         log.debug("Start getCampaignByCampaignIdAndSenderId for campaignId={} and senderId={}", campaignId, senderId);
         return mvpCampaignsParameterConsumer.getCampaignByCampaignIdAndSenderId(campaignId, senderId);
     }

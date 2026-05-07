@@ -1,16 +1,16 @@
 package it.pagopa.pn.deliverypushvalidator.config;
 
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
-import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
+import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Slf4j
-@Configuration
+@Component
 @RequiredArgsConstructor
 public class MVPCampaignsParameterConsumer {
 

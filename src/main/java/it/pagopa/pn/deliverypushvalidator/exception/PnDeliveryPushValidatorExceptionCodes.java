@@ -45,6 +45,8 @@ public class PnDeliveryPushValidatorExceptionCodes extends PnExceptionsCodes {
     public static final String ERROR_CODE_DELIVERYPUSH_ACTION_CONFLICT = "PN_ACTIONMANAGER_ERROR_CODE_ACTION_CONFLICT";
     public static final String ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT = "PN_TIMELINESERVICE_TIMELINEELEMENTNOTPRESENT";
 
+    public static final String ERROR_CODE_DELIVERYPUSH_CAMPAIGN_NOT_FOUND = "PN_DELIVERY_CAMPAIGN_NOT_FOUND";
+
     @Getter
     public enum NotificationRefusedErrorCodeInt {
         FILE_NOTFOUND("FILE_NOTFOUND", false),
