@@ -17,18 +17,6 @@ public class SchedulerServiceMock implements SchedulerService {
     this.actionPoolMock = actionPoolMock;
   }
 
-  private void handleSchedulingAction(String iun, Integer recIndex, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails, String timelineId) {
-    Action action = Action.builder()
-            .iun(iun)
-            .recipientIndex(recIndex)
-            .notBefore(dateToSchedule)
-            .type(actionType)
-            .details(actionDetails)
-            .timelineId(timelineId)
-            .build();
-    actionPoolMock.addAction(action);
-  }
-
   @Override
   public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
       ActionType actionType, String timelineId, ActionDetails actionDetails, CommunicationType communicationType) {
