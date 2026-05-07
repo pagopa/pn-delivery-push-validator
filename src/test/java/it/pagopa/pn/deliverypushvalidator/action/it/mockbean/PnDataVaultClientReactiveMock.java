@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -24,6 +25,7 @@ public class PnDataVaultClientReactiveMock implements PnDataVaultClientReactive 
     public void clear() {
         this.confidentialMap = new ConcurrentHashMap<>();
         this.normalizedAddress = new ConcurrentHashMap<>();
+        this.messageMap = new ConcurrentHashMap<>();
     }
     
     public void insertBaseRecipientDto(BaseRecipientDto dto){
@@ -64,6 +66,21 @@ public class PnDataVaultClientReactiveMock implements PnDataVaultClientReactive 
             }
             return Mono.empty();
         }
+    }
+
+    private ConcurrentMap<String, MessageResponseDto> messageMap = new ConcurrentHashMap<>();
+
+    public void insertMessageResponseDto(MessageResponseDto dto) {
+        messageMap.put(dto.getMessageId().toString(), dto);
+    }
+
+    @Override
+    public Mono<MessageResponseDto> getMessageById(UUID messageId, UUID senderId) {
+        MessageResponseDto dto = messageMap.get(messageId.toString());
+        if (dto != null) {
+            return Mono.just(dto);
+        }
+        return Mono.empty();
     }
 
     private NotificationPhysicalAddress mapToNotificationPhysicalAddress(AnalogDomicile dto) {
