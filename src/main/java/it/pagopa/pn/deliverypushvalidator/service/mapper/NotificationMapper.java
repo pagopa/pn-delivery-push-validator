@@ -184,26 +184,22 @@ public class NotificationMapper {
 
         for (InformalNotificationPaymentItem payment : payments) {
             PagoPaPaymentBase pagoPa = payment.getPagoPa();
-            if (pagoPa == null) {
-                list.add(NotificationPaymentInfoInt.builder().build());
-            } else {
-                list.add(
-                        NotificationPaymentInfoInt.builder()
-                                .pagoPA(PagoPaInt.builder()
-                                        .creditorTaxId(pagoPa.getCreditorTaxId())
-                                        .noticeCode(pagoPa.getNoticeCode())
-                                        .attachment(pagoPa.getAttachment() != null ? NotificationDocumentInt.builder()
-                                                .ref(NotificationDocumentInt.Ref.builder()
-                                                        .key(pagoPa.getAttachment().getRef().getKey())
-                                                        .versionToken(pagoPa.getAttachment().getRef().getVersionToken())
-                                                        .build())
-                                                .digests(NotificationDocumentInt.Digests.builder()
-                                                        .sha256(pagoPa.getAttachment().getDigests().getSha256())
-                                                        .build())
-                                                .build() : null)
-                                        .build())
-                                .build());
-            }
+            list.add(
+                    NotificationPaymentInfoInt.builder()
+                            .pagoPA(PagoPaInt.builder()
+                                    .creditorTaxId(pagoPa.getCreditorTaxId())
+                                    .noticeCode(pagoPa.getNoticeCode())
+                                    .attachment(pagoPa.getAttachment() != null ? NotificationDocumentInt.builder()
+                                            .ref(NotificationDocumentInt.Ref.builder()
+                                                    .key(pagoPa.getAttachment().getRef().getKey())
+                                                    .versionToken(pagoPa.getAttachment().getRef().getVersionToken())
+                                                    .build())
+                                            .digests(NotificationDocumentInt.Digests.builder()
+                                                    .sha256(pagoPa.getAttachment().getDigests().getSha256())
+                                                    .build())
+                                            .build() : null)
+                                    .build())
+                            .build());
         }
 
         return list;
