@@ -7,6 +7,7 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.MockAWSObjectsTest;
 import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
@@ -33,12 +34,20 @@ import static org.mockserver.model.HttpResponse.response;
 @TestPropertySource(properties = {
         "pn.delivery-push-validator.data-vault-base-url=http://localhost:9998"
 })
+@SuppressWarnings("resource")
 class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
     @Autowired
     private PnDataVaultClientReactiveImpl client;
-    
+
     private static ClientAndServer mockServer;
-    
+
+    @AfterEach
+    void tearDown() {
+        if (mockServer != null && mockServer.isRunning()) {
+            mockServer.stop();
+        }
+    }
+
     @Test
     void getRecipientDenominationByInternalId() throws JsonProcessingException {
         mockServer = startClientAndServer(9998);
@@ -73,8 +82,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertNotNull(responseMono);
         BaseRecipientDto response = responseMono.blockFirst();
         Assertions.assertEquals(responseDto, response);
-
-        mockServer.stop();
     }
 
     @Test
@@ -99,8 +106,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertNotNull(responseMono);
         
         Assertions.assertThrows( PnInternalException.class, responseMono::blockFirst);
-        
-        mockServer.stop();
     }
 
     @Test
@@ -157,8 +162,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertEquals(analogDomicile.getAt(), dto.getPhysicalAddress().getAt());
         Assertions.assertEquals(analogDomicile.getCap(), dto.getPhysicalAddress().getCap());
         Assertions.assertEquals(analogDomicile.getMunicipality(), dto.getPhysicalAddress().getMunicipality());
-
-        mockServer.stop();
     }
 
     @Test
@@ -184,8 +187,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
 
         Flux<ConfidentialTimelineElementDto> fluxDto = client.getNotificationTimelines(List.of(confidentialTimelineElementId));
         Assertions.assertThrows(PnInternalException.class, fluxDto::blockFirst);
-
-        mockServer.stop();
     }
 
     @Test
@@ -211,6 +212,7 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
                 .when(request()
                         .withMethod("GET")
                         .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
                 )
                 .respond(response()
                         .withBody(responseJson)
@@ -224,8 +226,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(messageId, response.getMessageId());
         Assertions.assertEquals(senderId.toString(), response.getSenderId());
-
-        mockServer.stop();
     }
 
     @Test
@@ -241,6 +241,7 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
                 .when(request()
                         .withMethod("GET")
                         .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
                 )
                 .respond(response()
                         .withContentType(MediaType.APPLICATION_JSON)
@@ -250,8 +251,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Mono<MessageResponseDto> responseMono = client.getMessageById(messageId, senderId);
         Assertions.assertNotNull(responseMono);
         Assertions.assertThrows(PnInternalException.class, responseMono::block);
-
-        mockServer.stop();
     }
 
     @Test
@@ -267,6 +266,7 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
                 .when(request()
                         .withMethod("GET")
                         .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
                 )
                 .respond(response()
                         .withContentType(MediaType.APPLICATION_JSON)
@@ -278,7 +278,5 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         PnMessageNotFoundException exception = Assertions.assertThrows(PnMessageNotFoundException.class, responseMono::block);
         Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_MESSAGE_NOT_FOUND,
                 exception.getProblem().getErrors().getFirst().getCode());
-
-        mockServer.stop();
     }
 }

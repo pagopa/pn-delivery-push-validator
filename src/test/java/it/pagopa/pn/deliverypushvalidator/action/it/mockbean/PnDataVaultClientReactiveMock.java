@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
+import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationPhysicalAddress;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV25;
@@ -68,19 +69,26 @@ public class PnDataVaultClientReactiveMock implements PnDataVaultClientReactive 
         }
     }
 
+    private static String getMessageKey(UUID messageId, UUID senderId) {
+        return String.valueOf(messageId) + "_" + String.valueOf(senderId);
+    }
+
     private ConcurrentMap<String, MessageResponseDto> messageMap = new ConcurrentHashMap<>();
 
     public void insertMessageResponseDto(MessageResponseDto dto) {
-        messageMap.put(dto.getMessageId().toString(), dto);
+
+        messageMap.put(getMessageKey(dto.getMessageId(), UUID.fromString(dto.getSenderId())), dto);
     }
 
     @Override
     public Mono<MessageResponseDto> getMessageById(UUID messageId, UUID senderId) {
-        MessageResponseDto dto = messageMap.get(messageId.toString());
+        MessageResponseDto dto = messageMap.get(getMessageKey(messageId, senderId));
         if (dto != null) {
             return Mono.just(dto);
         }
-        return Mono.empty();
+        return Mono.error(new PnMessageNotFoundException(
+                "Message not found for messageId=" + messageId + ", senderId=" + senderId
+        ));
     }
 
     private NotificationPhysicalAddress mapToNotificationPhysicalAddress(AnalogDomicile dto) {
