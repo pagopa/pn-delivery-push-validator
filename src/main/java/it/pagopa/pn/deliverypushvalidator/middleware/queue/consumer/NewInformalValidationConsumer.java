@@ -27,7 +27,7 @@ public class NewInformalValidationConsumer {
         setMdc(message);
         final String processName = "NEW INFORMAL NOTIFICATION";
         try {
-            log.info("Handle message from {} with content {}", PnDeliveryClient.CLIENT_NAME, message);
+            log.info("Handle message for informal notification from {} with content {}", PnDeliveryClient.CLIENT_NAME, message);
             String iun = message.getPayload().getIun();
             HandleEventUtils.addIunToMdc(iun);
             log.logStartingProcess(processName);
