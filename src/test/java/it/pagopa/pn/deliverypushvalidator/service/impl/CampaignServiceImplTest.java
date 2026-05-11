@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CampaignServiceImplTest {
+class CampaignServiceImplTest {
 
     private static final String CAMPAIGN_ID = "campaign-id";
     private static final String SENDER_ID = "sender-id";

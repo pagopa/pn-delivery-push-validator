@@ -7,6 +7,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageLanguageMismatchException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageNotFoundException;
+import it.pagopa.pn.deliverypushvalidator.exception.PnValidationSenderIdNotValidException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.LocalizedContent;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.MessageResponseDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NO_RECIPIENT_IN_NOTIFICATION;
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_SENDER_ID_NOT_VALID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -107,6 +109,38 @@ class MessageValidatorTest {
                     Assertions.assertEquals("recipients[0].messageId", ex.getProblem().getErrors().getFirst().getElement());
                 })
                 .verify();
+    }
+
+    @Test
+    void validateWhenSenderPaIdIsNullThenThrowSenderIdNotValid() {
+        NotificationInt notification = buildNotificationWithSender(null, UUID.randomUUID().toString(), List.of("it"));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .expectErrorSatisfies(throwable -> {
+                    Assertions.assertInstanceOf(PnValidationSenderIdNotValidException.class, throwable);
+                    PnValidationSenderIdNotValidException ex = (PnValidationSenderIdNotValidException) throwable;
+                    Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_SENDER_ID_NOT_VALID,
+                            ex.getProblem().getErrors().getFirst().getCode());
+                    Assertions.assertEquals("sender.paId", ex.getProblem().getErrors().getFirst().getElement());
+                })
+                .verify();
+        verify(pnDataVaultClientReactive, never()).getMessageById(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void validateWhenSenderPaIdIsNotUuidThenThrowSenderIdNotValid() {
+        NotificationInt notification = buildNotificationWithSender("pa_02", UUID.randomUUID().toString(), List.of("it"));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .expectErrorSatisfies(throwable -> {
+                    Assertions.assertInstanceOf(PnValidationSenderIdNotValidException.class, throwable);
+                    PnValidationSenderIdNotValidException ex = (PnValidationSenderIdNotValidException) throwable;
+                    Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_SENDER_ID_NOT_VALID,
+                            ex.getProblem().getErrors().getFirst().getCode());
+                    Assertions.assertEquals("sender.paId", ex.getProblem().getErrors().getFirst().getElement());
+                })
+                .verify();
+        verify(pnDataVaultClientReactive, never()).getMessageById(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
     }
 
     @Test
@@ -210,6 +244,15 @@ class MessageValidatorTest {
                 .iun("IUN_01")
                 .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
                 .recipients(List.of(NotificationRecipientInt.builder().messageId(messageId.toString()).build()))
+                .additionalLanguages(additionalLanguages)
+                .build();
+    }
+
+    private NotificationInt buildNotificationWithSender(String senderPaId, String messageId, List<String> additionalLanguages) {
+        return NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderPaId).build())
+                .recipients(List.of(NotificationRecipientInt.builder().messageId(messageId).build()))
                 .additionalLanguages(additionalLanguages)
                 .build();
     }

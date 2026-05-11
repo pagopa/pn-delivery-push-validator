@@ -6,6 +6,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageLanguageMismatchException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageNotFoundException;
+import it.pagopa.pn.deliverypushvalidator.exception.PnValidationSenderIdNotValidException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.LocalizedContent;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.MessageResponseDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
@@ -39,6 +40,8 @@ import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidat
 public class MessageValidator {
 
     private static final String VALIDATE_MESSAGE_PROCESS = "Validate message";
+    private static final String MESSAGE_VALIDATION_FAILED_LOG = "Message validation failed: {} - iun={}, element={}";
+    private static final String ELEMENT_SENDER_PA_ID = "sender.paId";
 
     private final PnDataVaultClientReactive pnDataVaultClientReactive;
 
@@ -79,8 +82,8 @@ public class MessageValidator {
             // 1. Check messageId presence
             if (!StringUtils.hasText(recipient.getMessageId())) {
                 String detail = "messageId is missing for recipient";
-                log.warn("Message validation failed: {} - iun={}, element={}", detail, notification.getIun(), element);
-                return Mono.error(new PnValidationMessageNotFoundException(detail, element));
+                return Mono.error(logValidationFailure(notification, element, detail,
+                        new PnValidationMessageNotFoundException(detail, element)));
             }
 
             UUID messageId;
@@ -88,25 +91,23 @@ public class MessageValidator {
                 messageId = UUID.fromString(recipient.getMessageId());
             } catch (IllegalArgumentException e) {
                 String detail = "messageId is not a valid UUID: " + recipient.getMessageId();
-                log.warn("Message validation failed: {} - iun={}, element={}", detail, notification.getIun(), element);
-                return Mono.error(new PnValidationMessageNotFoundException(detail, element));
+                return Mono.error(logValidationFailure(notification, element, detail,
+                        new PnValidationMessageNotFoundException(detail, element)));
             }
 
-            UUID senderId = UUID.fromString(notification.getSender().getPaId());
-
-            // 2. Retrieve message from data-vault; translate not-found into a validation refusal
-            return pnDataVaultClientReactive.getMessageById(messageId, senderId)
-                    .onErrorMap(PnMessageNotFoundException.class, e -> {
-                        String detail = "Message with id: " + recipient.getMessageId() + " not found";
-                        log.warn("Message validation failed: {} - iun={}, element={}", detail, notification.getIun(), element);
-                        return new PnValidationMessageNotFoundException(detail, element);
-                    })
-                    .switchIfEmpty(Mono.defer(() -> {
-                        String detail = "Message with id: " + recipient.getMessageId() + " not found";
-                        log.warn("Message validation failed: {} - iun={}, element={}", detail, notification.getIun(), element);
-                        return Mono.error(new PnValidationMessageNotFoundException(detail, element));
-                    }))
-                    .flatMap(message -> validateMessageLanguage(notification, recipient, element, message));
+            return resolveSenderId(notification)
+                    .flatMap(senderId -> pnDataVaultClientReactive.getMessageById(messageId, senderId)
+                            .onErrorMap(PnMessageNotFoundException.class, e -> {
+                                String detail = "Message with id: " + recipient.getMessageId() + " not found";
+                                return logValidationFailure(notification, element, detail,
+                                        new PnValidationMessageNotFoundException(detail, element));
+                            })
+                            .switchIfEmpty(Mono.defer(() -> {
+                                String detail = "Message with id: " + recipient.getMessageId() + " not found";
+                                return Mono.error(logValidationFailure(notification, element, detail,
+                                        new PnValidationMessageNotFoundException(detail, element)));
+                            }))
+                            .flatMap(message -> validateMessageLanguage(notification, recipient, element, message)));
         });
     }
 
@@ -127,12 +128,36 @@ public class MessageValidator {
                 String detail = "Message language '" + messageLanguage
                         + "' does not match notification additional languages " + additionalLanguages
                         + " for messageId: " + recipient.getMessageId();
-                log.warn("Message validation failed: {} - iun={}, element={}", detail, notification.getIun(), element);
-                return Mono.error(new PnValidationMessageLanguageMismatchException(detail, element));
+                return Mono.error(logValidationFailure(notification, element, detail,
+                        new PnValidationMessageLanguageMismatchException(detail, element)));
             }
         }
 
         return Mono.empty();
+    }
+
+    private Mono<UUID> resolveSenderId(NotificationInt notification) {
+        if (notification.getSender() == null || !StringUtils.hasText(notification.getSender().getPaId())) {
+            String detail = "sender.paId is missing for notification";
+            return Mono.error(logValidationFailure(notification, ELEMENT_SENDER_PA_ID, detail,
+                    new PnValidationSenderIdNotValidException(detail, ELEMENT_SENDER_PA_ID)));
+        }
+
+        try {
+            return Mono.just(UUID.fromString(notification.getSender().getPaId()));
+        } catch (IllegalArgumentException e) {
+            String detail = "sender.paId is not a valid UUID: " + notification.getSender().getPaId();
+            return Mono.error(logValidationFailure(notification, ELEMENT_SENDER_PA_ID, detail,
+                    new PnValidationSenderIdNotValidException(detail, ELEMENT_SENDER_PA_ID)));
+        }
+    }
+
+    private <T extends Throwable> T logValidationFailure(NotificationInt notification,
+                                                        String element,
+                                                        String detail,
+                                                        T exception) {
+        log.warn(MESSAGE_VALIDATION_FAILED_LOG, detail, notification.getIun(), element);
+        return exception;
     }
 }
 

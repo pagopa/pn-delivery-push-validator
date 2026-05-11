@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 
-public class MVPCampaignsParameterConsumerTest {
+class MVPCampaignsParameterConsumerTest {
 
     private static final String CAMPAIGN_ID = "campaign-id";
     private static final String SENDER_ID = "sender-id";
