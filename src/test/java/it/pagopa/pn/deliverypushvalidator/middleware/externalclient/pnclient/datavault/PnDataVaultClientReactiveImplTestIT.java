@@ -2,9 +2,12 @@ package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.da
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.MockAWSObjectsTest;
+import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
@@ -15,9 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_MESSAGE_NOT_FOUND;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -27,12 +34,20 @@ import static org.mockserver.model.HttpResponse.response;
 @TestPropertySource(properties = {
         "pn.delivery-push-validator.data-vault-base-url=http://localhost:9998"
 })
+@SuppressWarnings("resource")
 class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
     @Autowired
     private PnDataVaultClientReactiveImpl client;
-    
+
     private static ClientAndServer mockServer;
-    
+
+    @AfterEach
+    void tearDown() {
+        if (mockServer != null && mockServer.isRunning()) {
+            mockServer.stop();
+        }
+    }
+
     @Test
     void getRecipientDenominationByInternalId() throws JsonProcessingException {
         mockServer = startClientAndServer(9998);
@@ -67,8 +82,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertNotNull(responseMono);
         BaseRecipientDto response = responseMono.blockFirst();
         Assertions.assertEquals(responseDto, response);
-
-        mockServer.stop();
     }
 
     @Test
@@ -93,8 +106,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertNotNull(responseMono);
         
         Assertions.assertThrows( PnInternalException.class, responseMono::blockFirst);
-        
-        mockServer.stop();
     }
 
     @Test
@@ -151,8 +162,6 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
         Assertions.assertEquals(analogDomicile.getAt(), dto.getPhysicalAddress().getAt());
         Assertions.assertEquals(analogDomicile.getCap(), dto.getPhysicalAddress().getCap());
         Assertions.assertEquals(analogDomicile.getMunicipality(), dto.getPhysicalAddress().getMunicipality());
-
-        mockServer.stop();
     }
 
     @Test
@@ -178,7 +187,96 @@ class PnDataVaultClientReactiveImplTestIT extends MockAWSObjectsTest {
 
         Flux<ConfidentialTimelineElementDto> fluxDto = client.getNotificationTimelines(List.of(confidentialTimelineElementId));
         Assertions.assertThrows(PnInternalException.class, fluxDto::blockFirst);
+    }
 
-        mockServer.stop();
+    @Test
+    void getMessageById() throws JsonProcessingException {
+        mockServer = startClientAndServer(9998);
+
+        //Given
+        UUID messageId = UUID.randomUUID();
+        UUID senderId = UUID.randomUUID();
+        String path = "/datavault-private/v1/messages/" + messageId;
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        MessageResponseDto responseDto = new MessageResponseDto();
+        responseDto.setMessageId(messageId);
+        responseDto.setSenderId(senderId.toString());
+        responseDto.setCreatedAt(Instant.now());
+
+        String responseJson = mapper.writeValueAsString(responseDto);
+
+        new MockServerClient("localhost", 9998)
+                .when(request()
+                        .withMethod("GET")
+                        .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
+                )
+                .respond(response()
+                        .withBody(responseJson)
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(200)
+                );
+
+        Mono<MessageResponseDto> responseMono = client.getMessageById(messageId, senderId);
+        Assertions.assertNotNull(responseMono);
+        MessageResponseDto response = responseMono.block();
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(messageId, response.getMessageId());
+        Assertions.assertEquals(senderId.toString(), response.getSenderId());
+    }
+
+    @Test
+    void getMessageByIdKo() {
+        mockServer = startClientAndServer(9998);
+
+        //Given
+        UUID messageId = UUID.randomUUID();
+        UUID senderId = UUID.randomUUID();
+        String path = "/datavault-private/v1/messages/" + messageId;
+
+        new MockServerClient("localhost", 9998)
+                .when(request()
+                        .withMethod("GET")
+                        .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
+                )
+                .respond(response()
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(400)
+                );
+
+        Mono<MessageResponseDto> responseMono = client.getMessageById(messageId, senderId);
+        Assertions.assertNotNull(responseMono);
+        Assertions.assertThrows(PnInternalException.class, responseMono::block);
+    }
+
+    @Test
+    void getMessageByIdNotFound() {
+        mockServer = startClientAndServer(9998);
+
+        //Given
+        UUID messageId = UUID.randomUUID();
+        UUID senderId = UUID.randomUUID();
+        String path = "/datavault-private/v1/messages/" + messageId;
+
+        new MockServerClient("localhost", 9998)
+                .when(request()
+                        .withMethod("GET")
+                        .withPath(path)
+                        .withQueryStringParameter("senderId", senderId.toString())
+                )
+                .respond(response()
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withStatusCode(404)
+                );
+
+        Mono<MessageResponseDto> responseMono = client.getMessageById(messageId, senderId);
+        Assertions.assertNotNull(responseMono);
+        PnMessageNotFoundException exception = Assertions.assertThrows(PnMessageNotFoundException.class, responseMono::block);
+        Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_MESSAGE_NOT_FOUND,
+                exception.getProblem().getErrors().getFirst().getCode());
     }
 }
