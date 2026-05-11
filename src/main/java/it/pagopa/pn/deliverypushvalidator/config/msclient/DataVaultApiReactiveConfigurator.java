@@ -5,6 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.ApiClient;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.NotificationsApi;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.RecipientsApi;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.api.MessagesApi;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,11 @@ public class DataVaultApiReactiveConfigurator extends CommonBaseClient {
         return new RecipientsApi(getNewApiClient(cfg));
     }
     
+    @Bean
+    public MessagesApi messagesApiReactive(PnDeliveryPushValidatorConfigs cfg){
+        return new MessagesApi(getNewApiClient(cfg));
+    }
+
     @NotNull
     private ApiClient getNewApiClient(PnDeliveryPushValidatorConfigs cfg) {
         ApiClient newApiClient = new ApiClient( initWebClient(ApiClient.buildWebClientBuilder()) );

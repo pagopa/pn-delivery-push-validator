@@ -44,6 +44,9 @@ public class ActionManagerMapper {
     }
 
     private CommunicationType mapCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType type) {
-        return type != null ? CommunicationType.valueOf(type.name()) : null;
+        if (type == it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL) {
+            return CommunicationType.INFORMAL;
+        }
+        return CommunicationType.LEGAL;
     }
 }
