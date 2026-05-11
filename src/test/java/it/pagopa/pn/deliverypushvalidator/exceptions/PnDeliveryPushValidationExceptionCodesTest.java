@@ -13,7 +13,8 @@ class PnDeliveryPushValidationExceptionCodesTest {
     void checkAll() {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("PN_DELIVERYPUSH_NOTFOUND", code.ERROR_CODE_DELIVERYPUSH_NOTFOUND),
-                () -> Assertions.assertEquals("PN_DELIVERYPUSH_GETFILEERROR", code.ERROR_CODE_DELIVERYPUSH_GETFILEERROR)
+                () -> Assertions.assertEquals("PN_DELIVERYPUSH_GETFILEERROR", code.ERROR_CODE_DELIVERYPUSH_GETFILEERROR),
+                () -> Assertions.assertEquals("PN_DELIVERYPUSH_MESSAGE_NOT_FOUND", code.ERROR_CODE_DELIVERYPUSH_MESSAGE_NOT_FOUND)
         );
     }
 
