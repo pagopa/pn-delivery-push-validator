@@ -4,4 +4,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 
 public interface NotificationService {
     NotificationInt getNotificationByIun(String iun);
+
+    NotificationInt getInformalNotificationByIun(String iun);
 }
