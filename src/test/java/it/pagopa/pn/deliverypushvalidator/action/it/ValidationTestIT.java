@@ -79,7 +79,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         Integer recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
         
         //THEN
         await().untilAsserted(() ->
@@ -128,7 +128,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -170,7 +170,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -214,7 +214,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -260,7 +260,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -314,7 +314,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -373,7 +373,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         String iun = notification.getIun();
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->
@@ -435,7 +435,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         pnDeliveryClientMock.addNotification(notification);
         
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
@@ -507,7 +507,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
@@ -559,7 +559,7 @@ class ValidationTestIT extends CommonTestConfiguration{
         Integer recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
 
         //WHEN the workflow start
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         //THEN
         await().untilAsserted(() ->

@@ -1,9 +1,11 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.ServiceLevelTypeInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.InformalSentNotificationV1;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV25;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
@@ -51,7 +53,46 @@ class NotificationServiceImplTest {
         Assertions.assertThrows(PnHttpResponseException.class, () -> service.getNotificationByIun("001"));
 
     }
-    
+
+    @Test
+    @ExtendWith(SpringExtension.class)
+    void getInformalNotificationByIun() {
+        InformalSentNotificationV1 sentInformalNotification = new InformalSentNotificationV1();
+        sentInformalNotification.setIun("001");
+        sentInformalNotification.setRecipients(Collections.emptyList());
+
+        Mockito.when(pnDeliveryClient.getSentInformalNotification("001")).thenReturn(sentInformalNotification);
+
+        NotificationInt actual = service.getInformalNotificationByIun("001");
+
+        Assertions.assertEquals("001", actual.getIun());
+        Assertions.assertEquals(Collections.emptyList(), actual.getRecipients());
+    }
+
+    @Test
+    @ExtendWith(SpringExtension.class)
+    void getInformalNotificationByIunNotFound() {
+        Mockito.when(pnDeliveryClient.getSentInformalNotification("001")).thenThrow(PnHttpResponseException.class);
+
+        Assertions.assertThrows(PnHttpResponseException.class, () -> service.getInformalNotificationByIun("001"));
+    }
+
+    @Test
+    @ExtendWith(SpringExtension.class)
+    void getNotificationByIunThrowsPnInternalExceptionWhenNull() {
+        Mockito.when(pnDeliveryClient.getSentNotification("002")).thenReturn(null);
+
+        Assertions.assertThrows(PnInternalException.class, () -> service.getNotificationByIun("002"));
+    }
+
+    @Test
+    @ExtendWith(SpringExtension.class)
+    void getInformalNotificationByIunThrowsPnInternalExceptionWhenNull() {
+        Mockito.when(pnDeliveryClient.getSentInformalNotification("003")).thenReturn(null);
+
+        Assertions.assertThrows(PnInternalException.class, () -> service.getInformalNotificationByIun("003"));
+    }
+
     private SentNotificationV25 buildSentNotification() {
         SentNotificationV25 sentNotification = new SentNotificationV25();
         sentNotification.setIun("001");

@@ -49,7 +49,7 @@ class SafeStorageResponseHandlerTest {
         Mockito.when(documentCreationRequestService.getDocumentCreationRequest(Mockito.anyString())).thenReturn(Optional.of(documentCreationRequest));
         //WHEN
         handler.handleSafeStorageResponse(fileDownloadResponse);
-        Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 
     @ExtendWith(SpringExtension.class)
@@ -67,7 +67,7 @@ class SafeStorageResponseHandlerTest {
         handler.handleSafeStorageResponse(fileDownloadResponse);
 
         //THEN
-        Mockito.verify(schedulerService, Mockito.times(1)).scheduleEvent(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulerService, Mockito.times(1)).scheduleEvent(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 
 }

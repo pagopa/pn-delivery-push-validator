@@ -83,7 +83,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
         String expectedValidationCallTimelineId = TestUtils.buildTimelineEventIdNationalRegistryValidationCall(iun);
@@ -137,7 +137,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
 
@@ -196,7 +196,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1, recIndex2));
 
@@ -260,7 +260,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1));
 
@@ -317,7 +317,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
@@ -374,7 +374,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
 
@@ -444,7 +444,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1, recIndex2, recIndex3));
 

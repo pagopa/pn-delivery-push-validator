@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationScheduler;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,8 @@ public class StartWorkflowHandler {
      *
      * @param iun Notification unique identifier
      */
-    public void startWorkflow(String iun) { 
-        notificationValidationScheduler.scheduleNotificationValidation(iun);
+    public void startWorkflow(String iun, CommunicationType communicationType ) {
+        notificationValidationScheduler.scheduleNotificationValidation(iun, communicationType);
     }
 
 }
