@@ -40,29 +40,28 @@ public class CampaignValidatorImpl implements CampaignValidator {
         try {
             return campaignService.getCampaignByCampaignIdAndSenderId(campaignId, senderId);
         } catch (PnCampaignNotFoundException ex) {
-            handleValidationException(
+            throw handleValidationException(
                     NotificationRefusedErrorCodeInt.CAMPAIGN_NOT_FOUND,
                     String.format("No campaign with id %s for sender %s", campaignId, senderId)
             );
-            throw ex;
         }
     }
 
     private void validateCampaignIsOpen(Campaign campaign, String campaignId) {
         if (campaign.isClosed()) {
-            handleValidationException(
+            throw handleValidationException(
                     NotificationRefusedErrorCodeInt.CAMPAIGN_CLOSED,
                     String.format("Campaign %s is closed", campaignId)
             );
         }
     }
 
-    private void handleValidationException(NotificationRefusedErrorCodeInt errorCode, String detail) {
+    private PnCampaignValidationException handleValidationException(NotificationRefusedErrorCodeInt errorCode, String detail) {
         ProblemError problemError = ProblemError.builder()
                 .code(errorCode.getValue())
                 .element(CAMPAIGN_ELEMENT)
                 .detail(detail)
                 .build();
-        throw new PnCampaignValidationException(errorCode.getValue(), List.of(problemError));
+        return new PnCampaignValidationException(detail, List.of(problemError));
     }
 }

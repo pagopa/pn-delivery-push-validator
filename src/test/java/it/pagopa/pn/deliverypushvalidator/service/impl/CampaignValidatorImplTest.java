@@ -5,14 +5,12 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignValidationException;
-import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt;
 import it.pagopa.pn.deliverypushvalidator.service.CampaignService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,8 +47,7 @@ class CampaignValidatorImplTest {
                 PnCampaignValidationException.class,
                 () -> campaignValidator.validateAndGetCampaign(notification)
         );
-        assertEquals(NotificationRefusedErrorCodeInt.CAMPAIGN_NOT_FOUND.getValue(), ex.getProblem().getDetail());
-        assertTrue(Objects.requireNonNull(ex.getProblem().getErrors().getFirst().getDetail()).contains("No campaign with id camp2 for sender sender2"));
+        assertEquals("No campaign with id camp2 for sender sender2", ex.getProblem().getDetail());
     }
 
     @Test
@@ -64,8 +61,7 @@ class CampaignValidatorImplTest {
                 PnCampaignValidationException.class,
                 () -> campaignValidator.validateAndGetCampaign(notification)
         );
-        assertEquals(NotificationRefusedErrorCodeInt.CAMPAIGN_CLOSED.getValue(), ex.getProblem().getDetail());
-        assertTrue(Objects.requireNonNull(ex.getProblem().getErrors().getFirst().getDetail()).contains("Campaign camp3 is closed"));
+        assertEquals("Campaign camp3 is closed", ex.getProblem().getDetail());
     }
 
     private NotificationInt buildNotification(String campaignId, String senderId) {
