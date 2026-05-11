@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 class ActionManagerMapperTest {
@@ -76,6 +75,6 @@ class ActionManagerMapperTest {
         ActionManagerMapper mapper = new ActionManagerMapper(objectMapper);
         var dto = mapper.fromActionInternalToActionDto(action);
 
-        assertNull(dto.getCommunicationType());
+        assertEquals(it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.actionmanager.model.CommunicationType.LEGAL, dto.getCommunicationType());
     }
 }

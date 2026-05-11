@@ -8,9 +8,9 @@ public enum CommunicationType {
     INFORMAL;
 
     public static CommunicationType fromValue(String value) {
-        if (value == null || "LEGAL".equalsIgnoreCase(value)) {
+        if (value == null || LEGAL.name().equals(value)) {
             return LEGAL;
-        } else if ("INFORMAL".equalsIgnoreCase(value)) {
+        } else if (INFORMAL.name().equals(value)) {
             return INFORMAL;
         }
         throw new IllegalArgumentException("Valore non valido: " + value);
