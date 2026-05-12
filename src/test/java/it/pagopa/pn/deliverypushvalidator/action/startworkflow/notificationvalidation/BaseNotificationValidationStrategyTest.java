@@ -45,7 +45,7 @@ class BaseNotificationValidationStrategyTest {
         when(ex.getProblem()).thenReturn(problem);
 
         assertDoesNotThrow(() -> strategy.handleValidationError(notification, ex));
-        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
+        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class), eq(null));
     }
 
     @Test
@@ -57,7 +57,7 @@ class BaseNotificationValidationStrategyTest {
         when(ex.getProblem()).thenReturn(null);
 
         assertDoesNotThrow(() -> strategy.handleValidationError(notification, ex));
-        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
+        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class), eq(null));
     }
 
     @Test
@@ -83,7 +83,7 @@ class BaseNotificationValidationStrategyTest {
         strategy.handleLookupAddressValidationError(notification, ex);
 
         ArgumentCaptor<NotificationRefusedActionDetails> captor = ArgumentCaptor.forClass(NotificationRefusedActionDetails.class);
-        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), captor.capture());
+        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), captor.capture(), eq(null));
         NotificationRefusedActionDetails details = captor.getValue();
         assertEquals(1, details.getErrors().size());
         assertEquals("ERR", details.getErrors().getFirst().getErrorCode());
