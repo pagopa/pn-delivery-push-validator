@@ -4,12 +4,12 @@ import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
 import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
+import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
-import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,7 +17,8 @@ import org.mockito.ArgumentCaptor;
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class BaseNotificationValidationStrategyTest {
@@ -96,6 +97,6 @@ class BaseNotificationValidationStrategyTest {
         NotificationRefusedErrorInt error = NotificationRefusedErrorInt.builder().errorCode("ERR").detail("detail").build();
 
         strategy.scheduleNotificationRefused(iun, List.of(error), null);
-        verify(schedulerService).scheduleEvent(eq(iun), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
+        verify(schedulerService).scheduleEvent(eq(iun), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class), eq(null));
     }
 }

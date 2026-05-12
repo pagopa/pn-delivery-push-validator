@@ -63,6 +63,6 @@ public class BaseNotificationValidationStrategy {
         NotificationRefusedActionDetails details = NotificationRefusedActionDetails.builder().errors(errors).build();
 
         log.debug("Scheduling Notification refused schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_REFUSED, details);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.NOTIFICATION_REFUSED, details, communicationType);
     }
 }
