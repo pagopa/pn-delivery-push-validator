@@ -6,6 +6,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,6 +84,7 @@ public class NotificationMapper {
                 .additionalLanguages(sentInformalNotification.getAdditionalLanguages())
                 .usedServices(UsedServicesMapper.externalToInternal(sentInformalNotification.getUsedServices()))
                 .idempotenceToken(sentInformalNotification.getIdempotenceToken())
+                .communicationType(CommunicationType.INFORMAL)
                 .build();
     }
 
