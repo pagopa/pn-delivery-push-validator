@@ -1,4 +1,4 @@
-package it.pagopa.pn.deliverypushvalidator.service.impl;
+package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.common.rest.error.v1.dto.Problem;
 import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
@@ -10,7 +10,6 @@ import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFai
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
-import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationScheduler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,21 +36,27 @@ class BaseNotificationValidationStrategyTest {
     @Test
     void handleValidationError_withProblem_shouldExtractErrors() {
         NotificationInt notification = mock(NotificationInt.class);
+        when(notification.getIun()).thenReturn("iun");
+        when(notification.getCommunicationType()).thenReturn(null);
         ProblemError error = ProblemError.builder().code("ERR").detail("detail").build();
         Problem problem = Problem.builder().errors(List.of(error)).build();
         PnValidationException ex = mock(PnValidationException.class);
         when(ex.getProblem()).thenReturn(problem);
 
         assertDoesNotThrow(() -> strategy.handleValidationError(notification, ex));
+        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
     }
 
     @Test
     void handleValidationError_withNullProblem_shouldNotFail() {
         NotificationInt notification = mock(NotificationInt.class);
+        when(notification.getIun()).thenReturn("iun");
+        when(notification.getCommunicationType()).thenReturn(null);
         PnValidationException ex = mock(PnValidationException.class);
         when(ex.getProblem()).thenReturn(null);
 
         assertDoesNotThrow(() -> strategy.handleValidationError(notification, ex));
+        verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
     }
 
     @Test
@@ -62,7 +67,6 @@ class BaseNotificationValidationStrategyTest {
         Instant now = Instant.now();
 
         strategy.handleRuntimeException("iun", details, notification, ex, now);
-
         verify(notificationValidationScheduler).scheduleNotificationValidation(notification, 2, ex, now);
     }
 
@@ -81,9 +85,9 @@ class BaseNotificationValidationStrategyTest {
         verify(schedulerService).scheduleEvent(eq("iun"), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), captor.capture());
         NotificationRefusedActionDetails details = captor.getValue();
         assertEquals(1, details.getErrors().size());
-        assertEquals("ERR", details.getErrors().get(0).getErrorCode());
-        assertEquals("detail", details.getErrors().get(0).getDetail());
-        assertEquals(1, details.getErrors().get(0).getRecIndex());
+        assertEquals("ERR", details.getErrors().getFirst().getErrorCode());
+        assertEquals("detail", details.getErrors().getFirst().getDetail());
+        assertEquals(1, details.getErrors().getFirst().getRecIndex());
     }
 
     @Test
@@ -91,8 +95,7 @@ class BaseNotificationValidationStrategyTest {
         String iun = "iun";
         NotificationRefusedErrorInt error = NotificationRefusedErrorInt.builder().errorCode("ERR").detail("detail").build();
 
-        strategy.scheduleNotificationRefused(iun, List.of(error));
-
+        strategy.scheduleNotificationRefused(iun, List.of(error), null);
         verify(schedulerService).scheduleEvent(eq(iun), any(Instant.class), eq(ActionType.NOTIFICATION_REFUSED), any(NotificationRefusedActionDetails.class));
     }
 }

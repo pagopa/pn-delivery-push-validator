@@ -1,10 +1,10 @@
-package it.pagopa.pn.deliverypushvalidator.service.impl;
+package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
-import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationScheduler;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -33,6 +33,8 @@ public class BaseNotificationValidationStrategy {
                 errors.add(notificationRefusedError);
             });
         }
+        log.info("Notification refused, errors {} - iun {}", errors, notification.getIun());
+        scheduleNotificationRefused(notification.getIun(), errors, notification.getCommunicationType());
     }
 
     protected void handleRuntimeException(String iun, NotificationValidationActionDetails details, NotificationInt notification, RuntimeException ex, Instant startWorkflowTime) {
@@ -52,10 +54,10 @@ public class BaseNotificationValidationStrategy {
             });
         }
         log.info("Notification refused by lookupAddress error validation, errors {} - iun {}", errors, notification.getIun());
-        scheduleNotificationRefused(notification.getIun(), errors);
+        scheduleNotificationRefused(notification.getIun(), errors, notification.getCommunicationType());
     }
 
-    protected void scheduleNotificationRefused(String iun, List<NotificationRefusedErrorInt> errors) {
+    protected void scheduleNotificationRefused(String iun, List<NotificationRefusedErrorInt> errors, CommunicationType communicationType) {
         Instant schedulingDate = Instant.now();
 
         NotificationRefusedActionDetails details = NotificationRefusedActionDetails.builder().errors(errors).build();
