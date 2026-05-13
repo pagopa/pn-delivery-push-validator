@@ -218,11 +218,6 @@ class LegalNotificationRefusedStrategyTest {
 
     @Test
     void handleNotificationRefusedWhenUpdateResultsIsNotEmpty() {
-        // Given - DELIVERY_MODE + ASYNC, response con updateResults NON vuoto
-        // Questo test copre il blocco:
-        // if (updateNotificationCostResponse != null && !updateNotificationCostResponse.getUpdateResults().isEmpty()) {
-        //    handleResponse(notification, updateNotificationCostResponse);
-        // }
         String iun = "IUN_9";
         Instant notBefore = Instant.parse("2026-05-12T17:00:00Z");
         List<NotificationRefusedErrorInt> errors = List.of(NotificationRefusedErrorInt.builder().errorCode("E07").detail("detail").build());
