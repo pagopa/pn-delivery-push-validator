@@ -47,10 +47,13 @@ public class BaseNotificationValidationStrategy {
         List<NotificationRefusedErrorInt> errors = new ArrayList<>();
         if (Objects.nonNull(ex.getProblem())) {
             ex.getProblem().getErrors().forEach(elem -> {
-                assert elem.getElement() != null;
-                NotificationRefusedErrorInt notificationRefusedError = NotificationRefusedErrorInt.builder().errorCode(elem.getCode()).detail(elem.getDetail()).recIndex(Integer.valueOf(elem.getElement())).build();
-
-                errors.add(notificationRefusedError);
+                NotificationRefusedErrorInt.NotificationRefusedErrorIntBuilder builder = NotificationRefusedErrorInt.builder()
+                        .errorCode(elem.getCode())
+                        .detail(elem.getDetail());
+                if (Objects.nonNull(elem.getElement())) {
+                    builder.recIndex(Integer.valueOf(elem.getElement()));
+                }
+                errors.add(builder.build());
             });
         }
         log.info("Notification refused by lookupAddress error validation, errors {} - iun {}", errors, notification.getIun());
