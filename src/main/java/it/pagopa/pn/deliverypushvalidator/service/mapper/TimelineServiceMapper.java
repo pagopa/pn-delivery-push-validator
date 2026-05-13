@@ -46,6 +46,9 @@ public class TimelineServiceMapper {
                 .notificationSentAt(timelineElement.getNotificationSentAt())
                 .ingestionTimestamp(timelineElement.getIngestionTimestamp())
                 .eventTimestamp(timelineElement.getEventTimestamp())
+                .communicationType(timelineElement.getCommunicationType() != null
+                        ? it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.valueOf(timelineElement.getCommunicationType().name())
+                        : null)
                 .build();
     }
 
@@ -66,7 +69,10 @@ public class TimelineServiceMapper {
                 .legalFactsIds(timelineElementInternal.getLegalFactsIds() != null ? toLegalFactsIdList(timelineElementInternal.getLegalFactsIds()) : null)
                 .category(TimelineCategory.valueOf(timelineElementInternal.getCategory().name()))
                 .details(toTimelineElementDetails(timelineElementInternal.getDetails(), timelineElementInternal.getCategory().name()))
-                .notificationSentAt(timelineElementInternal.getNotificationSentAt());
+                .notificationSentAt(timelineElementInternal.getNotificationSentAt())
+                .communicationType(timelineElementInternal.getCommunicationType() != null
+                        ? CommunicationType.valueOf(timelineElementInternal.getCommunicationType().name())
+                        : null);
     }
 
     private List<LegalFactsId> toLegalFactsIdList(List<LegalFactsIdInt> legalFactsIdIntList) {
@@ -105,8 +111,7 @@ public class TimelineServiceMapper {
         return smartMapper.mapToClassWithObjectMapper(detailsInt, TimelineElementDetails.class);
     }
 
-    public TimelineElementDetailsInt toTimelineElementDetailsInt(TimelineElementDetails details, TimelineElementCategoryInt category) {
-        return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
+    public TimelineElementDetailsInt toTimelineElementDetailsInt(TimelineElementDetails details, TimelineElementCategoryInt category) {        return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
     }
 
     private StatusInfoInternal toStatusInfoInternal(StatusInfo statusInfo) {

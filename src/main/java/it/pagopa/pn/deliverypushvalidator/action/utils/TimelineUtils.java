@@ -52,6 +52,7 @@ public class TimelineUtils {
                 .elementId(elementId)
                 .details(details)
                 .paId(notification.getSender().getPaId())
+                .communicationType(notification.getCommunicationType())
                 .notificationSentAt(notification.getSentAt())
                 .build();
     }

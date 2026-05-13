@@ -22,6 +22,7 @@ public class TimelineElementInternal implements Comparable<TimelineElementIntern
     private String elementId;
     private Instant timestamp;
     private String paId;
+    private CommunicationType communicationType;
     private List<LegalFactsIdInt> legalFactsIds;
     private TimelineElementCategoryInt category;
     private TimelineElementDetailsInt details;

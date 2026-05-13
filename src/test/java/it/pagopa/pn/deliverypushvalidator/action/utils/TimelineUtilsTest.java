@@ -48,6 +48,28 @@ class TimelineUtilsTest {
         Assertions.assertEquals("pa_02", actual.getPaId());
         Assertions.assertEquals(TimelineElementCategoryInt.REQUEST_ACCEPTED, actual.getCategory());
         Assertions.assertEquals(detailsInt, actual.getDetails());
+        Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType());
+    }
+
+    @Test
+    void buildTimelineWithNullCommunicationType() {
+        NotificationRequestAcceptedDetailsInt detailsInt = new NotificationRequestAcceptedDetailsInt();
+        NotificationInt notification = buildNotificationInt().toBuilder()
+                .communicationType(null)
+                .build();
+
+        TimelineElementInternal actual = timelineUtils.buildTimeline(
+                notification,
+                TimelineElementCategoryInt.REQUEST_ACCEPTED,
+                "001",
+                detailsInt
+        );
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("001", actual.getIun()),
+                () -> Assertions.assertEquals("001", actual.getElementId()),
+                () -> Assertions.assertNull(actual.getCommunicationType())
+        );
     }
 
     @Test
@@ -58,7 +80,8 @@ class TimelineUtilsTest {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Example_IUN_1234_Test", actual.getIun()),
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
-                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId())
+                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType())
         );
     }
 
@@ -75,6 +98,7 @@ class TimelineUtilsTest {
                 .sender(createSender())
                 .sentAt(Instant.now().minus(Duration.ofDays(1).minus(Duration.ofMinutes(10))))
                 .iun("Example_IUN_1234_Test")
+                .communicationType(CommunicationType.INFORMAL)
                 .subject("notification test subject")
                 .documents(Arrays.asList(
                                 NotificationDocumentInt.builder()
@@ -135,6 +159,7 @@ class TimelineUtilsTest {
         return NotificationInt.builder()
                 .iun("001")
                 .paProtocolNumber("protocol_01")
+                .communicationType(CommunicationType.INFORMAL)
                 .sender(NotificationSenderInt.builder()
                         .paId("pa_02")
                         .build()
@@ -173,7 +198,8 @@ class TimelineUtilsTest {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Example_IUN_1234_Test", actual.getIun()),
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
-                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId())
+                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType())
         );
     }
 
@@ -192,7 +218,8 @@ class TimelineUtilsTest {
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Example_IUN_1234_Test", actual.getIun()),
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
-                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId())
+                () -> Assertions.assertEquals("TEST_PA_ID", actual.getPaId()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType())
         );
     }
 
@@ -200,6 +227,7 @@ class TimelineUtilsTest {
     void buildRefusedRequestTimelineElement_ShouldBuildCorrectTimelineElement() {
         NotificationInt notification = NotificationInt.builder()
                 .iun("Test_IUN_123")
+                .communicationType(CommunicationType.INFORMAL)
                 .sender(NotificationSenderInt.builder().paId("TEST_PA_ID").build())
                 .recipients(buildRecipients())
                 .build();
@@ -216,7 +244,8 @@ class TimelineUtilsTest {
                 () -> Assertions.assertTrue(result.getElementId().contains("REQUEST_REFUSED")),
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.REQUEST_REFUSED, result.getCategory()),
                 () -> Assertions.assertNotNull(result.getDetails()),
-                () -> Assertions.assertEquals(errors, ((RequestRefusedDetailsInt) result.getDetails()).getRefusalReasons())
+                () -> Assertions.assertEquals(errors, ((RequestRefusedDetailsInt) result.getDetails()).getRefusalReasons()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, result.getCommunicationType())
         );
     }
 
@@ -231,7 +260,8 @@ class TimelineUtilsTest {
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_REQUEST, actual.getCategory()),
                 () -> Assertions.assertNotNull(actual.getDetails()),
-                () -> Assertions.assertInstanceOf(NotificationCostValidationRequestDetailsInt.class, actual.getDetails())
+                () -> Assertions.assertInstanceOf(NotificationCostValidationRequestDetailsInt.class, actual.getDetails()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType())
         );
     }
 
@@ -246,7 +276,8 @@ class TimelineUtilsTest {
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
                 () -> Assertions.assertEquals(TimelineElementCategoryInt.NOTIFICATION_COST_VALIDATION_RESPONSE, actual.getCategory()),
                 () -> Assertions.assertNotNull(actual.getDetails()),
-                () -> Assertions.assertInstanceOf(NotificationCostValidationResponseDetailsInt.class, actual.getDetails())
+                () -> Assertions.assertInstanceOf(NotificationCostValidationResponseDetailsInt.class, actual.getDetails()),
+                () -> Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType())
         );
     }
 }

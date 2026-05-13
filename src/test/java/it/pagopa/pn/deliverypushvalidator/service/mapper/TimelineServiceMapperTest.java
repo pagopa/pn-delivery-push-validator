@@ -37,7 +37,10 @@ class TimelineServiceMapperTest {
                 .taxId("taxId").denomination("denomination").physicalAddress(address).build();
 
         TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
-                .iun("IUN123").elementId("EID456").category(TimelineElementCategoryInt.VALIDATED_F24).build();
+                .iun("IUN123").elementId("EID456")
+                .category(TimelineElementCategoryInt.VALIDATED_F24)
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
                 .iun("IUN123").paProtocolNumber("PROT789").sentAt(Instant.now())
@@ -46,6 +49,7 @@ class TimelineServiceMapperTest {
         NewTimelineElement result = mapper.getNewTimelineElement(timelineElementInternal, notificationInt);
 
         assertThat(result.getTimelineElement()).isNotNull();
+        assertThat(result.getTimelineElement().getCommunicationType()).isEqualTo(CommunicationType.INFORMAL);
         assertThat(result.getNotificationInfo().getIun()).isEqualTo("IUN123");
         assertThat(result.getNotificationInfo().getNumberOfRecipients()).isEqualTo(1);
     }
@@ -87,7 +91,8 @@ class TimelineServiceMapperTest {
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(details)
                 .statusInfo(new StatusInfo().actual("DELIVERED").statusChanged(true).statusChangeTimestamp(Instant.now()))
-                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(CommunicationType.INFORMAL);
 
         TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
 
@@ -98,6 +103,102 @@ class TimelineServiceMapperTest {
         assertThat(result.getLegalFactsIds().getFirst().getKey()).isEqualTo(legalFactsIdInt.getKey());
         assertThat(result.getLegalFactsIds().getFirst().getCategory()).isEqualTo(legalFactsIdInt.getCategory());
         assertThat(result.getStatusInfo().getActual()).isEqualTo("DELIVERED");
+        assertThat(result.getCommunicationType()).isEqualTo(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL);
+    }
+
+    @Test
+    void getNewTimelineElementMapsNullCommunicationType() {
+        TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
+                .iun("IUN123").elementId("EID456")
+                .category(TimelineElementCategoryInt.VALIDATED_F24)
+                .communicationType(null)
+                .build();
+
+        NotificationInt notificationInt = NotificationInt.builder()
+                .iun("IUN123").paProtocolNumber("PROT789").sentAt(Instant.now())
+                .recipients(List.of()).build();
+
+        NewTimelineElement result = mapper.getNewTimelineElement(timelineElementInternal, notificationInt);
+
+        assertThat(result.getTimelineElement()).isNotNull();
+        assertThat(result.getTimelineElement().getCommunicationType()).isNull();
+    }
+
+    @Test
+    void toTimelineElementInternalMapsNullCommunicationType() {
+        TimelineElement timelineElement = new TimelineElement()
+                .iun("IUN123").elementId("EID456").timestamp(Instant.now()).paId("PAID")
+                .legalFactsIds(List.of())
+                .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
+                .details(mock(TimelineElementDetails.class))
+                .statusInfo(new StatusInfo().actual("DELIVERED").statusChanged(true).statusChangeTimestamp(Instant.now()))
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(null);
+
+        TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
+
+        assertThat(result.getCommunicationType()).isNull();
+    }
+
+    @Test
+    void getNewTimelineElementMapsLegalFactsIds() {
+        LegalFactsIdInt legalFactsIdInt = LegalFactsIdInt.builder()
+                .key("lf-001")
+                .category(LegalFactCategoryInt.ANALOG_DELIVERY)
+                .build();
+
+        TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
+                .iun("IUN123")
+                .elementId("EID456")
+                .category(TimelineElementCategoryInt.VALIDATED_F24)
+                .legalFactsIds(List.of(legalFactsIdInt))
+                .build();
+
+        NotificationInt notificationInt = NotificationInt.builder()
+                .iun("IUN123")
+                .paProtocolNumber("PROT789")
+                .sentAt(Instant.now())
+                .recipients(List.of())
+                .build();
+
+        NewTimelineElement result = mapper.getNewTimelineElement(timelineElementInternal, notificationInt);
+
+        assertThat(result.getTimelineElement()).isNotNull();
+        assertThat(result.getTimelineElement().getLegalFactsIds()).hasSize(1);
+        assertThat(result.getTimelineElement().getLegalFactsIds().getFirst().getKey()).isEqualTo("lf-001");
+        assertThat(result.getTimelineElement().getLegalFactsIds().getFirst().getCategory())
+                .isEqualTo(LegalFactsId.CategoryEnum.ANALOG_DELIVERY);
+    }
+
+    @Test
+    void toTimelineElementInternalMapsNullStatusInfo() {
+        TimelineElement timelineElement = new TimelineElement()
+                .iun("IUN123").elementId("EID456").timestamp(Instant.now()).paId("PAID")
+                .legalFactsIds(List.of())
+                .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
+                .details(mock(TimelineElementDetails.class))
+                .statusInfo(null)
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+
+        TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
+
+        assertThat(result.getStatusInfo()).isNull();
+    }
+
+    @Test
+    void toTimelineElementInternalMapsStatusChangedDefaultToFalseWhenNull() {
+        TimelineElement timelineElement = new TimelineElement()
+                .iun("IUN123").elementId("EID456").timestamp(Instant.now()).paId("PAID")
+                .legalFactsIds(List.of())
+                .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
+                .details(mock(TimelineElementDetails.class))
+                .statusInfo(new StatusInfo().actual("DELIVERED").statusChangeTimestamp(Instant.now()).statusChanged(null))
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+
+        TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
+
+        assertThat(result.getStatusInfo()).isNotNull();
+        assertThat(result.getStatusInfo().isStatusChanged()).isFalse();
     }
 
     @Test
