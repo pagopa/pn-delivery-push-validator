@@ -8,6 +8,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -126,6 +127,7 @@ class NotificationMapperTest {
         Assertions.assertEquals("doc_inf_01", actual.getDocuments().getFirst().getRef().getKey());
         Assertions.assertEquals("v_doc_inf_01", actual.getDocuments().getFirst().getRef().getVersionToken());
         Assertions.assertEquals("sha256_doc_inf_01", actual.getDocuments().getFirst().getDigests().getSha256());
+        Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType());
     }
 
     @Test
