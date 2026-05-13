@@ -224,7 +224,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
             return;
         }
 
-        if (notificationInt.getUsedServices() != null && notificationInt.getUsedServices().getPhysicalAddressLookUp()) {
+        if (notificationInt.getUsedServices() != null && Boolean.TRUE.equals(notificationInt.getUsedServices().getPhysicalAddressLookUp())) {
             try {
                 lookupAddressHandler.performValidation(notificationInt);
                 NotificationInt refreshedNotification = notificationService.getNotificationByIun(notificationInt.getIun());
@@ -246,7 +246,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
 
     @NotNull
     private PnAuditLogEvent generateSkipAuditLog(NotificationInt notification, int validationStep, String detail) {
-        String message = "Notification validation step {} of 5." + detail;
+        String message = "Notification validation step {} of 5. " + detail;
 
         return auditLogService.buildAuditLogEvent(
                 notification.getIun(),
