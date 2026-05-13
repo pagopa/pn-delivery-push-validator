@@ -73,7 +73,7 @@ public class LegalNotificationRefusedStrategy implements NotificationRefusedStra
                     UpdateCostPhaseInt.REQUEST_REFUSED
             ).block();
 
-            if (updateNotificationCostResponse != null && !updateNotificationCostResponse.getUpdateResults().isEmpty()) {
+            if (updateNotificationCostResponse != null && updateNotificationCostResponse.getUpdateResults() != null && !updateNotificationCostResponse.getUpdateResults().isEmpty()) {
                 handleResponse(notification, updateNotificationCostResponse);
             }
         } else {
