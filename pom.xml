@@ -245,11 +245,11 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<!--
-								OpenAPI spec for pn-timeline-service is pinned to commit c197d2e9341609ed7acb293265b1901610f25299.
-								This version includes the timeline service changes related to notification cost validation timeline events.
+								OpenAPI spec for pn-timeline-service is pinned to commit e8e010db3cc3e6f86e668666574b99a959d4f74f.
+								This version includes support for communicationType in timeline elements.
 							-->
 							<inputSpec>
-								https://raw.githubusercontent.com/pagopa/pn-timeline-service/c197d2e9341609ed7acb293265b1901610f25299/docs/openapi/pn-timeline-service-private.yaml
+								https://raw.githubusercontent.com/pagopa/pn-timeline-service/e8e010db3cc3e6f86e668666574b99a959d4f74f/docs/openapi/pn-timeline-service-private.yaml
 							</inputSpec>
 							<templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
 							<generatorName>java</generatorName>
