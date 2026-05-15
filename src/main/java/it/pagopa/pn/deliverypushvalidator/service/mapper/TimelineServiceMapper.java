@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT;
 
 @Slf4j
 @Component
@@ -46,6 +49,7 @@ public class TimelineServiceMapper {
                 .notificationSentAt(timelineElement.getNotificationSentAt())
                 .ingestionTimestamp(timelineElement.getIngestionTimestamp())
                 .eventTimestamp(timelineElement.getEventTimestamp())
+                .communicationType(toInternalCommunicationType(timelineElement.getCommunicationType()))
                 .build();
     }
 
@@ -66,7 +70,8 @@ public class TimelineServiceMapper {
                 .legalFactsIds(timelineElementInternal.getLegalFactsIds() != null ? toLegalFactsIdList(timelineElementInternal.getLegalFactsIds()) : null)
                 .category(TimelineCategory.valueOf(timelineElementInternal.getCategory().name()))
                 .details(toTimelineElementDetails(timelineElementInternal.getDetails(), timelineElementInternal.getCategory().name()))
-                .notificationSentAt(timelineElementInternal.getNotificationSentAt());
+                .notificationSentAt(timelineElementInternal.getNotificationSentAt())
+                .communicationType(toExternalCommunicationType(timelineElementInternal.getCommunicationType()));
     }
 
     private List<LegalFactsId> toLegalFactsIdList(List<LegalFactsIdInt> legalFactsIdIntList) {
@@ -107,6 +112,22 @@ public class TimelineServiceMapper {
 
     public TimelineElementDetailsInt toTimelineElementDetailsInt(TimelineElementDetails details, TimelineElementCategoryInt category) {
         return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
+    }
+
+    private it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType toInternalCommunicationType(CommunicationType communicationType) {
+        if (communicationType == null) {
+            throw new PnInternalException("communicationType is null in timeline element", ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
+        }
+
+        return it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.valueOf(communicationType.name());
+    }
+
+    private CommunicationType toExternalCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType communicationType) {
+        if (communicationType == null) {
+            throw new PnInternalException("communicationType is null in timeline element internal", ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
+        }
+
+        return CommunicationType.valueOf(communicationType.name());
     }
 
     private StatusInfoInternal toStatusInfoInternal(StatusInfo statusInfo) {

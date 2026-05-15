@@ -19,7 +19,7 @@ import static it.pagopa.pn.deliverypushvalidator.middleware.queue.utils.ChannelU
 @RequiredArgsConstructor
 public class NewInformalValidationConsumer {
 
-    private PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
+    private final PnDeliveryPushValidatorConfigs pnDeliveryPushValidatorConfigs;
     private final StartWorkflowHandler startWorkflowHandler;
 
     @SqsListener(queueNames = "#{@pnDeliveryPushValidatorConfigs.topics.informalValidationInputEvents}")
