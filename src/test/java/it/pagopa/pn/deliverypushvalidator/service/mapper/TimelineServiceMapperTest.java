@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 class TimelineServiceMapperTest {
@@ -118,10 +120,9 @@ class TimelineServiceMapperTest {
                 .iun("IUN123").paProtocolNumber("PROT789").sentAt(Instant.now())
                 .recipients(List.of()).build();
 
-        NewTimelineElement result = mapper.getNewTimelineElement(timelineElementInternal, notificationInt);
-
-        assertThat(result.getTimelineElement()).isNotNull();
-        assertThat(result.getTimelineElement().getCommunicationType()).isNull();
+        assertThatThrownBy(() -> mapper.getNewTimelineElement(timelineElementInternal, notificationInt))
+                .isInstanceOf(PnInternalException.class)
+                .hasMessageContaining("communicationType is null");
     }
 
     @Test
@@ -135,9 +136,9 @@ class TimelineServiceMapperTest {
                 .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
                 .communicationType(null);
 
-        TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
-
-        assertThat(result.getCommunicationType()).isNull();
+        assertThatThrownBy(() -> mapper.toTimelineElementInternal(timelineElement))
+                .isInstanceOf(PnInternalException.class)
+                .hasMessageContaining("communicationType is null");
     }
 
     @Test
