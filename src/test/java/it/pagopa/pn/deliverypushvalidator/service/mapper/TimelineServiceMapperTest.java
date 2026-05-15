@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT;
 import static org.mockito.Mockito.mock;
 
 class TimelineServiceMapperTest {
@@ -59,7 +60,10 @@ class TimelineServiceMapperTest {
     @Test
     void getNewTimelineElementHandlesNullRecipients() {
         TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
-                .iun("IUN123").elementId("EID456").category(TimelineElementCategoryInt.VALIDATED_F24).build();
+                .iun("IUN123").elementId("EID456")
+                .category(TimelineElementCategoryInt.VALIDATED_F24)
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
                 .iun("IUN123").paProtocolNumber("PROT789").sentAt(Instant.now())
@@ -122,7 +126,12 @@ class TimelineServiceMapperTest {
 
         assertThatThrownBy(() -> mapper.getNewTimelineElement(timelineElementInternal, notificationInt))
                 .isInstanceOf(PnInternalException.class)
-                .hasMessageContaining("communicationType is null");
+                .satisfies(throwable -> {
+                    PnInternalException exception = (PnInternalException) throwable;
+                    assertThat(exception.getProblem().getErrors()).isNotEmpty();
+                    assertThat(exception.getProblem().getErrors().stream().findFirst().orElseThrow().getCode())
+                            .isEqualTo(ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
+                });
     }
 
     @Test
@@ -138,7 +147,12 @@ class TimelineServiceMapperTest {
 
         assertThatThrownBy(() -> mapper.toTimelineElementInternal(timelineElement))
                 .isInstanceOf(PnInternalException.class)
-                .hasMessageContaining("communicationType is null");
+                .satisfies(throwable -> {
+                    PnInternalException exception = (PnInternalException) throwable;
+                    assertThat(exception.getProblem().getErrors()).isNotEmpty();
+                    assertThat(exception.getProblem().getErrors().stream().findFirst().orElseThrow().getCode())
+                            .isEqualTo(ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
+                });
     }
 
     @Test
@@ -153,6 +167,7 @@ class TimelineServiceMapperTest {
                 .elementId("EID456")
                 .category(TimelineElementCategoryInt.VALIDATED_F24)
                 .legalFactsIds(List.of(legalFactsIdInt))
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
                 .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
@@ -179,7 +194,8 @@ class TimelineServiceMapperTest {
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(mock(TimelineElementDetails.class))
                 .statusInfo(null)
-                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(CommunicationType.INFORMAL);
 
         TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
 
@@ -194,7 +210,8 @@ class TimelineServiceMapperTest {
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(mock(TimelineElementDetails.class))
                 .statusInfo(new StatusInfo().actual("DELIVERED").statusChangeTimestamp(Instant.now()).statusChanged(null))
-                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(CommunicationType.INFORMAL);
 
         TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
 
@@ -210,7 +227,8 @@ class TimelineServiceMapperTest {
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(mock(TimelineElementDetails.class))
                 .statusInfo(new StatusInfo().actual("DELIVERED").statusChanged(true).statusChangeTimestamp(Instant.now()))
-                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(CommunicationType.INFORMAL);
 
         TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
 
@@ -225,7 +243,8 @@ class TimelineServiceMapperTest {
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(mock(TimelineElementDetails.class))
                 .statusInfo(new StatusInfo().actual("DELIVERED").statusChanged(true).statusChangeTimestamp(Instant.now()))
-                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now());
+                .notificationSentAt(Instant.now()).ingestionTimestamp(Instant.now()).eventTimestamp(Instant.now())
+                .communicationType(CommunicationType.INFORMAL);
 
         TimelineElementInternal result = mapper.toTimelineElementInternal(timelineElement);
 
