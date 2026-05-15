@@ -74,7 +74,7 @@ public enum ActionType {
   POST_VALIDATION_COMPLETED(NotHandledDetails.class) {
     @Override
     public String buildActionId(Action action) {
-      return String.format("%s_post_accepted_processing", //todo rinominare post_validation?
+      return String.format("%s_post_validation_completed",
               action.getIun());
     }
   };
