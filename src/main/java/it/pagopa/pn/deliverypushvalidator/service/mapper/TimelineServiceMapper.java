@@ -110,7 +110,8 @@ public class TimelineServiceMapper {
         return smartMapper.mapToClassWithObjectMapper(detailsInt, TimelineElementDetails.class);
     }
 
-    public TimelineElementDetailsInt toTimelineElementDetailsInt(TimelineElementDetails details, TimelineElementCategoryInt category) {        return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
+    public TimelineElementDetailsInt toTimelineElementDetailsInt(TimelineElementDetails details, TimelineElementCategoryInt category) {
+        return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
     }
 
     private it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType toInternalCommunicationType(CommunicationType communicationType) {
