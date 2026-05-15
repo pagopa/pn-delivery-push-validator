@@ -115,7 +115,6 @@ class InformalNotificationValidationStrategyTest {
                 notificationValidationScheduler,
                 schedulerService,
                 notificationService,
-                schedulerService,
                 addressValidator,
                 normalizeAddressHandler,
                 auditLogService,
@@ -387,7 +386,7 @@ class InformalNotificationValidationStrategyTest {
         // GIVEN
         String iun = "testIun";
         NotificationInt notification = TestUtils.getNotification();
-        Mockito.when(notificationService.getNotificationByIun(iun)).thenReturn(notification);
+        Mockito.when(notificationService.getInformalNotificationByIun(iun)).thenReturn(notification);
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
 
@@ -419,7 +418,7 @@ class InformalNotificationValidationStrategyTest {
         // GIVEN
         String iun = "testIun";
         NotificationInt notification = TestUtils.getNotification();
-        Mockito.when(notificationService.getNotificationByIun(iun)).thenReturn(notification);
+        Mockito.when(notificationService.getInformalNotificationByIun(iun)).thenReturn(notification);
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
 

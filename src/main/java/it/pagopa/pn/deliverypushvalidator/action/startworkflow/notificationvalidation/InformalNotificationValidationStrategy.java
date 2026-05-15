@@ -49,10 +49,10 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     private final MessageValidator messageValidator;
     private final LookupAddressHandler lookupAddressHandler;
 
-    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, SchedulerService schedulerService1, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler) {
+    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler) {
         super(notificationValidationScheduler, schedulerService, cfg);
         this.notificationService = notificationService;
-        this.schedulerService = schedulerService1;
+        this.schedulerService = schedulerService;
         this.addressValidator = addressValidator;
         this.normalizeAddressHandler = normalizeAddressHandler;
         this.auditLogService = auditLogService;
@@ -91,8 +91,9 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
             }
 
         } catch (PnValidationFileNotFoundException ex) {
-            if (cfg.isSafeStorageFileNotFoundRetry())
+            if (cfg.isSafeStorageFileNotFoundRetry()) {
                 logEvent.generateWarning("Validation need to be rescheduled - iun={} ex=", notification.getIun(), ex).log();
+            }
             handlePnValidationFileNotFoundException(notification.getIun(), details, notification, ex, details.getStartWorkflowTime());
         } catch (PnLookupAddressValidationFailedException ex) {
             log.warn(String.format("Lookup address validation failed - iun=%s", notification.getIun()), ex);
@@ -108,7 +109,7 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
 
     @Override
     public void handleValidateAndNormalizeAddressResponse(String iun, NormalizeItemsResultInt normalizeItemsResult) {
-        NotificationInt notification = notificationService.getNotificationByIun(iun);
+        NotificationInt notification = getNotification(iun);
         PnAuditLogEvent logEvent = generateAuditLog(notification, THIRD_VALIDATION_STEP);
 
         try {
