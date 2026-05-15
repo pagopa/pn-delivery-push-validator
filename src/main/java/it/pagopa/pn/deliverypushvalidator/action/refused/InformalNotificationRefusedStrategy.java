@@ -28,7 +28,7 @@ public class InformalNotificationRefusedStrategy implements NotificationRefusedS
 
     @Override
     public void handleNotificationRefused(String iun, List<NotificationRefusedErrorInt> errors, Instant notBefore) {
-        log.debug("Start handleNotificationRefused for informal notification - iun={}", iun);
+        log.debug("Start handleNotificationRefused for informal notification - iun={}, notBefore={}", iun, notBefore);
 
         NotificationInt notification = getNotification(iun);
 
