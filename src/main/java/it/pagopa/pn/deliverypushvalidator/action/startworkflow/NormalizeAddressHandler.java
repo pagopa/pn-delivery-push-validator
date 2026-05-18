@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static it.pagopa.pn.deliverypushvalidator.service.impl.ConfidentialInformationServiceImpl.buildNotificationRecipientAddressesDtoInt;
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper.buildNotificationRecipientAddressesDtoInt;
 
 @Component
 @AllArgsConstructor

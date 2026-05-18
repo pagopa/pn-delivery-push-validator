@@ -23,7 +23,7 @@ import java.util.List;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_LOOKUPADDRESS_INCONSISTENT_DATA;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.ADDRESS_NOT_FOUND;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.ADDRESS_SEARCH_FAILED;
-import static it.pagopa.pn.deliverypushvalidator.service.impl.ConfidentialInformationServiceImpl.buildNotificationRecipientAddressesDtoInt;
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper.buildNotificationRecipientAddressesDtoInt;
 
 @Component
 @AllArgsConstructor

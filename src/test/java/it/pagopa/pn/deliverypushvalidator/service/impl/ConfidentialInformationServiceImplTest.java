@@ -6,16 +6,17 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.NotificationRecipientAddressesDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static it.pagopa.pn.deliverypushvalidator.service.impl.ConfidentialInformationServiceImpl.buildNotificationRecipientAddressesDtoInt;
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper.buildNotificationRecipientAddressesDtoInt;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,8 +42,7 @@ class ConfidentialInformationServiceImplTest {
                 .withAddress(" Via Nuova 1")
                 .build();
 
-        DigitalAddressInt digitalAddressInt= mock(DigitalAddressInt.class);
-
+        DigitalAddressInt digitalAddressInt = mock(DigitalAddressInt.class);
 
         NotificationRecipientAddressesDtoInt notificationRecipientAddressesDtoInt = NotificationRecipientAddressesDtoInt.builder()
                 .physicalAddress(paPhysicalAddress1)
@@ -53,50 +53,42 @@ class ConfidentialInformationServiceImplTest {
                 .phoneNumber("+393331234567")
                 .build();
 
-        AddressDto addressDto = new AddressDto();
-        addressDto.setValue("via via");
-
-        AnalogDomicile analogDomicile = new AnalogDomicile();
-        analogDomicile.setAddress("via via");
-        analogDomicile.setAt("at");
-        analogDomicile.setAddressDetails("details");
-        analogDomicile.setCap("80000");
-        analogDomicile.setMunicipality("mun");
-        analogDomicile.setMunicipalityDetails("mun mun");
-        analogDomicile.setProvince("NA");
-        analogDomicile.setState("It");
-
-        EmailDto emailDto = new EmailDto();
-        emailDto.setValue("test@example.com");
-
-        PhoneNumberDto phoneNumberDto = new PhoneNumberDto();
-        phoneNumberDto.setValue("+393331234567");
-
-        NotificationRecipientAddressesDto notificationRecipientAddressesDto = NotificationRecipientAddressesDto.builder()
-                .physicalAddress(analogDomicile)
-                .digitalAddress(addressDto)
-                .denomination("denomination")
-                .recIndex(1)
-                .emails(List.of(emailDto))
-                .phoneNumbers(List.of(phoneNumberDto))
-                .build();
-
         List<NotificationRecipientAddressesDtoInt> inputList = List.of(notificationRecipientAddressesDtoInt);
-
 
         when(pnDataVaultClientReactive.updateNotificationAddressesByIun(eq(iun), eq(normalizer), anyList()))
                 .thenReturn(Mono.empty());
 
+        // WHEN
         confidentialInformationService.updateNotificationAddresses(iun, normalizer, inputList);
 
+
+        ArgumentCaptor<List> captor =
+                ArgumentCaptor.forClass(List.class);
+
         verify(pnDataVaultClientReactive, times(1))
-                .updateNotificationAddressesByIun(eq(iun), eq(normalizer), anyList());
-        assertEquals(analogDomicile, notificationRecipientAddressesDto.getPhysicalAddress());
-        assertEquals(addressDto, notificationRecipientAddressesDto.getDigitalAddress());
-        assertEquals("denomination", notificationRecipientAddressesDto.getDenomination());
-        assertEquals(1, notificationRecipientAddressesDto.getRecIndex());
-        assertEquals("test@example.com", notificationRecipientAddressesDto.getEmails() != null ? notificationRecipientAddressesDto.getEmails().getFirst().getValue() : null);
-        assertEquals("+393331234567", notificationRecipientAddressesDto.getPhoneNumbers() != null ? notificationRecipientAddressesDto.getPhoneNumbers().getFirst().getValue() : null);
+                .updateNotificationAddressesByIun(eq(iun), eq(normalizer), captor.capture());
+
+        List<NotificationRecipientAddressesDto> capturedList = captor.getValue();
+        assertNotNull(capturedList);
+        assertEquals(1, capturedList.size());
+
+        NotificationRecipientAddressesDto capturedDto = capturedList.getFirst();
+        assertEquals("denomination", capturedDto.getDenomination());
+        assertEquals(1, capturedDto.getRecIndex());
+
+        // Verify email mapping
+        assertNotNull(capturedDto.getEmails());
+        assertEquals(1, capturedDto.getEmails().size());
+        assertEquals("test@example.com", capturedDto.getEmails().getFirst().getValue());
+
+        // Verify phone number mapping
+        assertNotNull(capturedDto.getPhoneNumbers());
+        assertEquals(1, capturedDto.getPhoneNumbers().size());
+        assertEquals("+393331234567", capturedDto.getPhoneNumbers().getFirst().getValue());
+
+        // Verify other fields
+        assertNotNull(capturedDto.getPhysicalAddress());
+        assertNotNull(capturedDto.getDigitalAddress());
     }
 
     @Test

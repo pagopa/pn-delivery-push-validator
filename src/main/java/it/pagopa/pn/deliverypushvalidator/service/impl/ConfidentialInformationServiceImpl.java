@@ -1,9 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.NotificationRecipientAddressesDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
@@ -34,14 +32,4 @@ public class ConfidentialInformationServiceImpl implements ConfidentialInformati
         return pnDataVaultClientReactive.updateNotificationAddressesByIun(iun, normalized, listAddressExt);
     }
 
-    public static NotificationRecipientAddressesDtoInt buildNotificationRecipientAddressesDtoInt(NotificationRecipientInt recipient, PhysicalAddressInt physicalAddress, Integer recIndex){
-        return NotificationRecipientAddressesDtoInt.builder()
-                .denomination(recipient.getDenomination())
-                .digitalAddress(recipient.getDigitalDomicile())
-                .email(recipient.getEmail())
-                .phoneNumber(recipient.getPhoneNumber())
-                .physicalAddress(physicalAddress)
-                .recIndex(recIndex)
-                .build();
-    }
 }

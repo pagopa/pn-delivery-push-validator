@@ -5,6 +5,7 @@ import io.micrometer.common.util.StringUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.DigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,17 @@ public class NotificationRecipientAddressesDtoMapper {
         dtoExt.setEmails(mapEmailToDto(dtoInt.getEmail()));
         dtoExt.setPhoneNumbers(mapPhoneNumberToDto(dtoInt.getPhoneNumber()));
         return dtoExt;
+    }
+
+    public static NotificationRecipientAddressesDtoInt buildNotificationRecipientAddressesDtoInt(NotificationRecipientInt recipient, PhysicalAddressInt physicalAddress, Integer recIndex){
+        return NotificationRecipientAddressesDtoInt.builder()
+                .denomination(recipient.getDenomination())
+                .digitalAddress(recipient.getDigitalDomicile())
+                .email(recipient.getEmail())
+                .phoneNumber(recipient.getPhoneNumber())
+                .physicalAddress(physicalAddress)
+                .recIndex(recIndex)
+                .build();
     }
 
     private static List<EmailDto> mapEmailToDto(String email) {
