@@ -102,9 +102,9 @@ class NotificationRefusedActionHandlerTest {
 
         // Then - Verify exact arguments passed to strategy
         verify(informalNotificationRefusedStrategy).handleNotificationRefused(
-                eq(iun),
-                eq(errors),
-                eq(schedulingTime)
+                iun,
+                errors,
+                schedulingTime
         );
     }
 
@@ -123,9 +123,9 @@ class NotificationRefusedActionHandlerTest {
 
         // Then - Verify exact arguments passed to strategy
         verify(legalNotificationRefusedStrategy).handleNotificationRefused(
-                eq(iun),
-                eq(errors),
-                eq(schedulingTime)
+                iun,
+                errors,
+                schedulingTime
         );
     }
 
@@ -141,9 +141,9 @@ class NotificationRefusedActionHandlerTest {
 
         // Then
         verify(legalNotificationRefusedStrategy).handleNotificationRefused(
-                eq(iun),
-                eq(errors),
-                eq(schedulingTime)
+                iun,
+                errors,
+                schedulingTime
         );
     }
 
