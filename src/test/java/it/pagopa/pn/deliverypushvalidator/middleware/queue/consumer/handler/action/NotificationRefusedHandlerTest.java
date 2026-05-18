@@ -3,9 +3,11 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +19,6 @@ import org.springframework.messaging.MessageHeaders;
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,7 +37,7 @@ class NotificationRefusedHandlerTest {
 
     @Test
     void getSupportedEventTypeReturnsCorrectType() {
-        assertEquals(SupportedEventType.NOTIFICATION_REFUSED, handler.getSupportedEventType());
+        Assertions.assertEquals(SupportedEventType.NOTIFICATION_REFUSED, handler.getSupportedEventType());
     }
 
     @Test
@@ -52,11 +53,12 @@ class NotificationRefusedHandlerTest {
                 .iun("iun_123")
                 .details(details)
                 .notBefore(notBefore)
+                .communicationType(CommunicationType.INFORMAL)
                 .build();
 
         handler.handle(action, headers);
 
-        Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore);
+        Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore, CommunicationType.INFORMAL);
         Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123");
     }
 
@@ -73,13 +75,14 @@ class NotificationRefusedHandlerTest {
                 .iun("iun_123")
                 .details(details)
                 .notBefore(notBefore)
+                .communicationType(CommunicationType.INFORMAL)
                 .build();
 
-        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore);
+        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore, CommunicationType.INFORMAL);
 
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
-        Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore);
+        Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore, CommunicationType.INFORMAL);
         Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123");
     }
 
