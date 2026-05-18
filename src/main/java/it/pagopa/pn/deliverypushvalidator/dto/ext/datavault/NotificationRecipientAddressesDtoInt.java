@@ -16,4 +16,6 @@ public class NotificationRecipientAddressesDtoInt {
     private DigitalAddressInt digitalAddress;
     private PhysicalAddressInt physicalAddress;
     private Integer recIndex;
+    private String email;
+    private String phoneNumber;
 }

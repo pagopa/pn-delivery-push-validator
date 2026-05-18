@@ -4,9 +4,9 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
@@ -23,6 +23,7 @@ import java.util.List;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_LOOKUPADDRESS_INCONSISTENT_DATA;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.ADDRESS_NOT_FOUND;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.ADDRESS_SEARCH_FAILED;
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper.buildNotificationRecipientAddressesDtoInt;
 
 @Component
 @AllArgsConstructor
@@ -87,12 +88,8 @@ public class LookupAddressHandler {
 
             enrichAddressWithRecipientData(response, recipient);
 
-            NotificationRecipientAddressesDtoInt foundAddress = NotificationRecipientAddressesDtoInt.builder()
-                    .denomination(recipient.getDenomination())
-                    .digitalAddress(recipient.getDigitalDomicile() != null ? recipient.getDigitalDomicile() : null)
-                    .physicalAddress(response.getPhysicalAddress())
-                    .recIndex(response.getRecIndex())
-                    .build();
+            NotificationRecipientAddressesDtoInt foundAddress =
+                    buildNotificationRecipientAddressesDtoInt(recipient, response.getPhysicalAddress(), response.getRecIndex());
             recipientAddressesDtoList.add(foundAddress);
         }
 
