@@ -10,6 +10,8 @@ import java.time.Instant;
 
 public interface SchedulerService {
     void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType);
+
+    void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, CommunicationType communicationType);
     
     void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails);
 
