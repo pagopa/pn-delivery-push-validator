@@ -21,8 +21,8 @@ public class NotificationValidationActionHandler {
 
     public void validateNotification(String iun, NotificationValidationActionDetails details, CommunicationType communicationType) {
         log.debug("Start validateNotification - iun={}", iun);
-        NotificationInt notification = notificationService.getNotificationByIun(iun);
         NotificationValidationStrategy strategy = resolveStrategy(communicationType, iun);
+        NotificationInt notification = strategy.getNotification(iun);
         strategy.validate(notification, details);
     }
 

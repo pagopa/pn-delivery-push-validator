@@ -127,12 +127,12 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
 
     @Override
     public void handleValidateF24Response(PnF24MetadataValidationEndEventPayload payload) {
-        throw new PnInternalException(ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED, "F24 validation is not implemented for informal notification");
+        throw new PnInternalException("F24 validation is not implemented for informal notification", ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED);
     }
 
     @Override
     public void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event) {
-        throw new PnInternalException(ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED, "Notification cost validation is not implemented for informal notification");
+        throw new PnInternalException("Notification cost validation is not implemented for informal notification", ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED);
     }
 
     @Override

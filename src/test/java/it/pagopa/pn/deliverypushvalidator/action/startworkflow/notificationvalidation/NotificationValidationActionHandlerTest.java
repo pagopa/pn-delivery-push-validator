@@ -34,14 +34,12 @@ class NotificationValidationActionHandlerTest {
 
     @Test
     void validateNotification_whenInformal_shouldUseInformalStrategy() {
-
         NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
         NotificationInt notification = mock(NotificationInt.class);
-        when(notificationService.getNotificationByIun(IUN)).thenReturn(notification);
 
+        when(informalStrategy.getNotification(IUN)).thenReturn(notification);
         handler.validateNotification(IUN, details, CommunicationType.INFORMAL);
 
-        verify(notificationService).getNotificationByIun(IUN);
         verify(informalStrategy).validate(notification, details);
         verifyNoInteractions(legalStrategy);
     }
@@ -51,11 +49,10 @@ class NotificationValidationActionHandlerTest {
 
         NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
         NotificationInt notification = mock(NotificationInt.class);
-        when(notificationService.getNotificationByIun(IUN)).thenReturn(notification);
 
+        when(legalStrategy.getNotification(IUN)).thenReturn(notification);
         handler.validateNotification(IUN, details, CommunicationType.LEGAL);
 
-        verify(notificationService).getNotificationByIun(IUN);
         verify(legalStrategy).validate(notification, details);
         verifyNoInteractions(informalStrategy);
     }
