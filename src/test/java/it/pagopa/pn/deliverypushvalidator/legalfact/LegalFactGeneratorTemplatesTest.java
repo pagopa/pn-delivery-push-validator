@@ -2,8 +2,6 @@ package it.pagopa.pn.deliverypushvalidator.legalfact;
 
 import it.pagopa.pn.deliverypushvalidator.action.it.CommonTestConfiguration;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.TemplatesClientMock;
-import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
-import it.pagopa.pn.deliverypushvalidator.action.refused.LegalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
@@ -27,10 +25,6 @@ class LegalFactGeneratorTemplatesTest extends CommonTestConfiguration {
     LegalFactGenerator legalFactGeneratorTemplatesTest;
     @MockitoBean
     TemplatesClient templatesClient;
-    @MockitoBean
-    LegalNotificationRefusedStrategy legalNotificationRefusedStrategy;
-    @MockitoBean
-    InformalNotificationRefusedStrategy informalNotificationRefusedStrategy;
 
     TemplatesClientMock templatesClientMock = new TemplatesClientMock();
 
