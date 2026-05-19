@@ -55,7 +55,6 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
     private final AttachmentUtils attachmentUtils;
     private final TaxIdPivaValidator taxIdPivaValidator;
     private final F24Validator f24Validator;
-    private final NotificationValidationScheduler notificationValidationScheduler;
 
     //quickWorkaroundFor PN-9116
     private final NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
@@ -65,7 +64,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
 
 
     public LegalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, TimelineService timelineService, TimelineUtils timelineUtils, LookupAddressHandler lookupAddressHandler, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, NotificationCostService notificationCostService, PaymentValidator paymentValidator, AttachmentUtils attachmentUtils, TaxIdPivaValidator taxIdPivaValidator, F24Validator f24Validator, NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils, SendMoreThan20GramsParameterConsumer parameterConsumer, SafeStorageService safeStorageService, DocumentComposition documentComposition) {
-        super(notificationValidationScheduler, schedulerService);
+        super(notificationValidationScheduler, schedulerService, cfg);
         this.notificationService = notificationService;
         this.auditLogService = auditLogService;
         this.cfg = cfg;
@@ -80,7 +79,6 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
         this.attachmentUtils = attachmentUtils;
         this.taxIdPivaValidator = taxIdPivaValidator;
         this.f24Validator = f24Validator;
-        this.notificationValidationScheduler = notificationValidationScheduler;
         this.notificationCostServiceFeatureFlagUtils = notificationCostServiceFeatureFlagUtils;
         this.parameterConsumer = parameterConsumer;
         this.safeStorageService = safeStorageService;
@@ -368,20 +366,5 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
                         && notificationPaymentInfoIntV2s
                         .stream()
                         .anyMatch(paymentInfoIntV2 -> paymentInfoIntV2.getF24() != null));
-    }
-
-    private void handlePnValidationFileNotFoundException(String iun, NotificationValidationActionDetails details, NotificationInt notification, PnValidationFileNotFoundException ex, Instant startWorkflowTime) {
-    /* Per la PnValidationFileNotFoundException la notifica non viene portata in rifiutata MA è prevista una gestione ad hoc. Questo avviene
-       perchè al momento non c'è possibilità di distinguere un 404 dovuto ad un mancato caricamento file da parte della PA (che dovrebbe portare
-       regolarmente la notifica in rifiutata) e un 404 dovuto ad un ritardo nel caricamento del file nel bucket corretto da parte di
-       safeStorage (in questo caso si di deve procedere con i ritentativi). Si sceglie dunque per ore di ritentare in entrambi i casi
-    */
-        log.warn(String.format("File not found exception in validateNotification - iun=%s", iun), ex);
-        if (cfg.isSafeStorageFileNotFoundRetry()) {
-            log.info("Notification validation need to be rescheduled  - iun={}", iun);
-            notificationValidationScheduler.scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, startWorkflowTime);
-        } else {
-            handleValidationError(notification, ex);
-        }
     }
 }
