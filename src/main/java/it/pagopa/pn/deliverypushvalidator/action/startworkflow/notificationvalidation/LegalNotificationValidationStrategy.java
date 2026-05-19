@@ -95,11 +95,12 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
     }
 
     @Override
-    public void validate(NotificationInt notification, NotificationValidationActionDetails details) {
+    public void validate(String iun, NotificationValidationActionDetails details) {
 
-        log.debug("Start validateNotification - iun={}", notification.getIun());
+        log.debug("Start validateNotification - iun={}", iun);
+        NotificationInt notification = getNotification(iun);
+
         PnAuditLogEvent logEvent = generateAuditLog(notification, FIRST_VALIDATION_STEP);
-
         try {
             paymentValidator.validatePayments(notification, details.getStartWorkflowTime());
 
