@@ -6,7 +6,6 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationA
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,9 +22,6 @@ class NotificationValidationActionHandlerTest {
 
     @Mock
     private LegalNotificationValidationStrategy legalStrategy;
-
-    @Mock
-    private NotificationService notificationService;
 
     @InjectMocks
     private NotificationValidationActionHandler handler;

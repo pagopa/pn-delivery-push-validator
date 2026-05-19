@@ -6,7 +6,6 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationA
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class NotificationValidationActionHandler {
     private final InformalNotificationValidationStrategy informalStrategy;
     private final LegalNotificationValidationStrategy legalStrategy;
-    private final NotificationService notificationService;
 
     public void validateNotification(String iun, NotificationValidationActionDetails details, CommunicationType communicationType) {
         log.debug("Start validateNotification - iun={}", iun);
