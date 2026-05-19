@@ -17,6 +17,7 @@ import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterCon
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
@@ -242,7 +243,7 @@ public class NotificationValidationActionHandler {
         try {
             addressValidator.handleAddressValidation(iun, normalizeItemsResult);
             normalizeAddressHandler.handleNormalizedAddressResponse(notification, normalizeItemsResult);
-            checkFeatureFlagAndInitializeAndValidateNotificationCost(iun, notification);
+            checkFeatureFlagAndInitializeAndValidateNotificationCost(notification);
             logEvent.generateSuccess().log();
 
         } catch (PnValidationNotValidAddressException ex) {
@@ -251,11 +252,11 @@ public class NotificationValidationActionHandler {
         }
     }
 
-    private void checkFeatureFlagAndInitializeAndValidateNotificationCost(String iun, NotificationInt notification) {
+    private void checkFeatureFlagAndInitializeAndValidateNotificationCost(NotificationInt notification) {
         if (notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification)) {
             notificationCostService.initializeAndValidateNotificationCost(notification);
         } else {
-            scheduleReceivedLegalFactGeneration(iun);
+            scheduleEndValidationAction(notification);
             generateSkipAuditLog(notification, FIFTH_VALIDATION_STEP,
                     "Notification cost validation will be skipped due to feature flag").generateSuccess().log();
         }
@@ -274,7 +275,7 @@ public class NotificationValidationActionHandler {
                 TimelineElementInternal buildNotificationCostValidationResponse = timelineUtils.buildNotificationCostValidationResponse(notification);
                 timelineService.addTimelineElement(buildNotificationCostValidationResponse, notification);
                 log.debug("Notification validated successfully - iun={}", iun);
-                scheduleReceivedLegalFactGeneration(iun);
+                scheduleEndValidationAction(notification);
                 logEvent.generateSuccess().log();
             }
             case KO -> {
@@ -287,10 +288,17 @@ public class NotificationValidationActionHandler {
         }
     }
 
-    private void scheduleReceivedLegalFactGeneration(String iun) {
+    private void scheduleEndValidationAction(NotificationInt notification) {
+        String iun = notification.getIun();
         Instant schedulingDate = Instant.now();
-        log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
+
+        if (CommunicationType.INFORMAL.equals(notification.getCommunicationType())) {
+            log.debug("Scheduling post validation completed, schedulingDate={} - iun={} communicationType={}", schedulingDate, iun, notification.getCommunicationType());
+            schedulerService.scheduleEvent(iun, schedulingDate, ActionType.POST_VALIDATION_COMPLETED, null, notification.getCommunicationType());
+        } else {
+            log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
+            schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
+        }
     }
 
     /**

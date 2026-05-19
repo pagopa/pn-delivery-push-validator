@@ -103,9 +103,15 @@ public class TimelineUtils {
                 .build();
 
         TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(singleLegalFactId(legalFactId, LegalFactCategoryInt.SENDER_ACK));
+                .legalFactsIds(legalFactId != null
+                        ? singleLegalFactId(legalFactId, LegalFactCategoryInt.SENDER_ACK)
+                        : Collections.emptyList());
 
         return buildTimeline(notification, TimelineElementCategoryInt.REQUEST_ACCEPTED, elementId, details, timelineBuilder);
+    }
+
+    public TimelineElementInternal buildAcceptedRequestTimelineElement(NotificationInt notification) {
+        return buildAcceptedRequestTimelineElement(notification, null);
     }
 
     public TimelineElementInternal buildRefusedRequestTimelineElement(NotificationInt notification, List<NotificationRefusedErrorInt> errors, Integer notificationCost) {

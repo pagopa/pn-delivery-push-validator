@@ -18,9 +18,11 @@ import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.DocumentCreationResponseEventHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationRefusedHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationValidationHandler;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.PostValidationCompletedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.ReceivedLegalFactGenerationHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventHandlerRegistry;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventRouter;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.AddressManagerResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCreationResponseHandler;
@@ -47,6 +49,8 @@ import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.EnumMap;
+import java.util.Map;
 
 import static org.awaitility.Awaitility.setDefaultTimeout;
 
@@ -72,6 +76,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         NotificationValidationActionHandler.class,
         TaxIdPivaValidator.class,
         ReceivedLegalFactCreationRequest.class,
+        CheckAttachmentRetentionScheduler.class,
+        PostValidationCompletedHandler.class,
         NotificationValidationScheduler.class,
         AddressValidator.class,
         AddressManagerServiceImpl.class,
@@ -107,6 +113,7 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         ValidationActionsConsumer.class,
         DocumentCreationResponseHandler.class,
         DocumentCreationResponseEventHandler.class,
+        PostValidationCompletedActionHandler.class,
         NotificationCostServiceImpl.class,
         NotificationCostServiceClientMock.class,
         NotificationCostServiceMapper.class,
@@ -178,7 +185,11 @@ public class CommonTestConfiguration {
         times.setAttachmentRetentionTimeAfterValidation(Duration.ofSeconds(5));
         times.setCheckAttachmentTimeBeforeExpiration(Duration.ofSeconds(2));
 
-        Mockito.when(cfg.getTimeParams()).thenReturn(times);
+        Map<CommunicationType, TimeParams> timeParamsMap = new EnumMap<>(CommunicationType.class);
+        timeParamsMap.put(CommunicationType.LEGAL, times);
+        timeParamsMap.put(CommunicationType.INFORMAL, times);
+
+        Mockito.when(cfg.getTimeParamsMap()).thenReturn(timeParamsMap);
 
         // Impostazione delle proprietà di validazione PDF
         Mockito.when(cfg.isCheckPdfValidEnabled()).thenReturn(true);
