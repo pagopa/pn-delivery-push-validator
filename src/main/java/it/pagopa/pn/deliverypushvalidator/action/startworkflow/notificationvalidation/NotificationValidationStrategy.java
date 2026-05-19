@@ -16,7 +16,7 @@ public interface NotificationValidationStrategy {
     /**
      * Executes the main validation flow for a notification.
      */
-    void validate(NotificationInt notification, NotificationValidationActionDetails details);
+    void validate(String iun, NotificationValidationActionDetails details);
 
     /**
      * Handles the async F24 metadata validation response.

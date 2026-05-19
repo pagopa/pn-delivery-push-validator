@@ -67,6 +67,7 @@ class InformalNotificationValidationStrategyTest {
     private LookupAddressHandler lookupAddressHandler;
 
     private InformalNotificationValidationStrategy handler;
+    private static final String IUN = "TEST-IUN-001";
 
     private Campaign campaignWithAnalog() {
         WorkflowEntity analogWorkflow = WorkflowEntity.builder()
@@ -156,7 +157,7 @@ class InformalNotificationValidationStrategyTest {
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithoutAnalog());
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(attachmentUtils).validateAttachment(notification);
@@ -195,7 +196,7 @@ class InformalNotificationValidationStrategyTest {
                 .thenReturn(Mono.empty());
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(lookupAddressHandler, never()).performValidation(any());
@@ -226,7 +227,7 @@ class InformalNotificationValidationStrategyTest {
                 .thenReturn(Mono.empty());
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(lookupAddressHandler).performValidation(notification);
@@ -251,7 +252,7 @@ class InformalNotificationValidationStrategyTest {
                 .thenReturn(Mono.empty());
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(lookupAddressHandler, never()).performValidation(any());
@@ -273,7 +274,7 @@ class InformalNotificationValidationStrategyTest {
         NotificationValidationActionDetails details = defaultDetails();
 
         // WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         // THEN
         Mockito.verify(notificationValidationScheduler)
@@ -297,7 +298,7 @@ class InformalNotificationValidationStrategyTest {
         NotificationValidationActionDetails details = defaultDetails();
 
         // WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         // THEN – when retry is disabled the notification is refused (not rescheduled)
         Mockito.verify(notificationValidationScheduler, never())
@@ -318,7 +319,7 @@ class InformalNotificationValidationStrategyTest {
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(addressValidator, never()).requestValidateAndNormalizeAddresses(any());
@@ -341,7 +342,7 @@ class InformalNotificationValidationStrategyTest {
         NotificationValidationActionDetails details = defaultDetails();
 
         // WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         // THEN
         Mockito.verify(notificationValidationScheduler)
@@ -371,7 +372,7 @@ class InformalNotificationValidationStrategyTest {
         doThrow(ex).when(lookupAddressHandler).performValidation(notification);
 
         // WHEN
-        handler.validate(notification, defaultDetails());
+        handler.validate(IUN, defaultDetails());
 
         // THEN
         Mockito.verify(addressValidator, never()).requestValidateAndNormalizeAddresses(any());
