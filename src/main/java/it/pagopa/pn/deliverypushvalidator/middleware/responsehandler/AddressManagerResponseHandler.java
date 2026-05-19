@@ -35,7 +35,7 @@ public class AddressManagerResponseHandler {
         try {
             log.logStartingProcess(processName);
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
-            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult);
+            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, null);
             log.logEndingProcess(processName);
         } catch (Exception ex){
             log.logEndingProcess(processName, false, ex.getMessage(),ex);

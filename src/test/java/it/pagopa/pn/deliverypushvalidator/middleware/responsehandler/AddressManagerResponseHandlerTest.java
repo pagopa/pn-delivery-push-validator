@@ -36,6 +36,6 @@ class AddressManagerResponseHandlerTest {
         handler.handleResponseReceived(normalizeItemsResult);
 
         //THEN
-        Mockito.verify(notificationValidationActionHandler, Mockito.never()).handleValidateAndNormalizeAddressResponse(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationValidationActionHandler, Mockito.never()).handleValidateAndNormalizeAddressResponse(Mockito.anyString(), Mockito.any(), Mockito.isNull());
     }
 }

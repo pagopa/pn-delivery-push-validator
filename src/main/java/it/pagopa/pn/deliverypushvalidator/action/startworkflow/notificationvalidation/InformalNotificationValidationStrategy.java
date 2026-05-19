@@ -26,12 +26,14 @@ import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED;
 
 @CustomLog
+@Component
 public class InformalNotificationValidationStrategy extends BaseNotificationValidationStrategy implements NotificationValidationStrategy {
 
     private static final int FIRST_VALIDATION_STEP = 1;

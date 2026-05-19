@@ -63,7 +63,7 @@ public class F24ResponseHandler {
 
             try {
                 log.logStartingProcess(processName);
-                validationActionHandler.handleValidateF24Response(metadataValidationEndEvent);
+                validationActionHandler.handleValidateF24Response(metadataValidationEndEvent, null);
                 log.logEndingProcess(processName);
             } catch (Exception ex){
                 log.logEndingProcess(processName, false, ex.getMessage(),ex);

@@ -46,7 +46,7 @@ class NotificationCostConsumerTest {
         notificationCostConsumer.pnNotificationCostEventInboundConsumer(message);
 
         // Then
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(null));
     }
 
     @Test
@@ -65,14 +65,14 @@ class NotificationCostConsumerTest {
                 .setHeader("test", "headerValue")
                 .build();
 
-        Mockito.doThrow(new RuntimeException("Test Exception")).when(handler).handleValidateNotificationCost(any(), any());
+        Mockito.doThrow(new RuntimeException("Test Exception")).when(handler).handleValidateNotificationCost(any(), any(), eq(null));
 
         // When/Then
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () ->
                 notificationCostConsumer.pnNotificationCostEventInboundConsumer(message));
         Assertions.assertEquals("Test Exception", exception.getMessage());
 
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(null));
     }
 
     @Test
@@ -95,6 +95,6 @@ class NotificationCostConsumerTest {
         notificationCostConsumer.pnNotificationCostEventInboundConsumer(message);
 
         // Then
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(null));
     }
 }
