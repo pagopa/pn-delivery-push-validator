@@ -72,11 +72,12 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     }
 
     @Override
-    public void validate(NotificationInt notification, NotificationValidationActionDetails details) {
+    public void validate(String iun, NotificationValidationActionDetails details) {
 
-        log.debug("Start validateInformalNotification - iun={}", notification.getIun());
+        log.debug("Start validateInformalNotification - iun={}", iun);
+        NotificationInt notification = getNotification(iun);
+
         PnAuditLogEvent logEvent = generateAuditLog(notification, FIRST_VALIDATION_STEP);
-
         try {
             attachmentUtils.validateAttachment(notification);
             Campaign campaign = campaignValidator.validateAndGetCampaign(notification);
