@@ -4,7 +4,6 @@ import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
 import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -20,8 +19,7 @@ public class NotificationValidationActionHandler {
     public void validateNotification(String iun, NotificationValidationActionDetails details, CommunicationType communicationType) {
         log.debug("Start validateNotification - iun={}", iun);
         NotificationValidationStrategy strategy = resolveStrategy(communicationType, iun);
-        NotificationInt notification = strategy.getNotification(iun);
-        strategy.validate(notification, details);
+        strategy.validate(iun, details);
     }
 
     public void handleValidateF24Response(PnF24MetadataValidationEndEventPayload metadataValidationEndEvent, CommunicationType communicationType) {

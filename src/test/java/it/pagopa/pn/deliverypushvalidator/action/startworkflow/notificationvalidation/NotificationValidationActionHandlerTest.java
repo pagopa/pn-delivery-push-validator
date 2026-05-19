@@ -4,7 +4,6 @@ import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
 import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +29,11 @@ class NotificationValidationActionHandlerTest {
 
     @Test
     void validateNotification_whenInformal_shouldUseInformalStrategy() {
-        NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
-        NotificationInt notification = mock(NotificationInt.class);
 
-        when(informalStrategy.getNotification(IUN)).thenReturn(notification);
+        NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
         handler.validateNotification(IUN, details, CommunicationType.INFORMAL);
 
-        verify(informalStrategy).validate(notification, details);
+        verify(informalStrategy).validate(IUN, details);
         verifyNoInteractions(legalStrategy);
     }
 
@@ -44,12 +41,19 @@ class NotificationValidationActionHandlerTest {
     void validateNotification_whenLegal_shouldUseLegalStrategy() {
 
         NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
-        NotificationInt notification = mock(NotificationInt.class);
-
-        when(legalStrategy.getNotification(IUN)).thenReturn(notification);
         handler.validateNotification(IUN, details, CommunicationType.LEGAL);
 
-        verify(legalStrategy).validate(notification, details);
+        verify(legalStrategy).validate(IUN, details);
+        verifyNoInteractions(informalStrategy);
+    }
+
+    @Test
+    void validateNotification_whenCommunicationTypeIsNull_shouldUseLegalStrategy() {
+        NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
+
+        handler.validateNotification(IUN, details, null);
+
+        verify(legalStrategy).validate(IUN, details);
         verifyNoInteractions(informalStrategy);
     }
 
