@@ -5,6 +5,7 @@ import it.pagopa.pn.common.rest.error.v1.dto.ProblemError;
 import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
+import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
@@ -26,12 +27,13 @@ class BaseNotificationValidationStrategyTest {
     private NotificationValidationScheduler notificationValidationScheduler;
     private SchedulerService schedulerService;
     private BaseNotificationValidationStrategy strategy;
+    private final PnDeliveryPushValidatorConfigs cfg = new PnDeliveryPushValidatorConfigs();
 
     @BeforeEach
     void setUp() {
         notificationValidationScheduler = mock(NotificationValidationScheduler.class);
         schedulerService = mock(SchedulerService.class);
-        strategy = new BaseNotificationValidationStrategy(notificationValidationScheduler, schedulerService);
+        strategy = new BaseNotificationValidationStrategy(notificationValidationScheduler, schedulerService, cfg);
     }
 
     @Test

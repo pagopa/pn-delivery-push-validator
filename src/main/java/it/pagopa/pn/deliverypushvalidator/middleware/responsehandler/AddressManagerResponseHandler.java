@@ -3,9 +3,12 @@ package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeItemsResult;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.addressmanager.AddressManagerClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
+import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.AddressManagerMapper;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -18,6 +21,7 @@ public class AddressManagerResponseHandler {
 
     private NotificationValidationActionHandler notificationValidationActionHandler;
     private TimelineUtils timelineUtils;
+    private TimelineService timelineService;
     
     public void handleResponseReceived( NormalizeItemsResult response ) {
         String iun = timelineUtils.getIunFromTimelineId(response.getCorrelationId());
@@ -34,8 +38,13 @@ public class AddressManagerResponseHandler {
 
         try {
             log.logStartingProcess(processName);
+
+            TimelineElementInternal timelineElement = timelineService.getTimelineElement(iun, response.getCorrelationId())
+                    .orElseThrow(() -> new IllegalStateException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId()));
+            CommunicationType communicationType = timelineElement.getCommunicationType();
+
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
-            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult);
+            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);
             log.logEndingProcess(processName);
         } catch (Exception ex){
             log.logEndingProcess(processName, false, ex.getMessage(),ex);

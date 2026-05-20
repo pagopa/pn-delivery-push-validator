@@ -94,6 +94,8 @@ class LegalNotificationValidationStrategyTest {
     @Mock
     private NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
 
+    private static final String IUN = "TEST-IUN-001";
+
 
     @BeforeEach
     void setup() {
@@ -133,7 +135,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification)).thenReturn(Mono.empty());
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         //THEN
         Mockito.verify(attachmentUtils).validateAttachment(notification);
@@ -190,7 +192,7 @@ class LegalNotificationValidationStrategyTest {
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
 
@@ -253,7 +255,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(documentComposition.getNumberOfPageFromPdfBytes(Mockito.any())).thenReturn(1);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         //THEN
         Mockito.verify(attachmentUtils).validateAttachment(notification);
@@ -300,7 +302,7 @@ class LegalNotificationValidationStrategyTest {
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
 
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
 
@@ -340,7 +342,7 @@ class LegalNotificationValidationStrategyTest {
         PnAuditLogEvent pnAuditLogEventWarn = Mockito.mock(PnAuditLogEvent.class);
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(pnAuditLogEventWarn);
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(Mockito.eq(notification), Mockito.anyInt(), any(), Mockito.any(Instant.class));
 
     }
@@ -385,7 +387,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(f24Validator.requestValidateF24(notification)).thenReturn(Mono.empty());
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(attachmentUtils).validateAttachment(notification);
         Mockito.verify(auditLogEvent).generateSuccess();
@@ -423,7 +425,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, details.getStartWorkflowTime());
         Mockito.verify(auditLogEvent).generateWarning(any(), any(String.class), any());
@@ -459,7 +461,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(notificationValidationScheduler, Mockito.never()).scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, details.getStartWorkflowTime());
@@ -488,7 +490,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
@@ -519,7 +521,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),
@@ -562,7 +564,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification)).thenReturn(Mono.empty());
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(timelineService, Mockito.never()).addTimelineElement(timelineElementInternal, notification);
@@ -600,7 +602,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification)).thenReturn(Mono.empty());
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(taxIdPivaValidator, Mockito.never()).validateTaxIdPiva(notification);
@@ -637,7 +639,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, details.getStartWorkflowTime());
@@ -752,7 +754,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(notificationValidationScheduler).scheduleNotificationValidation(notification, details.getRetryAttempt(), ex, details.getStartWorkflowTime());
@@ -782,7 +784,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any(String.class), any())).thenReturn(auditLogEvent);
 
         //WHEN
-        handler.validate(notification, details);
+        handler.validate(IUN, details);
         //THEN
         Mockito.verify(addressValidator, Mockito.never()).requestValidateAndNormalizeAddresses(notification);
         Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(Instant.class),

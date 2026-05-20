@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.events.*;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidF24Exception;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;
@@ -40,13 +41,14 @@ class F24ResponseHandlerTest {
     @Test
     void handleEventF24_shouldCallHandleValidationResponseReceived() {
         PnF24MetadataValidationEndEvent.Detail event = mock(PnF24MetadataValidationEndEvent.Detail.class);
+        CommunicationType communicationType = CommunicationType.LEGAL;
         when(event.getMetadataValidationEnd()).thenReturn(mock(PnF24MetadataValidationEndEventPayload.class));
         when(event.getMetadataValidationEnd().getSetId()).thenReturn("IUN123");
         when(timelineUtils.checkIsNotificationCancellationRequested("IUN123")).thenReturn(false);
 
         handler.handleEventF24(event);
 
-        verify(validationActionHandler).handleValidateF24Response(any());
+        verify(validationActionHandler).handleValidateF24Response(any(), eq(communicationType));
     }
 
     @Test

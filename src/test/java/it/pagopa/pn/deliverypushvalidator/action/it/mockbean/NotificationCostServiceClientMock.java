@@ -47,7 +47,7 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
 
             PnNotificationCostValidationEventPayload eventPayload = createEventPayload(iun);
 
-            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload);
+            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload, null);
 
             log.info("[TEST] END handle notification cost validation for iun={}", iun);
         }));
