@@ -63,14 +63,6 @@ public enum ActionType {
     
   },
 
-  POST_VALIDATION_COMPLETED(NotHandledDetails.class) {
-    @Override
-    public String buildActionId(Action action) {
-      return String.format("%s_post_validation_completed",
-              action.getIun());
-    }
-  },
-
   POST_ACCEPTED_PROCESSING_COMPLETED(NotHandledDetails.class) {
     @Override
     public String buildActionId(Action action) {
