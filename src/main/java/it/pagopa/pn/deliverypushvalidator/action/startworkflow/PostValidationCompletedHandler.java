@@ -27,7 +27,7 @@ public class PostValidationCompletedHandler {
         NotificationInt notification = notificationService.getNotificationByIun(iun);
         checkAttachmentRetentionScheduler.scheduleCheckAttachmentRetentionBeforeExpiration(iun, CommunicationType.INFORMAL);
         attachmentUtils.changeAttachmentsStatusToAttached(notification);
-        TimelineElementInternal acceptedTimelineElement = timelineUtils.buildAcceptedRequestTimelineElement(notification);
+        TimelineElementInternal acceptedTimelineElement = timelineUtils.buildAcceptedRequestTimelineElement(notification, null);
         timelineService.addTimelineElement(acceptedTimelineElement, notification);
         schedulerService.scheduleEvent(iun, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED, null, CommunicationType.INFORMAL);
         log.debug("Scheduled POST_ACCEPTED_PROCESSING_COMPLETED for iun={} communicationType={}", iun, CommunicationType.INFORMAL);

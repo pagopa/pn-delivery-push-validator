@@ -110,10 +110,6 @@ public class TimelineUtils {
         return buildTimeline(notification, TimelineElementCategoryInt.REQUEST_ACCEPTED, elementId, details, timelineBuilder);
     }
 
-    public TimelineElementInternal buildAcceptedRequestTimelineElement(NotificationInt notification) {
-        return buildAcceptedRequestTimelineElement(notification, null);
-    }
-
     public TimelineElementInternal buildRefusedRequestTimelineElement(NotificationInt notification, List<NotificationRefusedErrorInt> errors, Integer notificationCost) {
         log.debug("buildRefusedRequestTimelineElement - iun={}", notification.getIun());
 
