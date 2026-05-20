@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
@@ -46,7 +47,7 @@ class F24ResponseHandlerTest {
 
         handler.handleEventF24(event);
 
-        verify(validationActionHandler).handleValidateF24Response(any());
+        verify(validationActionHandler).handleValidateF24Response(any(), Mockito.isNull());
     }
 
     @Test

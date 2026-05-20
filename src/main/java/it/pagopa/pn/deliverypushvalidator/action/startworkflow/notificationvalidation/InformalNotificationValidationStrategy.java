@@ -26,12 +26,14 @@ import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED;
 
 @CustomLog
+@Component
 public class InformalNotificationValidationStrategy extends BaseNotificationValidationStrategy implements NotificationValidationStrategy {
 
     private static final int FIRST_VALIDATION_STEP = 1;
@@ -70,11 +72,12 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     }
 
     @Override
-    public void validate(NotificationInt notification, NotificationValidationActionDetails details) {
+    public void validate(String iun, NotificationValidationActionDetails details) {
 
-        log.debug("Start validateInformalNotification - iun={}", notification.getIun());
+        log.debug("Start validateInformalNotification - iun={}", iun);
+        NotificationInt notification = getNotification(iun);
+
         PnAuditLogEvent logEvent = generateAuditLog(notification, FIRST_VALIDATION_STEP);
-
         try {
             attachmentUtils.validateAttachment(notification);
             Campaign campaign = campaignValidator.validateAndGetCampaign(notification);
@@ -125,12 +128,12 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
 
     @Override
     public void handleValidateF24Response(PnF24MetadataValidationEndEventPayload payload) {
-        throw new PnInternalException(ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED, "F24 validation is not implemented for informal notification");
+        throw new PnInternalException("F24 validation is not implemented for informal notification", ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED);
     }
 
     @Override
     public void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event) {
-        throw new PnInternalException(ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED, "Notification cost validation is not implemented for informal notification");
+        throw new PnInternalException("Notification cost validation is not implemented for informal notification", ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED);
     }
 
     @Override

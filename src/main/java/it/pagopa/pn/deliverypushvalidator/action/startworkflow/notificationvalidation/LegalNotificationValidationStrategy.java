@@ -24,6 +24,7 @@ import it.pagopa.pn.deliverypushvalidator.service.*;
 import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 
 @CustomLog
+@Component
 public class LegalNotificationValidationStrategy extends BaseNotificationValidationStrategy implements NotificationValidationStrategy {
 
     private static final int FIRST_VALIDATION_STEP = 1;
@@ -93,11 +95,12 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
     }
 
     @Override
-    public void validate(NotificationInt notification, NotificationValidationActionDetails details) {
+    public void validate(String iun, NotificationValidationActionDetails details) {
 
-        log.debug("Start validateNotification - iun={}", notification.getIun());
+        log.debug("Start validateNotification - iun={}", iun);
+        NotificationInt notification = getNotification(iun);
+
         PnAuditLogEvent logEvent = generateAuditLog(notification, FIRST_VALIDATION_STEP);
-
         try {
             paymentValidator.validatePayments(notification, details.getStartWorkflowTime());
 

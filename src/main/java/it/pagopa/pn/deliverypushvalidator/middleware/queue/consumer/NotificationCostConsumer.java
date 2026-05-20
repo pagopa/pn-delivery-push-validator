@@ -32,7 +32,7 @@ public class NotificationCostConsumer {
             HandleEventUtils.addIunToMdc(iun);
             log.logStartingProcess(processName);
 
-            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload());
+            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload(), null);
 
             log.logEndingProcess(processName);
         } catch (Exception ex) {

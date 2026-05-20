@@ -48,7 +48,7 @@ class NotificationValidationHandlerTest {
 
         handler.handle(action, headers);
 
-        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details);
+        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, null);
         Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
     }
 
@@ -60,7 +60,7 @@ class NotificationValidationHandlerTest {
 
         handler.handle(action, headers);
 
-        Mockito.verify(notificationValidationActionHandler, Mockito.never()).validateNotification(Mockito.anyString(), Mockito.any());
+        Mockito.verify(notificationValidationActionHandler, Mockito.never()).validateNotification(Mockito.anyString(), Mockito.any(), Mockito.isNull());
         Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
     }
 
@@ -73,11 +73,11 @@ class NotificationValidationHandlerTest {
                 .build();
 
         Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
-        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationValidationActionHandler).validateNotification("iun_123", details);
+        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationValidationActionHandler).validateNotification("iun_123", details, null);
 
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
-        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details);
+        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, null);
         Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
     }
 }
