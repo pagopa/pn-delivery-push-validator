@@ -4,6 +4,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
 import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEvent;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice.NotificationCostServiceClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class NotificationCostConsumer {
             HandleEventUtils.addIunToMdc(iun);
             log.logStartingProcess(processName);
 
-            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload(), null);
+            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload(), CommunicationType.LEGAL);
 
             log.logEndingProcess(processName);
         } catch (Exception ex) {
