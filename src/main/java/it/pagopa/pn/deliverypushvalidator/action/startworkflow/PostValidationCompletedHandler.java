@@ -24,7 +24,7 @@ public class PostValidationCompletedHandler {
     private final SchedulerService schedulerService;
 
     public void acceptNotification(String iun) {
-        NotificationInt notification = notificationService.getNotificationByIun(iun);
+        NotificationInt notification = notificationService.getInformalNotificationByIun(iun);
         checkAttachmentRetentionScheduler.scheduleCheckAttachmentRetentionBeforeExpiration(iun, CommunicationType.INFORMAL);
         attachmentUtils.changeAttachmentsStatusToAttached(notification);
         TimelineElementInternal acceptedTimelineElement = timelineUtils.buildAcceptedRequestTimelineElement(notification, null);

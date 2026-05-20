@@ -52,11 +52,12 @@ class PostValidationCompletedHandlerTest {
         NotificationInt notification = NotificationInt.builder().iun(iun).build();
         TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder().elementId("REQUEST_ACCEPTED").build();
 
-        Mockito.when(notificationService.getNotificationByIun(iun)).thenReturn(notification);
-        Mockito.when(timelineUtils.buildAcceptedRequestTimelineElement(notification)).thenReturn(timelineElementInternal);
+        Mockito.when(notificationService.getInformalNotificationByIun(iun)).thenReturn(notification);
+        Mockito.when(timelineUtils.buildAcceptedRequestTimelineElement(notification, null)).thenReturn(timelineElementInternal);
 
         handler.acceptNotification(iun);
 
+        Mockito.verify(notificationService).getInformalNotificationByIun(iun);
         Mockito.verify(checkAttachmentRetentionScheduler)
                 .scheduleCheckAttachmentRetentionBeforeExpiration(iun, CommunicationType.INFORMAL);
         Mockito.verify(attachmentUtils).changeAttachmentsStatusToAttached(notification);
