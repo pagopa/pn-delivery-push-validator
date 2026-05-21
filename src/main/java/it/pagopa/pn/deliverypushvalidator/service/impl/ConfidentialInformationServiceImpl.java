@@ -31,4 +31,5 @@ public class ConfidentialInformationServiceImpl implements ConfidentialInformati
 
         return pnDataVaultClientReactive.updateNotificationAddressesByIun(iun, normalized, listAddressExt);
     }
+
 }

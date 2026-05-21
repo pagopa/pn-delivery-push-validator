@@ -1,12 +1,15 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 
+import io.micrometer.common.util.StringUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.DigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.AddressDto;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.AnalogDomicile;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.NotificationRecipientAddressesDto;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotificationRecipientAddressesDtoMapper {
     private NotificationRecipientAddressesDtoMapper(){}
@@ -17,7 +20,42 @@ public class NotificationRecipientAddressesDtoMapper {
         dtoExt.setDigitalAddress(getAddressDtoFromDigitalAddress(dtoInt.getDigitalAddress()));
         dtoExt.setPhysicalAddress(getAnalogDomicileFromPhysical(dtoInt.getPhysicalAddress()));
         dtoExt.setRecIndex(dtoInt.getRecIndex());
+        dtoExt.setEmails(mapEmailToDto(dtoInt.getEmail()));
+        dtoExt.setPhoneNumbers(mapPhoneNumberToDto(dtoInt.getPhoneNumber()));
         return dtoExt;
+    }
+
+    public static NotificationRecipientAddressesDtoInt buildNotificationRecipientAddressesDtoInt(NotificationRecipientInt recipient, PhysicalAddressInt physicalAddress, Integer recIndex){
+        return NotificationRecipientAddressesDtoInt.builder()
+                .denomination(recipient.getDenomination())
+                .digitalAddress(recipient.getDigitalDomicile())
+                .email(recipient.getEmail())
+                .phoneNumber(recipient.getPhoneNumber())
+                .physicalAddress(physicalAddress)
+                .recIndex(recIndex)
+                .build();
+    }
+
+    private static List<EmailDto> mapEmailToDto(String email) {
+        if (StringUtils.isBlank(email)) {
+            return null;
+        }
+        List<EmailDto> list = new ArrayList<>();
+        EmailDto emailDto = new EmailDto();
+        emailDto.setValue(email);
+        list.add(emailDto);
+        return list;
+    }
+
+    private static List<PhoneNumberDto> mapPhoneNumberToDto(String phoneNumber) {
+        if (StringUtils.isBlank(phoneNumber)) {
+            return null;
+        }
+        List<PhoneNumberDto> list = new ArrayList<>();
+        PhoneNumberDto phoneNumberDto = new PhoneNumberDto();
+        phoneNumberDto.setValue(phoneNumber);
+        list.add(phoneNumberDto);
+        return list;
     }
 
     private static AddressDto getAddressDtoFromDigitalAddress(DigitalAddressInt digitalAddressInt){
