@@ -83,7 +83,7 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
         try {
             attachmentUtils.validateAttachment(notification);
             Campaign campaign = campaignValidator.validateAndGetCampaign(notification);
-            messageValidator.validate(notification);
+            MDCUtils.addMDCToContextAndExecute(messageValidator.validate(notification)).block();
             digitalAddressValidator.validateDigitalAddress(notification, campaign);
             logEvent.generateSuccess().log();
 

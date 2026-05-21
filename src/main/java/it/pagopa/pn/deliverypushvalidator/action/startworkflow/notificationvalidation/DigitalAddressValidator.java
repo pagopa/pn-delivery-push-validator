@@ -27,7 +27,7 @@ public class DigitalAddressValidator {
         }
 
         List<NotificationRecipientInt> recipients = notificationInt.getRecipients();
-        if (recipients == null) {
+        if (recipients == null || recipients.isEmpty()) {
             throw new PnInternalException("Notification recipients list is null", ERROR_CODE_DELIVERYPUSH_NO_RECIPIENT_IN_NOTIFICATION);
         }
 

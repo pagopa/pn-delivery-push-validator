@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PnValidationDigitalAddressMissingException extends PnValidationException {
     public PnValidationDigitalAddressMissingException(List<Integer> recipients) {
-        super("Validation failed, message not found", buildProblemErrorList(recipients));
+        super("Validation failed, digital address missing", buildProblemErrorList(recipients));
     }
 
     private static List<ProblemError> buildProblemErrorList(List<Integer> recipients) {

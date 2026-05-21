@@ -122,4 +122,28 @@ class DigitalAddressValidatorTest {
 
         assertThrows(PnValidationDigitalAddressMissingException.class, () -> validator.validateDigitalAddress(notification, campaign));
     }
+
+    @Test
+    void validateDigitalAddress_pgWithNullDigitalDomicile_shouldThrow() {
+        Campaign campaign = Campaign.builder()
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.PEC).build()))
+                .build();
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .recipientType(RecipientTypeInt.PG)
+                .digitalDomicile(null)
+                .build();
+        NotificationInt notification = NotificationInt.builder().recipients(List.of(recipient)).build();
+
+        assertThrows(PnValidationDigitalAddressMissingException.class, () -> validator.validateDigitalAddress(notification, campaign));
+    }
+
+    @Test
+    void validateDigitalAddress_emptyRecipients_shouldThrow() {
+        Campaign campaign = Campaign.builder()
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.PEC).build()))
+                .build();
+        NotificationInt notification = NotificationInt.builder().recipients(List.of()).build();
+
+        assertThrows(PnInternalException.class, () -> validator.validateDigitalAddress(notification, campaign));
+    }
 }
