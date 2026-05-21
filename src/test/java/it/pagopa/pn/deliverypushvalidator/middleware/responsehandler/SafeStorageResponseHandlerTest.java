@@ -11,10 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+@ExtendWith(MockitoExtension.class)
 class SafeStorageResponseHandlerTest {
     @Mock
     private TimelineUtils timelineUtils;
@@ -36,7 +37,6 @@ class SafeStorageResponseHandlerTest {
         handler = new SafeStorageResponseHandler(documentCreationRequestService, schedulerService, timelineUtils);
     }
 
-    @ExtendWith(SpringExtension.class)
     @Test
     void handleResponseCancelled() {
         String iun = "IUN-handleResponseCancelled";
@@ -52,7 +52,6 @@ class SafeStorageResponseHandlerTest {
         Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 
-    @ExtendWith(SpringExtension.class)
     @Test
     void handleResponseCancelledAndNotificationCancelled() {
         String iun = "IUN-handleResponseCancelled";

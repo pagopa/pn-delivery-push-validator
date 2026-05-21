@@ -1,29 +1,36 @@
 package it.pagopa.pn.deliverypushvalidator.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 
 @Configuration
 @ConfigurationProperties( prefix = "pn.delivery-push-validator")
 @Data
 @Import({SharedAutoConfiguration.class})
 @Slf4j
+@Validated
 public class PnDeliveryPushValidatorConfigs {
 
     private DocumentCreationRequestDao documentCreationRequestDao;
     private Topics topics;
     private boolean safeStorageFileNotFoundRetry;
-    private TimeParams timeParams;
+    @NotEmpty(message = "timeParamsMap must not be empty")
+    private Map<CommunicationType, @Valid TimeParams> timeParamsMap;
     private int pagoPaNotificationBaseCost;
     private Duration[] validationRetryIntervals;
     private String nationalRegistriesBaseUrl;

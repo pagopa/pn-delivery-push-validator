@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(SpringExtension.class)
 class TimelineUtilsTest {
 
-    @Mock
     private TimelineService timelineService;
 
     private TimelineUtils timelineUtils;
@@ -100,7 +98,7 @@ class TimelineUtilsTest {
                 .iun("Example_IUN_1234_Test")
                 .communicationType(CommunicationType.INFORMAL)
                 .subject("notification test subject")
-                .documents(Arrays.asList(
+                .documents(Collections.singletonList(
                                 NotificationDocumentInt.builder()
                                         .ref(NotificationDocumentInt.Ref.builder()
                                                 .key("doc00")
