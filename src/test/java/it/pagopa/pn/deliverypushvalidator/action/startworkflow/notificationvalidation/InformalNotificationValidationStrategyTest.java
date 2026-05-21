@@ -65,6 +65,8 @@ class InformalNotificationValidationStrategyTest {
     private MessageValidator messageValidator;
     @Mock
     private LookupAddressHandler lookupAddressHandler;
+    @Mock
+    private DigitalAddressValidator digitalAddressValidator;
 
     private InformalNotificationValidationStrategy handler;
     private static final String IUN = "TEST-IUN-001";
@@ -123,7 +125,8 @@ class InformalNotificationValidationStrategyTest {
                 attachmentUtils,
                 campaignValidator,
                 messageValidator,
-                lookupAddressHandler
+                lookupAddressHandler,
+                digitalAddressValidator
         );
     }
 
