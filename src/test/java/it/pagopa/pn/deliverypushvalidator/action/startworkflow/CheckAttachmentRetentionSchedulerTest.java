@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.EnumMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +52,7 @@ class CheckAttachmentRetentionSchedulerTest {
         map.put(CommunicationType.INFORMAL, informalParams);
         Mockito.when(configs.getTimeParamsMap()).thenReturn(map);
 
+        Instant referenceTime = Instant.now();
         checkAttachmentRetentionScheduler.scheduleCheckAttachmentRetentionBeforeExpiration("IUN_123", CommunicationType.INFORMAL);
 
         ArgumentCaptor<Instant> dateCaptor = ArgumentCaptor.forClass(Instant.class);
@@ -63,9 +65,25 @@ class CheckAttachmentRetentionSchedulerTest {
         );
 
         Instant scheduledDate = dateCaptor.getValue();
-        Instant expectedMin = Instant.now().plus(Duration.ofDays(25)).minusSeconds(5);
-        Instant expectedMax = Instant.now().plus(Duration.ofDays(25)).plusSeconds(5);
+        Instant expectedMin = referenceTime.plus(Duration.ofDays(25)).minusSeconds(5);
+        Instant expectedMax = referenceTime.plus(Duration.ofDays(25)).plusSeconds(5);
         assertTrue(!scheduledDate.isBefore(expectedMin) && !scheduledDate.isAfter(expectedMax));
+    }
+
+    @Test
+    void scheduleCheckAttachmentRetentionBeforeExpirationFailsFastWhenCommunicationTypeConfigIsMissing() {
+        TimeParams legalParams = new TimeParams();
+        legalParams.setAttachmentRetentionTimeAfterValidation(Duration.ofDays(120));
+        legalParams.setCheckAttachmentTimeBeforeExpiration(Duration.ofDays(10));
+
+        Map<CommunicationType, TimeParams> map = new EnumMap<>(CommunicationType.class);
+        map.put(CommunicationType.LEGAL, legalParams);
+        Mockito.when(configs.getTimeParamsMap()).thenReturn(map);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> checkAttachmentRetentionScheduler.scheduleCheckAttachmentRetentionBeforeExpiration("IUN_123", CommunicationType.INFORMAL));
+
+        assertTrue(exception.getMessage().contains("communicationType=INFORMAL"));
     }
 }
 
