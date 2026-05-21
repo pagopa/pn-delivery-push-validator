@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.configs.MVPParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
+import it.pagopa.pn.deliverypushvalidator.action.refused.LegalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.*;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.*;
@@ -86,6 +88,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         PnExternalRegistriesClientReactiveMock.class,
         PaymentValidator.class,
         NotificationRefusedActionHandler.class,
+        LegalNotificationRefusedStrategy.class,
+        InformalNotificationRefusedStrategy.class,
         F24ResponseHandler.class,
         ActionPoolMock.class,
         //quickWorkAroundForPN-9116
