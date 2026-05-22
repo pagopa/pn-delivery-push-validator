@@ -67,7 +67,7 @@ class F24ResponseHandlerTest {
         handler.handleEventF24(event);
 
         verify(f24Service).handleF24PrepareResponse(eq("IUN456"), any(Map.class));
-        verify(schedulerService).scheduleEvent(eq("IUN456"), any(Instant.class), eq(ActionType.POST_ACCEPTED_PROCESSING_COMPLETED));
+        verify(schedulerService).scheduleEvent(eq("IUN456"), any(Instant.class), eq(ActionType.POST_ACCEPTED_PROCESSING_COMPLETED), eq(CommunicationType.LEGAL));
     }
 
     @Test

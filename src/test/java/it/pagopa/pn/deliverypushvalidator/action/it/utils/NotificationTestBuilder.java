@@ -25,6 +25,7 @@ public class NotificationTestBuilder {
     private String group;
 
     private UsedServicesInt usedServices;
+    private CommunicationType communicationType;
 
     public NotificationTestBuilder() {
         sentAt = Instant.now();
@@ -93,6 +94,11 @@ public class NotificationTestBuilder {
         return this;
     }
 
+    public NotificationTestBuilder withCommunicationType(CommunicationType communicationType) {
+        this.communicationType = communicationType;
+        return this;
+    }
+
     public NotificationInt build() {
         if(iun == null){
             iun = TestUtils.getRandomIun(4);
@@ -128,6 +134,10 @@ public class NotificationTestBuilder {
             pagoPaIntMode = PagoPaIntMode.SYNC;
         }
 
+        if(communicationType == null) {
+            communicationType = CommunicationType.LEGAL;
+        }
+
         return NotificationInt.builder()
                 .iun(iun)
                 .paProtocolNumber("protocol_01")
@@ -150,6 +160,7 @@ public class NotificationTestBuilder {
                 .paFee(paFee)
                 .group(group)
                 .usedServices(usedServices)
+                .communicationType(communicationType)
                 .build();
     }
 

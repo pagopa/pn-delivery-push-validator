@@ -40,14 +40,6 @@ public class SchedulerServiceMock implements SchedulerService {
   }
 
   @Override
-  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails) {
-    scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, null);  }
-
-  @Override
-  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType){
-    scheduleEvent(iun, null, dateToSchedule, actionType, null, null, null);  }
-
-  @Override
   public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, CommunicationType communicationType) {
     scheduleEvent(iun, null, dateToSchedule, actionType, null, null, communicationType);
   }

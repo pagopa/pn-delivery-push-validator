@@ -96,7 +96,7 @@ public class F24ResponseHandler {
         f24Service.handleF24PrepareResponse(iunFromTimelineId,result);
 
         log.debug("scheduleEvent POST_ACCEPTED_PROCESSING_COMPLETED for iun {}", iunFromTimelineId);
-        schedulerService.scheduleEvent(iunFromTimelineId, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
+        schedulerService.scheduleEvent(iunFromTimelineId, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED, CommunicationType.LEGAL);
 
     }
 }

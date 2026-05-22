@@ -23,18 +23,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final TimelineUtils timelineUtils;
 
     @Override
-    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType) {
-        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, null, null);
-    }
-
-    @Override
     public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, CommunicationType communicationType) {
         this.scheduleEvent(iun, null, dateToSchedule, actionType, null, null, communicationType);
-    }
-
-    @Override
-    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails){
-        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, null);
     }
 
     @Override

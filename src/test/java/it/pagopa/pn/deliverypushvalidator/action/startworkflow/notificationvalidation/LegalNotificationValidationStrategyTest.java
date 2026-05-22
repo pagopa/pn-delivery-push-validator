@@ -883,7 +883,11 @@ class LegalNotificationValidationStrategyTest {
         Mockito.verify(notificationCostServiceFeatureFlagUtils).checkNotificationCostServiceStartDate(notification);
         Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
         Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(
-                any(), any(), Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+                any(),
+                any(),
+                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION),
+                Mockito.eq(CommunicationType.LEGAL)
+        );
         Mockito.verify(auditLogEvent, times(1)).generateSuccess(); // Solo alla fine del metodo
     }
 
@@ -941,7 +945,9 @@ class LegalNotificationValidationStrategyTest {
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
-                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION),
+                Mockito.eq(CommunicationType.LEGAL)
+        );
         Mockito.verify(auditLogEvent, times(2)).generateSuccess();
     }
 
@@ -983,7 +989,9 @@ class LegalNotificationValidationStrategyTest {
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
-                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION));
+                Mockito.eq(ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION),
+                Mockito.eq(CommunicationType.LEGAL)
+        );
         Mockito.verify(auditLogEvent).generateSuccess();
         Mockito.verify(auditLogEvent).log();
     }
@@ -1025,7 +1033,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.verify(auditLogEvent).log();
         Mockito.verify(timelineService, Mockito.never()).addTimelineElement(any(), any());
         Mockito.verify(schedulerService, Mockito.never()).scheduleEvent(
-                any(), any(), any());
+                any(), any(), any(), any());
     }
 
 }

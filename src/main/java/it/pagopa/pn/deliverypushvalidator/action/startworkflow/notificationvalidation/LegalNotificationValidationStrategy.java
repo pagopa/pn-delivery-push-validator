@@ -196,10 +196,9 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
 
     @Override
     public void scheduleEndValidationAction(String iun) {
-
         Instant schedulingDate = Instant.now();
         log.debug("Scheduling received legalFact generation, schedulingDate={} - iun={}", schedulingDate, iun);
-        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION);
+        schedulerService.scheduleEvent(iun, schedulingDate, ActionType.SCHEDULE_RECEIVED_LEGALFACT_GENERATION, CommunicationType.LEGAL);
     }
 
     private PnAuditLogEvent generateAuditLog(NotificationInt notification, int validationStep) {
