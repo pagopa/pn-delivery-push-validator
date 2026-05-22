@@ -158,6 +158,7 @@ class InformalNotificationValidationStrategyTest {
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithoutAnalog());
+        Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
 
         // WHEN
         handler.validate(IUN, defaultDetails());
@@ -195,6 +196,7 @@ class InformalNotificationValidationStrategyTest {
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
+        Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification))
                 .thenReturn(Mono.empty());
 
@@ -221,11 +223,11 @@ class InformalNotificationValidationStrategyTest {
         NotificationInt refreshedNotification = TestUtils.getNotificationV2(usedServices);
 
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
-                .thenReturn(notification)   // first call in validate()
-                .thenReturn(refreshedNotification); // second call in verifyLookUpAddressAndRefreshNotification()
-
+                .thenReturn(notification)
+                .thenReturn(refreshedNotification);
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
+        Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(refreshedNotification))
                 .thenReturn(Mono.empty());
 
@@ -235,7 +237,7 @@ class InformalNotificationValidationStrategyTest {
         // THEN
         Mockito.verify(lookupAddressHandler).performValidation(notification);
         Mockito.verify(addressValidator).requestValidateAndNormalizeAddresses(refreshedNotification);
-        Mockito.verify(auditLogEvent, times(2)).generateSuccess(); // twice: lookup-step log + validate() outer log
+        Mockito.verify(auditLogEvent, times(2)).generateSuccess();
     }
 
     /**
@@ -251,6 +253,7 @@ class InformalNotificationValidationStrategyTest {
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
+        Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification))
                 .thenReturn(Mono.empty());
 
@@ -369,6 +372,7 @@ class InformalNotificationValidationStrategyTest {
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
+        Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
 
         PnLookupAddressValidationFailedException ex =
                 new PnLookupAddressValidationFailedException(Collections.emptyList());
