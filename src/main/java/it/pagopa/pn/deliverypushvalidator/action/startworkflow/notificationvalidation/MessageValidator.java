@@ -117,7 +117,7 @@ public class MessageValidator {
                                                MessageResponseDto message) {
         // 3. Language consistency check
         LocalizedContent secondaryContent = message.getSecondaryContent();
-        if (secondaryContent != null && secondaryContent.getLanguage() != null) {
+        if (secondaryContent != null) {
             String messageLanguage = secondaryContent.getLanguage().getValue();
             List<String> additionalLanguages = notification.getAdditionalLanguages();
 

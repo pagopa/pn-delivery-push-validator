@@ -59,7 +59,7 @@ public class HandleEventUtils {
 
     public static void addIunAndCommunicationTypeToMdc(String iun, CommunicationType communicationType) {
         addIunToMdc(iun);
-        addCommunicationTypeToMdc(communicationType.name());
+        addCommunicationTypeToMdc(communicationType);
     }
 
     public static void addIunToMdc(String iun) {
@@ -76,7 +76,7 @@ public class HandleEventUtils {
         MDC.put(MDCUtils.MDC_PN_CTX_REQUEST_ID, correlationId);
     }
 
-    public static void addCommunicationTypeToMdc(String communicationType) {
-        MDC.put(MDCUtils.MDC_PN_CTX_COMMUNICATION_TYPE, communicationType);
+    public static void addCommunicationTypeToMdc(CommunicationType communicationType) {
+        MDC.put(MDCUtils.MDC_PN_CTX_COMMUNICATION_TYPE, communicationType != null ? communicationType.name() : CommunicationType.LEGAL.name());
     }
 }

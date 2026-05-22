@@ -48,7 +48,7 @@ class NotificationCostConsumerTest {
         notificationCostConsumer.pnNotificationCostEventInboundConsumer(message);
 
         // Then
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(communicationType));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(iun, payload, communicationType);
     }
 
     @Test
@@ -75,7 +75,7 @@ class NotificationCostConsumerTest {
                 notificationCostConsumer.pnNotificationCostEventInboundConsumer(message));
         Assertions.assertEquals("Test Exception", exception.getMessage());
 
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(communicationType));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(iun, payload, communicationType);
     }
 
     @Test
@@ -99,6 +99,6 @@ class NotificationCostConsumerTest {
         notificationCostConsumer.pnNotificationCostEventInboundConsumer(message);
 
         // Then
-        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(eq(iun), eq(payload), eq(communicationType));
+        Mockito.verify(handler, Mockito.times(1)).handleValidateNotificationCost(iun, payload, communicationType);
     }
 }

@@ -251,7 +251,6 @@ class InformalNotificationValidationStrategyTest {
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
                 .thenReturn(notification);
 
-        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
         Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification))
@@ -370,7 +369,6 @@ class InformalNotificationValidationStrategyTest {
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
                 .thenReturn(notification);
 
-        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
         Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
 

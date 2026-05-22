@@ -45,7 +45,7 @@ public class AddressManagerResponseHandler {
             TimelineElementInternal timelineElement = timelineService.getTimelineElement(iun, response.getCorrelationId())
                     .orElseThrow(() -> new PnInternalException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId(), ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT));
             CommunicationType communicationType = timelineElement.getCommunicationType();
-            HandleEventUtils.addCommunicationTypeToMdc(communicationType.name());
+            HandleEventUtils.addCommunicationTypeToMdc(communicationType);
 
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
             notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);
