@@ -2,7 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,13 +17,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NewInformalValidationConsumerTest {
+class NewInformalNotificationConsumerTest {
 
     @Mock
     private StartWorkflowHandler startWorkflowHandler;
 
     @InjectMocks
-    private NewInformalValidationConsumer consumer;
+    private NewInformalNotificationConsumer consumer;
 
 
     @Test

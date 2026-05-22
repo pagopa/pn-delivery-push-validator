@@ -4,7 +4,7 @@ import it.pagopa.pn.api.dto.events.*;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidF24Exception;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;

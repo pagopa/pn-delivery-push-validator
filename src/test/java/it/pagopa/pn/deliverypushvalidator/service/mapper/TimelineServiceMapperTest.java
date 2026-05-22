@@ -42,7 +42,7 @@ class TimelineServiceMapperTest {
         TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
                 .iun("IUN123").elementId("EID456")
                 .category(TimelineElementCategoryInt.VALIDATED_F24)
-                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL)
                 .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
@@ -62,7 +62,7 @@ class TimelineServiceMapperTest {
         TimelineElementInternal timelineElementInternal = TimelineElementInternal.builder()
                 .iun("IUN123").elementId("EID456")
                 .category(TimelineElementCategoryInt.VALIDATED_F24)
-                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL)
                 .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
@@ -109,7 +109,7 @@ class TimelineServiceMapperTest {
         assertThat(result.getLegalFactsIds().getFirst().getKey()).isEqualTo(legalFactsIdInt.getKey());
         assertThat(result.getLegalFactsIds().getFirst().getCategory()).isEqualTo(legalFactsIdInt.getCategory());
         assertThat(result.getStatusInfo().getActual()).isEqualTo("DELIVERED");
-        assertThat(result.getCommunicationType()).isEqualTo(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL);
+        assertThat(result.getCommunicationType()).isEqualTo(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL);
     }
 
     @Test
@@ -167,7 +167,7 @@ class TimelineServiceMapperTest {
                 .elementId("EID456")
                 .category(TimelineElementCategoryInt.VALIDATED_F24)
                 .legalFactsIds(List.of(legalFactsIdInt))
-                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                .communicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL)
                 .build();
 
         NotificationInt notificationInt = NotificationInt.builder()

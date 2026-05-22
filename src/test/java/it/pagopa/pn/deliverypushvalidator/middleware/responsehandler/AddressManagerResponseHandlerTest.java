@@ -1,9 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeItemsResult;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
@@ -95,6 +96,6 @@ class AddressManagerResponseHandlerTest {
         normalizeItemsResult.setCorrelationId(correlationId);
 
         //WHEN + THEN
-        assertThrows(IllegalStateException.class, () -> handler.handleResponseReceived(normalizeItemsResult));
+        assertThrows(PnInternalException.class, () -> handler.handleResponseReceived(normalizeItemsResult));
     }
 }

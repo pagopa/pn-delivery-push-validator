@@ -2,7 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.service;
 
 
 
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 

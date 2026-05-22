@@ -5,7 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationA
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;

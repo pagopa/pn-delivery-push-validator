@@ -27,6 +27,8 @@ public class ValidationActionsConsumer {
         final String processName = "VALIDATION_ACTIONS_INBOUND";
         try {
             log.info("Handle action pnDeliveryPushValidationActionsInboundConsumer, with content {}", message);
+            Action action = message.getPayload();
+            HandleEventUtils.addIunAndCommunicationTypeToMdc(action.getIun(), action.getCommunicationType());
             String actionType = extractActionType(message.getPayload());
             EventRouter.RoutingConfig routerConfig = EventRouter.RoutingConfig.builder()
                     .eventType(actionType)

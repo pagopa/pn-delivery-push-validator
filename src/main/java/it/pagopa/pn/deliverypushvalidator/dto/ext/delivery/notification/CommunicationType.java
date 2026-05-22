@@ -1,4 +1,4 @@
-package it.pagopa.pn.deliverypushvalidator.dto.timeline;
+package it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification;
 
 import lombok.Getter;
 

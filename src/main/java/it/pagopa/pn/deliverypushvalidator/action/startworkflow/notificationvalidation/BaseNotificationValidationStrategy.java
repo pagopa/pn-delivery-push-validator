@@ -5,7 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActi
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;

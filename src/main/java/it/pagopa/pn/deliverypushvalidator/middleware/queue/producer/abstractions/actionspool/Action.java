@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool;
 
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import lombok.*;
 
 import java.time.Instant;

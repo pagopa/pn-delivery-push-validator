@@ -3,7 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.service.mapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import org.junit.jupiter.api.Assertions;

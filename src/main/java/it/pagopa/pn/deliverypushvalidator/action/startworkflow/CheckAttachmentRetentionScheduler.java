@@ -1,7 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;

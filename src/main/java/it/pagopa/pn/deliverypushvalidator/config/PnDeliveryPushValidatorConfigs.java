@@ -1,7 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.config;
 
 import it.pagopa.pn.commons.conf.SharedAutoConfiguration;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;

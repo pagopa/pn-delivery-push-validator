@@ -114,15 +114,15 @@ public class TimelineServiceMapper {
         return SmartMapper.mapToClass(details, category.getDetailsJavaClass());
     }
 
-    private it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType toInternalCommunicationType(CommunicationType communicationType) {
+    private it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType toInternalCommunicationType(CommunicationType communicationType) {
         if (communicationType == null) {
             throw new PnInternalException("communicationType is null in timeline element", ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
         }
 
-        return it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.valueOf(communicationType.name());
+        return it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.valueOf(communicationType.name());
     }
 
-    private CommunicationType toExternalCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType communicationType) {
+    private CommunicationType toExternalCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType communicationType) {
         if (communicationType == null) {
             throw new PnInternalException("communicationType is null in timeline element internal", ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT);
         }

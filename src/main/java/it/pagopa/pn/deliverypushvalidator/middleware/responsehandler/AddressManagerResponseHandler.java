@@ -1,9 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeItemsResult;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.addressmanager.AddressManagerClient;
@@ -13,6 +14,8 @@ import it.pagopa.pn.deliverypushvalidator.service.mapper.AddressManagerMapper;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
+
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT;
 
 @Component
 @CustomLog
@@ -40,8 +43,9 @@ public class AddressManagerResponseHandler {
             log.logStartingProcess(processName);
 
             TimelineElementInternal timelineElement = timelineService.getTimelineElement(iun, response.getCorrelationId())
-                    .orElseThrow(() -> new IllegalStateException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId()));
+                    .orElseThrow(() -> new PnInternalException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId(), ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT));
             CommunicationType communicationType = timelineElement.getCommunicationType();
+            HandleEventUtils.addCommunicationTypeToMdc(communicationType.name());
 
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
             notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);

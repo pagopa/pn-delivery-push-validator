@@ -43,8 +43,8 @@ public class ActionManagerMapper {
         return "";
     }
 
-    private CommunicationType mapCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType type) {
-        if (type == it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL) {
+    private CommunicationType mapCommunicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType type) {
+        if (type == it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL) {
             return CommunicationType.INFORMAL;
         }
         return CommunicationType.LEGAL;

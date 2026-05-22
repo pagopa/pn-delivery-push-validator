@@ -3,7 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationRefusedActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;

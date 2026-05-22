@@ -17,7 +17,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsR
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotMatchingShaException;
@@ -175,7 +175,7 @@ class InformalNotificationValidationStrategyTest {
                 Mockito.eq(notification.getIun()),
                 Mockito.any(Instant.class),
                 Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
-                Mockito.eq(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                Mockito.eq(CommunicationType.INFORMAL)
         );
         Mockito.verify(auditLogEvent, times(3)).generateSuccess(); // step-1 + 2x generateSkipAuditLog (step-2 and step-3)
     }
@@ -416,7 +416,7 @@ class InformalNotificationValidationStrategyTest {
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
                 Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
-                Mockito.eq(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                Mockito.eq(CommunicationType.INFORMAL)
         );
         Mockito.verify(auditLogEvent).generateSuccess();
     }
@@ -486,7 +486,7 @@ class InformalNotificationValidationStrategyTest {
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
                 Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
-                Mockito.eq(it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType.INFORMAL)
+                Mockito.eq(CommunicationType.INFORMAL)
         );
     }
 }

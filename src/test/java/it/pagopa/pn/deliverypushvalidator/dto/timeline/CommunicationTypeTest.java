@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline;
 
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

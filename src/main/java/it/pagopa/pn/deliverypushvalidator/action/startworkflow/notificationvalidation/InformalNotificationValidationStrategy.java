@@ -15,7 +15,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidAddressException;

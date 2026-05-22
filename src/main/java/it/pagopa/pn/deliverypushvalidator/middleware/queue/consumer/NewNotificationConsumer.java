@@ -4,6 +4,7 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
 import it.pagopa.pn.api.dto.events.PnDeliveryNewNotificationEvent;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
 import lombok.AllArgsConstructor;
@@ -31,9 +32,10 @@ public class NewNotificationConsumer {
                     .header(HandleEventUtils.mapStandardEventHeader(message.getHeaders()))
                     .build();
             String iun = pnDeliveryNewNotificationEvent.getPayload().getIun();
-            HandleEventUtils.addIunToMdc(iun);
+            CommunicationType communicationType = CommunicationType.LEGAL;
+            HandleEventUtils.addIunAndCommunicationTypeToMdc(iun, communicationType);
             log.logStartingProcess(processName);
-            startWorkflowHandler.startWorkflow(iun, null);
+            startWorkflowHandler.startWorkflow(iun, communicationType);
             log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(),ex);

@@ -2,10 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.action.utils;
 
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationDocumentInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.*;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.*;

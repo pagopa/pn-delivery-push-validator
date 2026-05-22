@@ -8,7 +8,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

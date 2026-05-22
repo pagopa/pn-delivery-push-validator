@@ -4,7 +4,7 @@ import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalid
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.service.*;
 import lombok.AllArgsConstructor;

@@ -25,7 +25,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.acti
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.ReceivedLegalFactGenerationHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventHandlerRegistry;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventRouter;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.AddressManagerResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCreationResponseHandler;
