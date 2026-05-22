@@ -643,7 +643,7 @@ Resources:
       Targets:
         - Id: !Sub '${ProjectName}-CoreEventBus-InformalNotificationToDeliveryPushValidator'
           Arn: !Ref PnDeliveryPushInformalValidationInputsQueueARN
-          InputPath: $.detail
+          InputPath: $.detail.body
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
 
