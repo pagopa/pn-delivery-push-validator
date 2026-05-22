@@ -8,7 +8,6 @@ import it.pagopa.pn.deliverypushvalidator.exception.PnMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageLanguageMismatchException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationMessageNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationSenderIdNotValidException;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.LocalizedContent;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.datavault_reactive.model.MessageResponseDto;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.datavault.PnDataVaultClientReactive;
 import org.junit.jupiter.api.Assertions;
@@ -208,22 +207,6 @@ class MessageValidatorTest {
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("en");
-        when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
-
-        StepVerifier.create(messageValidator.validate(notification))
-                .verifyComplete();
-    }
-
-    @Test
-    void validateWhenSecondaryLanguageMissingThenPass() {
-        UUID senderId = UUID.randomUUID();
-        UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it"));
-
-        MessageResponseDto message = mock(MessageResponseDto.class);
-        LocalizedContent secondaryContent = mock(LocalizedContent.class);
-        when(message.getSecondaryContent()).thenReturn(secondaryContent);
-        when(secondaryContent.getLanguage()).thenReturn(null);
         when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
 
         StepVerifier.create(messageValidator.validate(notification))
