@@ -251,6 +251,7 @@ class InformalNotificationValidationStrategyTest {
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
                 .thenReturn(notification);
 
+        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
         Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
         Mockito.when(addressValidator.requestValidateAndNormalizeAddresses(notification))
@@ -262,6 +263,7 @@ class InformalNotificationValidationStrategyTest {
         // THEN
         Mockito.verify(lookupAddressHandler, never()).performValidation(any());
         Mockito.verify(addressValidator).requestValidateAndNormalizeAddresses(notification);
+        Mockito.verify(auditLogEvent, times(2)).generateSuccess(); // step-1 + generateSkipAuditLog for lookup skip (step-2)
     }
 
     @Test
@@ -369,6 +371,7 @@ class InformalNotificationValidationStrategyTest {
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
                 .thenReturn(notification);
 
+        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithAnalog());
         Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
 
@@ -385,6 +388,7 @@ class InformalNotificationValidationStrategyTest {
                 any(), any(), eq(ActionType.POST_VALIDATION_COMPLETED), eq(CommunicationType.INFORMAL));
         Mockito.verify(notificationValidationScheduler, never())
                 .scheduleNotificationValidation(any(), anyInt(), any(), any());
+        Mockito.verify(auditLogEvent).generateSuccess(); // step-1 success
     }
 
     @Test
