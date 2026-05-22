@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 import it.pagopa.pn.commons.exceptions.PnHttpResponseException;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.ServiceLevelTypeInt;
@@ -109,6 +110,7 @@ class NotificationServiceImplTest {
                 .sender(NotificationSenderInt.builder().build())
                 .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
                 .physicalCommunicationType(ServiceLevelTypeInt.REGISTERED_LETTER_890)
+                .communicationType(CommunicationType.LEGAL)
                 .build();
     }
 }

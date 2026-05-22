@@ -96,7 +96,6 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
 
     @Override
     public void validate(String iun, NotificationValidationActionDetails details) {
-
         log.debug("Start validateNotification - iun={}", iun);
         NotificationInt notification = getNotification(iun);
 

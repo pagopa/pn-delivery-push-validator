@@ -44,8 +44,7 @@ public class LegalNotificationRefusedStrategy implements NotificationRefusedStra
         log.debug("Start handleNotificationRefused - iun={}", iun);
 
         NotificationInt notification = getNotification(iun);
-        List<NotificationRefusedErrorInt> refusedErrors = castToRefusedErrors(errors);
-        int notificationCost = refusalCostCalculator.calculateRefusalCost(notification, refusedErrors);
+        int notificationCost = refusalCostCalculator.calculateRefusalCost(notification, errors);
 
         if (NotificationFeePolicy.DELIVERY_MODE.equals(notification.getNotificationFeePolicy())
                 && PagoPaIntMode.ASYNC.equals(notification.getPagoPaIntMode())) {
@@ -55,7 +54,7 @@ public class LegalNotificationRefusedStrategy implements NotificationRefusedStra
         }
 
         timelineService.addTimelineElement(
-                timelineUtils.buildRefusedRequestTimelineElement(notification, refusedErrors, notificationCost),
+                timelineUtils.buildRefusedRequestTimelineElement(notification, errors, notificationCost),
                 notification
         );
     }
@@ -79,11 +78,6 @@ public class LegalNotificationRefusedStrategy implements NotificationRefusedStra
         } else {
             log.debug("Don't need to update notification cost, paymentsInfoForRecipients is empty - iun={}", notification.getIun());
         }
-    }
-
-    private List<NotificationRefusedErrorInt> castToRefusedErrors(List<NotificationRefusedErrorInt> errors) {
-
-        return errors;
     }
 }
 

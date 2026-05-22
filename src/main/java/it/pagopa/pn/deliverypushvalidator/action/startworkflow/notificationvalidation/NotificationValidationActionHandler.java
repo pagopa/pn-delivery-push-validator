@@ -17,7 +17,7 @@ public class NotificationValidationActionHandler {
     private final LegalNotificationValidationStrategy legalStrategy;
 
     public void validateNotification(String iun, NotificationValidationActionDetails details, CommunicationType communicationType) {
-        log.debug("Start validateNotification - iun={}", iun);
+        log.debug("Start validateNotification - iun={} communicationType={}", iun, communicationType);
         NotificationValidationStrategy strategy = resolveStrategy(communicationType, iun);
         strategy.validate(iun, details);
     }

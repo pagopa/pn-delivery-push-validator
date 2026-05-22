@@ -35,7 +35,6 @@ import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidat
 @CustomLog
 @Component
 public class InformalNotificationValidationStrategy extends BaseNotificationValidationStrategy implements NotificationValidationStrategy {
-
     private static final int FIRST_VALIDATION_STEP = 1;
     private static final int SECOND_VALIDATION_STEP = 2;
     private static final int THIRD_VALIDATION_STEP = 3;
@@ -75,7 +74,6 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
 
     @Override
     public void validate(String iun, NotificationValidationActionDetails details) {
-
         log.debug("Start validateInformalNotification - iun={}", iun);
         NotificationInt notification = getNotification(iun);
 
