@@ -50,8 +50,9 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     private final CampaignValidator campaignValidator;
     private final MessageValidator messageValidator;
     private final LookupAddressHandler lookupAddressHandler;
+    private final DigitalAddressValidator digitalAddressValidator;
 
-    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler) {
+    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler, DigitalAddressValidator digitalAddressValidator) {
         super(notificationValidationScheduler, schedulerService, cfg);
         this.notificationService = notificationService;
         this.schedulerService = schedulerService;
@@ -63,6 +64,7 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
         this.campaignValidator = campaignValidator;
         this.messageValidator = messageValidator;
         this.lookupAddressHandler = lookupAddressHandler;
+        this.digitalAddressValidator = digitalAddressValidator;
     }
 
     @Override
@@ -81,7 +83,8 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
         try {
             attachmentUtils.validateAttachment(notification);
             Campaign campaign = campaignValidator.validateAndGetCampaign(notification);
-            messageValidator.validate(notification);
+            MDCUtils.addMDCToContextAndExecute(messageValidator.validate(notification)).block();
+            digitalAddressValidator.validateDigitalAddress(notification, campaign);
             logEvent.generateSuccess().log();
 
             if (hasAnalogCampaign(campaign)) {

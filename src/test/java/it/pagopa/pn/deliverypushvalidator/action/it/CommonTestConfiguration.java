@@ -128,7 +128,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         CampaignValidatorImpl.class,
         MessageValidator.class,
         CampaignServiceImpl.class,
-        MVPCampaignsParameterConsumer.class
+        MVPCampaignsParameterConsumer.class,
+        DigitalAddressValidator.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
