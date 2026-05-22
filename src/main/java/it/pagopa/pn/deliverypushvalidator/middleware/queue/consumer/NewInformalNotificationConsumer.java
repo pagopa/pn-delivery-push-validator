@@ -28,7 +28,11 @@ public class NewInformalNotificationConsumer {
         final String processName = "NEW INFORMAL NOTIFICATION";
         try {
             log.info("Handle message for informal notification from {} with content {}", PnDeliveryClient.CLIENT_NAME, message);
-            String iun = message.getPayload().getIun();
+            PnDeliveryNewNotificationEvent pnDeliveryNewNotificationEvent = PnDeliveryNewNotificationEvent.builder()
+                    .payload(message.getPayload())
+                    .header(HandleEventUtils.mapStandardEventHeader(message.getHeaders()))
+                    .build();
+            String iun = pnDeliveryNewNotificationEvent.getPayload().getIun();
             CommunicationType communicationType = CommunicationType.INFORMAL;
             HandleEventUtils.addIunAndCommunicationTypeToMdc(iun, communicationType);
             log.logStartingProcess(processName);

@@ -29,11 +29,11 @@ public class NotificationCostConsumer {
             log.info("Handle message from {} with content {}", NotificationCostServiceClient.CLIENT_NAME, message);
 
             String iun = message.getPayload().getPnNotificationCostValidationPayload().getIun();
-
-            HandleEventUtils.addIunToMdc(iun);
+            CommunicationType communicationType = CommunicationType.LEGAL;
+            HandleEventUtils.addIunAndCommunicationTypeToMdc(iun, communicationType);
             log.logStartingProcess(processName);
 
-            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload(), CommunicationType.LEGAL);
+            handler.handleValidateNotificationCost(iun, message.getPayload().getPnNotificationCostValidationPayload(), communicationType);
 
             log.logEndingProcess(processName);
         } catch (Exception ex) {
