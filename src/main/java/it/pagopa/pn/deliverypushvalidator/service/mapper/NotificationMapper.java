@@ -85,6 +85,7 @@ public class NotificationMapper {
                 .additionalLanguages(sentInformalNotification.getAdditionalLanguages())
                 .usedServices(UsedServicesMapper.externalToInternal(sentInformalNotification.getUsedServices()))
                 .idempotenceToken(sentInformalNotification.getIdempotenceToken())
+                .campaignId(sentInformalNotification.getCampaignId())
                 .communicationType(CommunicationType.INFORMAL)
                 .build();
     }
