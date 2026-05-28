@@ -178,6 +178,7 @@ class NotificationMapperTest {
                 .recipients(Collections.singletonList(
                         new InformalNotificationRecipientV1()
                                 .taxId("TAXID03")
+                                .messageId(UUID.randomUUID())
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Mario Rossi")
                                 .physicalAddress(
@@ -226,6 +227,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID02")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
+                                .messageId(UUID.randomUUID())
                                 .digitalDomicile(
                                         new NotificationDigitalAddress()
                                                 .address("pec@example.com")
@@ -259,6 +261,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
                                         new InformalNotificationPaymentItem()
                                                 .pagoPa(new PagoPaPaymentBase()
@@ -301,6 +304,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY3")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore3")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
                                         new InformalNotificationPaymentItem()
                                                 .pagoPa(new PagoPaPaymentBase()
@@ -335,6 +339,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY4")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore4")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.emptyList())
                 ));
 
