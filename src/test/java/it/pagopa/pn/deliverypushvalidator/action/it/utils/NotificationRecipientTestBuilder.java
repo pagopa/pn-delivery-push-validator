@@ -77,7 +77,10 @@ public class NotificationRecipientTestBuilder {
                     .build();
         }
         
-        String denomination = "Name_and_surname_of_" + taxId;
+        if (denomination == null) {
+            denomination = "Name_and_surname_of_" + taxId;
+        }
+
         if(physicalAddress != null){
             physicalAddress.setFullname(denomination);
         }

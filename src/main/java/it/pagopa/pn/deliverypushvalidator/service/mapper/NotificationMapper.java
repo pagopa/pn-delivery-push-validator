@@ -6,7 +6,6 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -139,13 +138,13 @@ public class NotificationMapper {
         if (recipients == null) {
             return list;
         }
-
         for (InformalNotificationRecipientV1 recipient : recipients) {
             NotificationRecipientInt.NotificationRecipientIntBuilder recipientIntBuilder = NotificationRecipientInt.builder()
                     .taxId(recipient.getTaxId())
                     .internalId(recipient.getInternalId())
                     .denomination(recipient.getDenomination())
-                    .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()));
+                    .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()))
+                    .messageId(recipient.getMessageId().toString());
 
             NotificationDigitalAddress digitalDomicile = recipient.getDigitalDomicile();
             if (digitalDomicile != null) {
