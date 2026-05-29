@@ -115,22 +115,29 @@ public class MessageValidator {
                                                NotificationRecipientInt recipient,
                                                String element,
                                                MessageResponseDto message) {
-        // 3. Language consistency check
+        List<String> additionalLanguages = notification.getAdditionalLanguages();
         LocalizedContent secondaryContent = message.getSecondaryContent();
-        if (secondaryContent != null) {
-            String messageLanguage = secondaryContent.getLanguage().getValue();
-            List<String> additionalLanguages = notification.getAdditionalLanguages();
 
-            boolean languageMatches = !CollectionUtils.isEmpty(additionalLanguages)
-                    && additionalLanguages.stream().anyMatch(lang -> lang.equalsIgnoreCase(messageLanguage));
-
-            if (!languageMatches) {
-                String detail = "Message language '" + messageLanguage
-                        + "' does not match notification additional languages " + additionalLanguages
-                        + " for messageId: " + recipient.getMessageId();
+        if (secondaryContent == null) {
+            if (!CollectionUtils.isEmpty(additionalLanguages)) {
+                String detail = "Message has no secondary content but notification declares additional languages "
+                        + additionalLanguages + " for messageId: " + recipient.getMessageId();
                 return Mono.error(logValidationFailure(notification, element, detail,
                         new PnValidationMessageLanguageMismatchException(detail, element)));
             }
+            return Mono.empty();
+        }
+
+        String messageLanguage = secondaryContent.getLanguage().getValue();
+        boolean languageMatches = !CollectionUtils.isEmpty(additionalLanguages)
+                && additionalLanguages.stream().anyMatch(lang -> lang.equalsIgnoreCase(messageLanguage));
+
+        if (!languageMatches) {
+            String detail = "Message language '" + messageLanguage
+                    + "' does not match notification additional languages " + additionalLanguages
+                    + " for messageId: " + recipient.getMessageId();
+            return Mono.error(logValidationFailure(notification, element, detail,
+                    new PnValidationMessageLanguageMismatchException(detail, element)));
         }
 
         return Mono.empty();

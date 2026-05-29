@@ -42,7 +42,7 @@ public class CampaignValidatorImpl implements CampaignValidator {
         } catch (PnCampaignNotFoundException ex) {
             throw handleValidationException(
                     NotificationRefusedErrorCodeInt.CAMPAIGN_NOT_FOUND,
-                    String.format("No campaign with id %s for sender %s", campaignId, senderId)
+                    String.format("Campaign with id %s not found", campaignId)
             );
         }
     }

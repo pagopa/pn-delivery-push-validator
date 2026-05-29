@@ -200,6 +200,40 @@ class MessageValidatorTest {
     }
 
     @Test
+    void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsPresentThenThrowMismatch() {
+        UUID senderId = UUID.randomUUID();
+        UUID messageId = UUID.randomUUID();
+        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "de"));
+
+        MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
+        when(message.getSecondaryContent()).thenReturn(null);
+        when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .expectErrorSatisfies(throwable -> {
+                    Assertions.assertInstanceOf(PnValidationMessageLanguageMismatchException.class, throwable);
+                    PnValidationMessageLanguageMismatchException ex = (PnValidationMessageLanguageMismatchException) throwable;
+                    Assertions.assertEquals("MESSAGE_LANGUAGE_MISMATCH", ex.getProblem().getErrors().getFirst().getCode());
+                    Assertions.assertEquals("recipients[0].messageId", ex.getProblem().getErrors().getFirst().getElement());
+                })
+                .verify();
+    }
+
+    @Test
+    void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsNullThenThrowMismatch() {
+        UUID senderId = UUID.randomUUID();
+        UUID messageId = UUID.randomUUID();
+        NotificationInt notification = buildNotification(senderId, messageId, Collections.emptyList());
+
+        MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
+        when(message.getSecondaryContent()).thenReturn(null);
+        when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .verifyComplete();
+    }
+
+    @Test
     void validateWhenSecondaryLanguageMatchesIgnoringCaseThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();

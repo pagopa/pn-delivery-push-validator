@@ -47,7 +47,7 @@ class CampaignValidatorImplTest {
                 PnCampaignValidationException.class,
                 () -> campaignValidator.validateAndGetCampaign(notification)
         );
-        assertEquals("No campaign with id camp2 for sender sender2", ex.getProblem().getDetail());
+        assertEquals("Campaign with id camp2 not found", ex.getProblem().getDetail());
     }
 
     @Test
