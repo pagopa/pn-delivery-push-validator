@@ -48,6 +48,22 @@ public class PaymentMapper {
         return Collections.emptyList();
     }
 
+    @NotNull
+    public static List<InformalNotificationPaymentItem> getInformalNotificationPaymentItem(List<NotificationPaymentInfoInt> paymentInternalList) {
+
+        if (!CollectionUtils.isEmpty(paymentInternalList)) {
+            return paymentInternalList.stream()
+                    .map(paymentInfoIntV2 -> {
+                        InformalNotificationPaymentItem item = new InformalNotificationPaymentItem();
+                        item.setPagoPa(getPagoPaPaymentBase(paymentInfoIntV2.getPagoPA()));
+                        return item;
+                    })
+                    .toList();
+
+        }
+        return Collections.emptyList();
+    }
+
     private static F24Payment getF24(F24Int f24) {
         F24Payment f24Payment = null;
         if (f24 != null) {
@@ -82,6 +98,16 @@ public class PaymentMapper {
         return pagoPaPayment;
     }
 
+    private static PagoPaPaymentBase getPagoPaPaymentBase(PagoPaInt pagoPa) {
+        PagoPaPaymentBase pagoPaPaymentBase = null;
+        if (pagoPa != null) {
+            pagoPaPaymentBase = new PagoPaPaymentBase();
+            pagoPaPaymentBase.setAttachment(getNotificationPaymentAttachment(pagoPa.getAttachment()));
+            pagoPaPaymentBase.setCreditorTaxId(pagoPa.getCreditorTaxId());
+            pagoPaPaymentBase.setNoticeCode(pagoPa.getNoticeCode());
+        }
+        return pagoPaPaymentBase;
+    }
 
     private static PagoPaInt getPagoPaInt(PagoPaPayment pagoPa) {
         if(pagoPa != null) {

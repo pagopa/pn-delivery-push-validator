@@ -91,6 +91,18 @@ public class TestUtils {
         return timelineElementOpt.isPresent();
     }
 
+    public static boolean checkIsPresentValidateNormalizeAddressRequest(String iun, TimelineService timelineService) {
+        Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
+                iun,
+                TimelineEventId.VALIDATE_NORMALIZE_ADDRESSES_REQUEST.buildEventId(
+                        EventId.builder()
+                                .iun(iun)
+                                .build())
+        );
+
+        return timelineElementOpt.isPresent();
+    }
+
 
     public static Optional<TimelineElementInternal> getNotificationRejected(String iun, TimelineService timelineService) {
         return timelineService.getTimelineElement(

@@ -2,7 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.de
 
 import it.pagopa.pn.commons.log.PnLogger;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.InformalSentNotificationV1;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV25;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV26;
 
 public interface PnDeliveryClient {
     String CLIENT_NAME = PnLogger.EXTERNAL_SERVICES.PN_DELIVERY;
@@ -10,7 +10,7 @@ public interface PnDeliveryClient {
     String GET_NOTIFICATION = "GET NOTIFICATION";
     String GET_INFORMAL_NOTIFICATION = "GET INFORMAL NOTIFICATION";
 
-    SentNotificationV25 getSentNotification(String iun);
+    SentNotificationV26 getSentNotification(String iun);
 
     InformalSentNotificationV1 getSentInformalNotification(String iun);
 }

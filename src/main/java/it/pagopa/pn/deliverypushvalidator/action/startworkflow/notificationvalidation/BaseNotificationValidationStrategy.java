@@ -31,8 +31,10 @@ public class BaseNotificationValidationStrategy {
         List<NotificationRefusedErrorInt> errors = new ArrayList<>();
         if (Objects.nonNull(ex.getProblem())) {
             ex.getProblem().getErrors().forEach(elem -> {
-                NotificationRefusedErrorInt notificationRefusedError = NotificationRefusedErrorInt.builder().errorCode(elem.getCode()).detail(elem.getDetail()).build();
-
+                NotificationRefusedErrorInt notificationRefusedError = NotificationRefusedErrorInt.builder()
+                        .errorCode(elem.getCode())
+                        .detail(elem.getDetail())
+                        .build();
                 errors.add(notificationRefusedError);
             });
         }

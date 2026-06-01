@@ -41,7 +41,7 @@ class NotificationMapperTest {
                 .vat(22)
                 .build();
         
-        SentNotificationV25 sent = NotificationMapper.internalToExternal( expected );
+        SentNotificationV26 sent = NotificationMapper.internalToExternal( expected );
         NotificationInt actual = NotificationMapper.externalToInternal( sent );
         
         Assertions.assertEquals(expected, actual );
@@ -50,10 +50,10 @@ class NotificationMapperTest {
 
     @Test
     void externalToInternal() {
-        SentNotificationV25 expected = getExternalNotification();
+        SentNotificationV26 expected = getExternalNotification();
 
         NotificationInt internal = NotificationMapper.externalToInternal( expected );
-        SentNotificationV25 actual = NotificationMapper.internalToExternal( internal );
+        SentNotificationV26 actual = NotificationMapper.internalToExternal( internal );
         
         Assertions.assertEquals( expected, actual );
     }
@@ -398,12 +398,12 @@ class NotificationMapperTest {
     @Test
     void externalToInternal_withNullRecipients() {
         // recipients == null nel mapping formale: deve restituire lista vuota senza eccezioni
-        SentNotificationV25 sent = new SentNotificationV25()
+        SentNotificationV26 sent = new SentNotificationV26()
                 .iun("IUN_FORMAL_NULL")
                 .paProtocolNumber("protocol_formal_null")
                 .subject("Subject formal null recipients")
                 .senderPaId("pa_formal_null")
-                .physicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
+                .physicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
                 .amount(0)
                 .paymentExpirationDate("2025-12-31")
                 .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
@@ -417,13 +417,13 @@ class NotificationMapperTest {
                 "La lista dei destinatari deve essere vuota quando recipients è null");
     }
 
-    private SentNotificationV25 getExternalNotification() {
-        return new SentNotificationV25()
+    private SentNotificationV26 getExternalNotification() {
+        return new SentNotificationV26()
                 .iun("IUN_01")
                 .paProtocolNumber("protocol_01")
                 .subject("Subject 01")
                 .senderPaId( "pa_02" )
-                .physicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
+                .physicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
                 .amount(18)
                 .paymentExpirationDate("2022-10-22")
                 .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
