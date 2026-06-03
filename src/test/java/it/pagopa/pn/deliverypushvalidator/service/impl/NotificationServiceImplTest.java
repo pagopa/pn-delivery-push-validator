@@ -8,7 +8,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.ServiceLevelTypeInt;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.InformalSentNotificationV1;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV25;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.SentNotificationV26;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.delivery.PnDeliveryClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class NotificationServiceImplTest {
     void getNotificationByIun() {
         NotificationInt expected = buildNotificationInt();
 
-        SentNotificationV25 sentNotification = buildSentNotification();
+        SentNotificationV26 sentNotification = buildSentNotification();
         Mockito.when(pnDeliveryClient.getSentNotification("001")).thenReturn(sentNotification);
 
         NotificationInt actual = service.getNotificationByIun("001");
@@ -94,10 +94,10 @@ class NotificationServiceImplTest {
         Assertions.assertThrows(PnInternalException.class, () -> service.getInformalNotificationByIun("003"));
     }
 
-    private SentNotificationV25 buildSentNotification() {
-        SentNotificationV25 sentNotification = new SentNotificationV25();
+    private SentNotificationV26 buildSentNotification() {
+        SentNotificationV26 sentNotification = new SentNotificationV26();
         sentNotification.setIun("001");
-        sentNotification.setPhysicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890);
+        sentNotification.setPhysicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890);
         sentNotification.setNotificationFeePolicy(it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy.DELIVERY_MODE);
         return sentNotification;
     }
