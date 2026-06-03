@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.action.refused;
 
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
+import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,9 @@ class NotificationRefusedActionHandlerTest {
 
     @Mock
     private InformalNotificationRefusedStrategy informalNotificationRefusedStrategy;
+
+    @Mock
+    private CommunicationTypeChecker communicationTypeChecker;
 
     @InjectMocks
     private NotificationRefusedActionHandler handler;
@@ -67,23 +71,6 @@ class NotificationRefusedActionHandlerTest {
         // Then - Verify that informalNotificationRefusedStrategy is called
         verify(informalNotificationRefusedStrategy).handleNotificationRefused(iun, errors, schedulingTime);
         verify(legalNotificationRefusedStrategy, never()).handleNotificationRefused(any(), any(), any());
-    }
-
-    @Test
-    void resolveStrategyReturnsLegalWhenCommunicationTypeIsNull() {
-        // Given - null communicationType should default to LEGAL
-        String iun = "IUN_NULL";
-        List<NotificationRefusedErrorInt> errors = List.of(
-                NotificationRefusedErrorInt.builder().errorCode("E03").detail("null detail").build()
-        );
-        Instant schedulingTime = Instant.now();
-
-        // When
-        handler.notificationRefusedHandler(iun, errors, schedulingTime, null);
-
-        // Then - Verify that legalNotificationRefusedStrategy (default) is called
-        verify(legalNotificationRefusedStrategy).handleNotificationRefused(iun, errors, schedulingTime);
-        verify(informalNotificationRefusedStrategy, never()).handleNotificationRefused(any(), any(), any());
     }
 
     @Test

@@ -180,7 +180,7 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
 
 
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withIun(TestUtils.getRandomIun() + F24_VALIDATION_FAIL)
+                .withIun(F24_VALIDATION_FAIL + TestUtils.getRandomIun(CommunicationType.LEGAL))
                 .withNotificationDocuments(notificationDocumentList)
                 .withPaId("paId01")
                 .withNotificationRecipient(recipient)
@@ -703,7 +703,7 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
 
     @Test
     void validationPaymentInfoOK() {
-        String iun = TestUtils.getRandomIun();
+        String iun = TestUtils.getRandomIun(CommunicationType.LEGAL);
 
         String fileDocPayment = "keyPagoPaForm_doc00";
         List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
@@ -775,7 +775,7 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
 
     @Test
     void testNotificationValidationComplete() throws PnIdConflictException {
-        String iun = TestUtils.getRandomIun();
+        String iun = TestUtils.getRandomIun(CommunicationType.LEGAL);
 
         String fileDocPayment = "keyPagoPaForm_doc00";
         List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
