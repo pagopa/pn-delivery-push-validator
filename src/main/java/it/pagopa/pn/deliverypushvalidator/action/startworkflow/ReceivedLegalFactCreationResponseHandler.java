@@ -51,7 +51,7 @@ public class ReceivedLegalFactCreationResponseHandler {
                 f24Service.preparePDF(iun);
             }else {
                 log.debug("scheduleEvent POST_ACCEPTED_PROCESSING_COMPLETED for iun {}", iun);
-                schedulerService.scheduleEvent(iun, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
+                schedulerService.scheduleEvent(iun, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED, notification.getCommunicationType());
             }
 
             logEvent.generateSuccess().log();

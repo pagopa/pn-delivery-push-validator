@@ -1,15 +1,21 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 
+import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.addressmanager.model.NormalizeItemsResult;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.addressmanager.AddressManagerClient;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.utils.HandleEventUtils;
+import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.AddressManagerMapper;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
+
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT;
 
 @Component
 @CustomLog
@@ -18,6 +24,7 @@ public class AddressManagerResponseHandler {
 
     private NotificationValidationActionHandler notificationValidationActionHandler;
     private TimelineUtils timelineUtils;
+    private TimelineService timelineService;
     
     public void handleResponseReceived( NormalizeItemsResult response ) {
         String iun = timelineUtils.getIunFromTimelineId(response.getCorrelationId());
@@ -34,8 +41,14 @@ public class AddressManagerResponseHandler {
 
         try {
             log.logStartingProcess(processName);
+
+            TimelineElementInternal timelineElement = timelineService.getTimelineElement(iun, response.getCorrelationId())
+                    .orElseThrow(() -> new PnInternalException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId(), ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT));
+            CommunicationType communicationType = timelineElement.getCommunicationType();
+            HandleEventUtils.addCommunicationTypeToMdc(communicationType);
+
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
-            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult);
+            notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);
             log.logEndingProcess(processName);
         } catch (Exception ex){
             log.logEndingProcess(processName, false, ex.getMessage(),ex);

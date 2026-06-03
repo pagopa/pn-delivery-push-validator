@@ -8,6 +8,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 class NotificationMapperTest {
 
@@ -39,7 +41,7 @@ class NotificationMapperTest {
                 .vat(22)
                 .build();
         
-        SentNotificationV25 sent = NotificationMapper.internalToExternal( expected );
+        SentNotificationV26 sent = NotificationMapper.internalToExternal( expected );
         NotificationInt actual = NotificationMapper.externalToInternal( sent );
         
         Assertions.assertEquals(expected, actual );
@@ -48,10 +50,10 @@ class NotificationMapperTest {
 
     @Test
     void externalToInternal() {
-        SentNotificationV25 expected = getExternalNotification();
+        SentNotificationV26 expected = getExternalNotification();
 
         NotificationInt internal = NotificationMapper.externalToInternal( expected );
-        SentNotificationV25 actual = NotificationMapper.internalToExternal( internal );
+        SentNotificationV26 actual = NotificationMapper.internalToExternal( internal );
         
         Assertions.assertEquals( expected, actual );
     }
@@ -70,6 +72,7 @@ class NotificationMapperTest {
                                 .taxId("Codice Fiscale 01")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
+                                .messageId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                                 .digitalDomicile(
                                         new NotificationDigitalAddress()
                                                 .address("pec@example.com")
@@ -109,6 +112,7 @@ class NotificationMapperTest {
         NotificationRecipientInt recipient = actual.getRecipients().getFirst();
         Assertions.assertEquals("Codice Fiscale 01", recipient.getTaxId());
         Assertions.assertEquals(RecipientTypeInt.PF, recipient.getRecipientType());
+        Assertions.assertEquals("123e4567-e89b-12d3-a456-426614174000", recipient.getMessageId());
         Assertions.assertNotNull(recipient.getDigitalDomicile());
         Assertions.assertEquals("pec@example.com", recipient.getDigitalDomicile().getAddress());
         Assertions.assertNotNull(recipient.getPhysicalAddress());
@@ -126,6 +130,39 @@ class NotificationMapperTest {
         Assertions.assertEquals("doc_inf_01", actual.getDocuments().getFirst().getRef().getKey());
         Assertions.assertEquals("v_doc_inf_01", actual.getDocuments().getFirst().getRef().getVersionToken());
         Assertions.assertEquals("sha256_doc_inf_01", actual.getDocuments().getFirst().getDigests().getSha256());
+        Assertions.assertEquals(CommunicationType.INFORMAL, actual.getCommunicationType());
+    }
+
+    @Test
+    void externalInformalToInternal_withMultipleRecipients_preservesEachMessageId() {
+        UUID firstMessageId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+        UUID secondMessageId = UUID.fromString("223e4567-e89b-12d3-a456-426614174001");
+
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1()
+                .iun("IUN_INF_01_MULTI")
+                .paProtocolNumber("protocol_inf_01_multi")
+                .subject("Subject informal multi recipient")
+                .senderPaId("pa_02")
+                .senderTaxId("taxId")
+                .senderDenomination("Comune")
+                .recipients(List.of(
+                        new InformalNotificationRecipientV1()
+                                .taxId("CF01")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Nome Cognome 1")
+                                .messageId(firstMessageId),
+                        new InformalNotificationRecipientV1()
+                                .taxId("CF02")
+                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .denomination("Nome Cognome 2")
+                                .messageId(secondMessageId)
+                ));
+
+        NotificationInt actual = NotificationMapper.externalToInternal(informal);
+
+        Assertions.assertEquals(2, actual.getRecipients().size());
+        Assertions.assertEquals(firstMessageId.toString(), actual.getRecipients().get(0).getMessageId());
+        Assertions.assertEquals(secondMessageId.toString(), actual.getRecipients().get(1).getMessageId());
     }
 
     @Test
@@ -141,6 +178,7 @@ class NotificationMapperTest {
                 .recipients(Collections.singletonList(
                         new InformalNotificationRecipientV1()
                                 .taxId("TAXID03")
+                                .messageId(UUID.randomUUID())
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Mario Rossi")
                                 .physicalAddress(
@@ -189,6 +227,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID02")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
+                                .messageId(UUID.randomUUID())
                                 .digitalDomicile(
                                         new NotificationDigitalAddress()
                                                 .address("pec@example.com")
@@ -222,6 +261,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
                                         new InformalNotificationPaymentItem()
                                                 .pagoPa(new PagoPaPaymentBase()
@@ -264,6 +304,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY3")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore3")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
                                         new InformalNotificationPaymentItem()
                                                 .pagoPa(new PagoPaPaymentBase()
@@ -298,6 +339,7 @@ class NotificationMapperTest {
                                 .taxId("TAXID_PAY4")
                                 .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore4")
+                                .messageId(UUID.randomUUID())
                                 .payments(Collections.emptyList())
                 ));
 
@@ -356,12 +398,12 @@ class NotificationMapperTest {
     @Test
     void externalToInternal_withNullRecipients() {
         // recipients == null nel mapping formale: deve restituire lista vuota senza eccezioni
-        SentNotificationV25 sent = new SentNotificationV25()
+        SentNotificationV26 sent = new SentNotificationV26()
                 .iun("IUN_FORMAL_NULL")
                 .paProtocolNumber("protocol_formal_null")
                 .subject("Subject formal null recipients")
                 .senderPaId("pa_formal_null")
-                .physicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
+                .physicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
                 .amount(0)
                 .paymentExpirationDate("2025-12-31")
                 .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
@@ -375,13 +417,13 @@ class NotificationMapperTest {
                 "La lista dei destinatari deve essere vuota quando recipients è null");
     }
 
-    private SentNotificationV25 getExternalNotification() {
-        return new SentNotificationV25()
+    private SentNotificationV26 getExternalNotification() {
+        return new SentNotificationV26()
                 .iun("IUN_01")
                 .paProtocolNumber("protocol_01")
                 .subject("Subject 01")
                 .senderPaId( "pa_02" )
-                .physicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
+                .physicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.REGISTERED_LETTER_890)
                 .amount(18)
                 .paymentExpirationDate("2022-10-22")
                 .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)

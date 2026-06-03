@@ -12,11 +12,14 @@ import java.util.UUID;
 
 public class NotificationRecipientTestBuilder {
     private String taxId;
+    private RecipientTypeInt recipientType;
     private PhysicalAddressInt physicalAddress;
     private String internalId;
     private LegalDigitalAddressInt digitalDomicile;
     private List<NotificationPaymentInfoInt> payments;
     private String denomination;
+    private String messageId;
+    private String email;
 
     public static NotificationRecipientTestBuilder builder() {
         return new NotificationRecipientTestBuilder();
@@ -24,6 +27,11 @@ public class NotificationRecipientTestBuilder {
 
     public NotificationRecipientTestBuilder withTaxId(String taxId) {
         this.taxId = taxId;
+        return this;
+    }
+
+    public NotificationRecipientTestBuilder withRecipientType(RecipientTypeInt recipientType) {
+        this.recipientType = recipientType;
         return this;
     }
 
@@ -53,6 +61,16 @@ public class NotificationRecipientTestBuilder {
         this.denomination = denomination;
         return this;
     }
+
+    public NotificationRecipientTestBuilder withMessageId(String messageId) {
+        this.messageId = messageId;
+        return this;
+    }
+
+    public NotificationRecipientTestBuilder withEmail(String email) {
+        this.email = email;
+        return this;
+    }
     
     public NotificationRecipientInt build() {
         if(taxId == null){
@@ -77,19 +95,28 @@ public class NotificationRecipientTestBuilder {
                     .build();
         }
         
-        String denomination = "Name_and_surname_of_" + taxId;
+        if (denomination == null) {
+            denomination = "Name_and_surname_of_" + taxId;
+        }
+
         if(physicalAddress != null){
             physicalAddress.setFullname(denomination);
         }
+
+        if(recipientType == null) {
+            recipientType = RecipientTypeInt.PF;
+        }
         
         return NotificationRecipientInt.builder()
-                .recipientType(RecipientTypeInt.PF)
+                .recipientType(recipientType)
                 .taxId(taxId)
                 .internalId(internalId)
                 .denomination(denomination)
                 .physicalAddress(physicalAddress)
                 .digitalDomicile(digitalDomicile)
                 .payments(payments)
+                .messageId(messageId)
+                .email(email)
                 .build();
     }
 

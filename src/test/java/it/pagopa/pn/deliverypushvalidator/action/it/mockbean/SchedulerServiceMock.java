@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -18,12 +19,9 @@ public class SchedulerServiceMock implements SchedulerService {
 
   @Override
   public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
-                            ActionType actionType, ActionDetails actionDetails) {
-    log.info("[TEST] Start scheduling - iun={} id={} actionType={} ", iun, recIndex, actionType);
-    handleSchedulingAction(iun, recIndex, dateToSchedule, actionType, actionDetails, null);
-  }
+      ActionType actionType, String timelineId, ActionDetails actionDetails, CommunicationType communicationType) {
 
-  private void handleSchedulingAction(String iun, Integer recIndex, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails, String timelineId) {
+    log.info("[TEST] Start scheduling with timelineid - iun={} id={} actionType={} timelineid={} datetoschedule={}", iun, recIndex, actionType, timelineId, dateToSchedule);
     Action action = Action.builder()
             .iun(iun)
             .recipientIndex(recIndex)
@@ -31,47 +29,19 @@ public class SchedulerServiceMock implements SchedulerService {
             .type(actionType)
             .details(actionDetails)
             .timelineId(timelineId)
+            .communicationType(communicationType)
             .build();
     actionPoolMock.addAction(action);
   }
 
   @Override
-  public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
-      ActionType actionType, String timelineId) {
-    log.info("[TEST] Start scheduling with timelineid - iun={} id={} actionType={} timelineid={} datetoschedule={}", iun, recIndex, actionType, timelineId, dateToSchedule);
-    handleSchedulingAction(iun, recIndex, dateToSchedule, actionType, null, timelineId);
+  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails, CommunicationType communicationType) {
+    scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, communicationType);
   }
 
   @Override
-  public void unscheduleEvent(String iun, Integer recIndex, ActionType actionType,
-      String timelineId) {
-    // non usato come mock
+  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, CommunicationType communicationType) {
+    scheduleEvent(iun, null, dateToSchedule, actionType, null, null, communicationType);
   }
 
-  @Override
-  public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
-      ActionType actionType, String timelineId, ActionDetails actionDetails) {
-      handleSchedulingAction(iun, recIndex, dateToSchedule, actionType, actionDetails, timelineId);
-  }
-
-  @Override
-  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails) {
-    this.scheduleEvent(iun, null, dateToSchedule, actionType, actionDetails);
-  }
-
-  @Override
-  public void scheduleEventNowOnlyIfAbsent(String iun, ActionType actionType, ActionDetails actionDetails) {
-    this.scheduleEvent(iun, null, Instant.now(), actionType, actionDetails);
-  }
-
-  @Override
-  public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType){
-    this.scheduleEvent(iun, null, dateToSchedule, actionType);
-  }
-
-  @Override
-  public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
-      ActionType actionType) {
-    this.scheduleEvent(iun, recIndex, dateToSchedule, actionType, (ActionDetails) null);
-  }
 }

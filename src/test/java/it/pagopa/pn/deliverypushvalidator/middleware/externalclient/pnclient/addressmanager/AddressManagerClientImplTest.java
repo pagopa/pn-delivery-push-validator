@@ -32,7 +32,9 @@ import static org.mockserver.model.HttpResponse.response;
 
 
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
+@TestPropertySource(
+        locations = "classpath:application-test.properties",
+        properties = {
         "pn.delivery-push-validator.address-manager-base-url=http://localhost:9998",
         "pn.delivery-push-validator.address-manager-api-key=testApiKey"
 })

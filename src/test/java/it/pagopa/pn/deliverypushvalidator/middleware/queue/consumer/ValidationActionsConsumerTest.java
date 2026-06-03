@@ -1,5 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer;
 
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventRouter;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -25,7 +26,12 @@ class ValidationActionsConsumerTest {
 
     @Test
     void pnDeliveryPushValidationActionsInboundConsumer_routesMessageSuccessfully() {
-        Action action = Action.builder().iun("test_IUN").recipientIndex(0).type(ActionType.NOTIFICATION_VALIDATION).build();
+        Action action = Action.builder()
+                .iun("test_IUN")
+                .recipientIndex(0)
+                .type(ActionType.NOTIFICATION_VALIDATION)
+                .communicationType(CommunicationType.LEGAL)
+                .build();
         Message<Action> message = Mockito.mock(Message.class);
         Mockito.when(message.getPayload()).thenReturn(action);
         Mockito.when(message.getHeaders()).thenReturn(new MessageHeaders(Map.of("test", "headerValue")));

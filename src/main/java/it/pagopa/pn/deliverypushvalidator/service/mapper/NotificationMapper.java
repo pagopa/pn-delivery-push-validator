@@ -18,7 +18,7 @@ import java.util.List;
 public class NotificationMapper {
     private NotificationMapper(){}
 
-    public static NotificationInt externalToInternal(SentNotificationV25 sentNotification) {
+    public static NotificationInt externalToInternal(SentNotificationV26 sentNotification) {
 
         List<NotificationRecipientInt> listNotificationRecipientInt = mapNotificationRecipient(sentNotification.getRecipients());
         List<NotificationDocumentInt> listNotificationDocumentInt = mapNotificationDocument(sentNotification.getDocuments());
@@ -57,6 +57,7 @@ public class NotificationMapper {
                 .additionalLanguages(sentNotification.getAdditionalLanguages())
                 .usedServices(UsedServicesMapper.externalToInternal(sentNotification.getUsedServices()))
                 .idempotenceToken(sentNotification.getIdempotenceToken())
+                .communicationType(CommunicationType.LEGAL)
                 .build();
     }
 
@@ -83,6 +84,8 @@ public class NotificationMapper {
                 .additionalLanguages(sentInformalNotification.getAdditionalLanguages())
                 .usedServices(UsedServicesMapper.externalToInternal(sentInformalNotification.getUsedServices()))
                 .idempotenceToken(sentInformalNotification.getIdempotenceToken())
+                .campaignId(sentInformalNotification.getCampaignId())
+                .communicationType(CommunicationType.INFORMAL)
                 .build();
     }
 
@@ -135,13 +138,15 @@ public class NotificationMapper {
         if (recipients == null) {
             return list;
         }
-
         for (InformalNotificationRecipientV1 recipient : recipients) {
             NotificationRecipientInt.NotificationRecipientIntBuilder recipientIntBuilder = NotificationRecipientInt.builder()
                     .taxId(recipient.getTaxId())
                     .internalId(recipient.getInternalId())
                     .denomination(recipient.getDenomination())
-                    .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()));
+                    .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()))
+                    .messageId(recipient.getMessageId() != null ? recipient.getMessageId().toString() : null)
+                    .email(recipient.getEmail())
+                    .phoneNumber(recipient.getPhoneNumber());
 
             NotificationDigitalAddress digitalDomicile = recipient.getDigitalDomicile();
             if (digitalDomicile != null) {
@@ -206,8 +211,8 @@ public class NotificationMapper {
     }
     
     //Utilizzata a livello di test
-    public static SentNotificationV25 internalToExternal(NotificationInt notification) {
-        SentNotificationV25 sentNotification = new SentNotificationV25();
+    public static SentNotificationV26 internalToExternal(NotificationInt notification) {
+        SentNotificationV26 sentNotification = new SentNotificationV26();
 
         sentNotification.setIun(notification.getIun());
         sentNotification.setPaProtocolNumber(notification.getPaProtocolNumber());
@@ -217,7 +222,7 @@ public class NotificationMapper {
         sentNotification.setPaFee(notification.getPaFee());
         sentNotification.setVat(notification.getVat());
         sentNotification.setAdditionalLanguages(notification.getAdditionalLanguages());
-        sentNotification.setUsedServices(mapToUserSevicesInt(notification.getUsedServices()));
+        sentNotification.setUsedServices(mapToUsedServicesInt(notification.getUsedServices()));
 
         ZonedDateTime time = DateFormatUtils.parseInstantToZonedDateTime(notification.getPaymentExpirationDate());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -225,11 +230,11 @@ public class NotificationMapper {
         sentNotification.setPaymentExpirationDate(formattedString);
         
         if(notification.getPagoPaIntMode() != null){
-            sentNotification.setPagoPaIntMode(SentNotificationV25.PagoPaIntModeEnum.valueOf(notification.getPagoPaIntMode().getValue()));
+            sentNotification.setPagoPaIntMode(SentNotificationV26.PagoPaIntModeEnum.valueOf(notification.getPagoPaIntMode().getValue()));
         }
         if( notification.getPhysicalCommunicationType() != null ) {
             sentNotification.setPhysicalCommunicationType(
-                    SentNotificationV25.PhysicalCommunicationTypeEnum.valueOf( notification.getPhysicalCommunicationType().name() )
+                    SentNotificationV26.PhysicalCommunicationTypeEnum.valueOf( notification.getPhysicalCommunicationType().name() )
             );
         }
 
@@ -251,7 +256,7 @@ public class NotificationMapper {
         sentNotification.setDocuments(documents);
 
         if(notification.getPhysicalCommunicationType() != null){
-            sentNotification.setPhysicalCommunicationType(SentNotificationV25.PhysicalCommunicationTypeEnum.valueOf(notification.getPhysicalCommunicationType().name()));
+            sentNotification.setPhysicalCommunicationType(SentNotificationV26.PhysicalCommunicationTypeEnum.valueOf(notification.getPhysicalCommunicationType().name()));
         }
         
         if(notification.getSender() != null){
@@ -284,13 +289,43 @@ public class NotificationMapper {
         return document;
     }
 
-    private static UsedServices mapToUserSevicesInt(UsedServicesInt usedServicesInt) {
+    private static UsedServices mapToUsedServicesInt(UsedServicesInt usedServicesInt) {
         if (usedServicesInt == null) {
             return null;
         }
         UsedServices usedServices = new UsedServices();
         usedServices.physicalAddressLookup(usedServicesInt.getPhysicalAddressLookUp());
         return usedServices;
+    }
+
+    public static InformalSentNotificationV1 internalToExternalInformal(NotificationInt internal) {
+        InformalSentNotificationV1 informal = new InformalSentNotificationV1();
+        informal.setIun(internal.getIun());
+        informal.setPaProtocolNumber(internal.getPaProtocolNumber());
+        informal.setSubject(internal.getSubject());
+        informal.setSentAt(internal.getSentAt());
+        NotificationSenderInt sender = internal.getSender();
+        if( sender != null ) {
+            informal.setSenderDenomination( sender.getPaDenomination() );
+            informal.setSenderPaId( sender.getPaId() );
+            informal.setSenderTaxId( sender.getPaTaxId() );
+        }
+        informal.setAdditionalLanguages(internal.getAdditionalLanguages());
+        informal.setGroup(internal.getGroup());
+        informal.setVersion(internal.getVersion());
+        informal.setIdempotenceToken(internal.getIdempotenceToken());
+        informal.setUsedServices(mapToUsedServicesInt(internal.getUsedServices()));
+        informal.setCampaignId(internal.getCampaignId());
+        List<NotificationDocument> documents = internal.getDocuments().stream()
+                .map(NotificationMapper::getNotificationDocument).toList();
+        informal.setDocuments(documents);
+
+        List<InformalNotificationRecipientV1> recipients = internal.getRecipients().stream()
+                .map(RecipientMapper::internalToExternalInformal).toList();
+
+        informal.setRecipients(recipients);
+
+        return informal;
     }
 
 }

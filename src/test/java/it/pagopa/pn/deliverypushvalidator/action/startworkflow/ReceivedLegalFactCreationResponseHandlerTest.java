@@ -2,10 +2,12 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationSenderInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
 import it.pagopa.pn.deliverypushvalidator.service.F24Service;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
@@ -58,7 +60,7 @@ class ReceivedLegalFactCreationResponseHandlerTest {
         //THEN
         Mockito.verify(timelineService).addTimelineElement(elementInternal, notification);
         Mockito.verify(timelineUtils).buildAcceptedRequestTimelineElement(notification, legalFactId);
-
+        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), Mockito.any(), Mockito.eq(ActionType.POST_ACCEPTED_PROCESSING_COMPLETED), Mockito.eq(notification.getCommunicationType()));
     }
 
 
@@ -81,6 +83,7 @@ class ReceivedLegalFactCreationResponseHandlerTest {
                                         .build())
                                 .build()
                 ))
+                .communicationType(CommunicationType.LEGAL)
                 .build();
     }
 

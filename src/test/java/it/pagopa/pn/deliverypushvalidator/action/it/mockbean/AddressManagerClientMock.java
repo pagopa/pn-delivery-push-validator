@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 public class AddressManagerClientMock implements AddressManagerClient {
     public static final String ADDRESS_MANAGER_NOT_VALID_ADDRESS = "ADDRESS_MANAGER_NOT_VALID_ADDRESS";
     public static final String ADDRESS_MANAGER_TO_NORMALIZE = "TO_NORMALIZE";
-    public static final String ADDRESS_MANAGER_NORMALIZED = "NORMALIZED";
     
     private AddressManagerResponseHandler addressManagerResponseHandler;
     private TimelineService timelineService;

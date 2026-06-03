@@ -583,6 +583,7 @@ Resources:
               - 'ssm:GetParameters'
             Resource:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MVPCampaigns'
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
@@ -643,7 +644,7 @@ Resources:
       Targets:
         - Id: !Sub '${ProjectName}-CoreEventBus-InformalNotificationToDeliveryPushValidator'
           Arn: !Ref PnDeliveryPushInformalValidationInputsQueueARN
-          InputPath: $.detail
+          InputPath: $.detail.body
           DeadLetterConfig:
             Arn: !Sub arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:pn-CoreEventBus-DLQ
 

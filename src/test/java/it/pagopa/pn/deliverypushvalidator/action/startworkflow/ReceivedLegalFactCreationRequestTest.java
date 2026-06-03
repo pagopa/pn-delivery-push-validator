@@ -2,28 +2,19 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.AttachmentUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
-import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
-import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import it.pagopa.pn.deliverypushvalidator.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 import static org.mockito.Mockito.doThrow;
 
@@ -41,16 +32,14 @@ class ReceivedLegalFactCreationRequestTest {
     @Mock
     private NotificationService notificationService;
     @Mock
-    private SchedulerService schedulerService;
-    @Mock
-    private PnDeliveryPushValidatorConfigs pnDeliveryPushConfigs;
-    
+    private CheckAttachmentRetentionScheduler checkAttachmentRetentionScheduler;
+
     private ReceivedLegalFactCreationRequest receivedLegalFactCreationRequest;
 
     @BeforeEach
     void setup() {
         receivedLegalFactCreationRequest = new ReceivedLegalFactCreationRequest(saveLegalFactsService, documentCreationRequestService,
-                timelineService, timelineUtils, attachmentUtils, notificationService, schedulerService, pnDeliveryPushConfigs);
+                timelineService, timelineUtils, attachmentUtils, notificationService, checkAttachmentRetentionScheduler);
     }
 
     @ExtendWith(SpringExtension.class)
@@ -60,13 +49,6 @@ class ReceivedLegalFactCreationRequestTest {
         NotificationInt notification = TestUtils.getNotification();
         
         Mockito.when(notificationService.getNotificationByIun(notification.getIun())).thenReturn(notification);
-
-        Duration retentionDaysAfterValidation = Duration.ofDays(120);
-        Duration checkAttachmentDaysBeforeExpiration = Duration.ofDays(10);
-        TimeParams times = new TimeParams();
-        times.setAttachmentRetentionTimeAfterValidation(retentionDaysAfterValidation);
-        times.setCheckAttachmentTimeBeforeExpiration(checkAttachmentDaysBeforeExpiration);
-        Mockito.when(pnDeliveryPushConfigs.getTimeParams()).thenReturn(times);
 
         String legalFactId = "testLegId";
         Mockito.when(saveLegalFactsService.sendCreationRequestForNotificationReceivedLegalFact(notification)).thenReturn(legalFactId);
@@ -78,22 +60,10 @@ class ReceivedLegalFactCreationRequestTest {
         receivedLegalFactCreationRequest.saveNotificationReceivedLegalFacts(notification.getIun());
         
         //THEN
+        Mockito.verify(checkAttachmentRetentionScheduler)
+                .scheduleCheckAttachmentRetentionBeforeExpiration(notification.getIun(), CommunicationType.LEGAL);
         Mockito.verify(timelineService).addTimelineElement(timelineElementInternal, notification);
         Mockito.verify(documentCreationRequestService).addDocumentCreationRequest(legalFactId, notification.getIun(), DocumentCreationTypeInt.SENDER_ACK, timelineElementInternal.getElementId());
-
-        ArgumentCaptor<Instant> checkAttachmentDateCaptor = ArgumentCaptor.forClass(Instant.class);
-        Mockito.verify(schedulerService).scheduleEvent(Mockito.eq(notification.getIun()), checkAttachmentDateCaptor.capture(), Mockito.eq(ActionType.CHECK_ATTACHMENT_RETENTION));
-        Instant checkAttachmentDateScheduled = checkAttachmentDateCaptor.getValue();
-
-        Duration checkAttachmentDaysToWait = retentionDaysAfterValidation.minus(checkAttachmentDaysBeforeExpiration);
-        Instant checkAttachmentDateExpected = Instant.now().plus(checkAttachmentDaysToWait);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                .withZone(ZoneId.from(ZoneOffset.UTC));
-        String checkAttachmentDateFormattedScheduled = formatter.format(checkAttachmentDateScheduled);
-        String checkAttachmentDateFormattedExpected = formatter.format(checkAttachmentDateExpected);
-
-        Assertions.assertEquals(checkAttachmentDateFormattedScheduled, checkAttachmentDateFormattedExpected);
     }
 
     @ExtendWith(SpringExtension.class)

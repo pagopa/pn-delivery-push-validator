@@ -40,6 +40,11 @@ public class ActionHandlerMock {
                     var handler = actionHandlerRegistry.getDocumentCreationResponseEventHandler();
                     handler.handle(message.getPayload(), message.getHeaders());
                 }
+                case POST_VALIDATION_COMPLETED -> {
+                    final Message<Action> message = getBaseActionMessage(action);
+                    var handler = actionHandlerRegistry.getPostValidationCompletedActionHandler();
+                    handler.handle(message.getPayload(), message.getHeaders());
+                }
                 default ->
                         log.error("[TEST] actionType not found {}", action.getType());
             }

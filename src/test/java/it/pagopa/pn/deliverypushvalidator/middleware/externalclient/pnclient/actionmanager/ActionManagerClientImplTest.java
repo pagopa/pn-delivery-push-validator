@@ -33,9 +33,12 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "pn.delivery-push-validator.action-manager-base-url=http://localhost:9999"
-})
+@TestPropertySource(
+        locations = "classpath:application-test.properties",
+        properties = {
+                "pn.delivery-push-validator.action-manager-base-url=http://localhost:9999"
+        }
+)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
         ActionManagerClientImpl.class

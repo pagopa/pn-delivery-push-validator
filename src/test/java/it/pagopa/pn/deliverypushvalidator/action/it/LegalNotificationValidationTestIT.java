@@ -1,28 +1,26 @@
 package it.pagopa.pn.deliverypushvalidator.action.it;
 
-import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.PnDeliveryClientMock;
-import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.SafeStorageClientMock;
+import it.pagopa.pn.commons.exceptions.PnIdConflictException;
+import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
+import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.cost.RefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationDocumentInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.PublicRegistryValidationCallDetailsInt;
-import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.RequestRefusedDetailsInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
+import it.pagopa.pn.deliverypushvalidator.legalfact.LegalFactGenerator;
+import it.pagopa.pn.deliverypushvalidator.logtest.ConsoleAppenderCustom;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
-import lombok.Builder;
-import lombok.Getter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,29 +28,246 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.util.HashSet;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.UUID;
 
+import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.F24ClientMock.F24_VALIDATION_FAIL;
 import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.NationalRegistriesClientMock.PHYS_ADDR_ERROR;
 import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.NationalRegistriesClientMock.PHYS_ADDR_NOT_FOUND;
 import static org.awaitility.Awaitility.await;
 
-public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
+class LegalNotificationValidationTestIT extends CommonNotificationValidationTestIT {
 
+    //digital
+    public static final String EXT_CHANNEL_SEND_FAIL_BOTH = "fail-both";
+
+    //ANALOG
+    public static final String EXTCHANNEL_SEND_SUCCESS = "OK"; //Invio notifica ok
+    public static final String EXT_CHANNEL_SEND_NEW_ADDR = "NEW_ADDR:"; //Invio notifica fallita con nuovo indirizzo da investigazione
+
+    @MockitoSpyBean
+    LegalFactGenerator legalFactGenerator;
     @Autowired
     StartWorkflowHandler startWorkflowHandler;
-    @Autowired
-    PnDeliveryClientMock pnDeliveryClientMock;
     @Autowired
     TimelineService timelineService;
     @Autowired
     SafeStorageClientMock safeStorageClientMock;
+    @Autowired
+    PnDeliveryClientMock pnDeliveryClientMock;
     @MockitoBean
     PnTechnicalRefusalCostMode pnTechnicalRefusalCostMode;
 
+    @Test
+    void taxIdNotValidTest() throws PnIdConflictException {
+        //Special address is present and all sending attempts fail
+        LegalDigitalAddressInt digitalDomicile = LegalDigitalAddressInt.builder()
+                .address("digitalDomicile@" + EXT_CHANNEL_SEND_FAIL_BOTH) //aggiungere stringa presente su delivery-push
+                .type(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC)
+                .build();
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01_" + NationalRegistriesClientMock.NOT_VALID)
+                .withDigitalDomicile(digitalDomicile)
+                .build();
+
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent, notificationDocumentList, safeStorageClientMock);
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withPaId("paId01")
+                .withNotificationRecipient(recipient)
+                .build();
+
+        byte[] differentFileSha = "error".getBytes();
+        notification = TestUtils.firstFileUploadFromNotificationError(notification, safeStorageClientMock, differentFileSha);
+
+
+        pnDeliveryClientMock.addNotification(notification);
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                //Check worfklow is failed
+                Assertions.assertTrue(timelineService.getTimelineElement(
+                        iun,
+                        TimelineEventId.REQUEST_REFUSED.buildEventId(
+                                EventId.builder()
+                                        .iun(iun)
+                                        .build())).isPresent()
+                )
+        );
+        ConsoleAppenderCustom.checkLogs();
+    }
+
+
+    @Test
+    void addressNotValidTest() {
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01")
+                .withPhysicalAddress(PhysicalAddressBuilder.builder()
+                        .withAddress("Via Nuova_" + AddressManagerClientMock.ADDRESS_MANAGER_NOT_VALID_ADDRESS)
+                        .build())
+                .build();
+
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent, notificationDocumentList, safeStorageClientMock);
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withPaId("paId01")
+                .withNotificationRecipient(recipient)
+                .build();
+
+
+        pnDeliveryClientMock.addNotification(notification);
+        
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                //Check worfklow is failed
+                Assertions.assertTrue(timelineService.getTimelineElement(
+                        iun,
+                        TimelineEventId.REQUEST_REFUSED.buildEventId(
+                                EventId.builder()
+                                        .iun(iun)
+                                        .build())).isPresent()
+                )
+        );
+        ConsoleAppenderCustom.checkLogs();
+    }
+
+    @Test
+    void f24ValidationKo() {
+        // GIVEN
+        PhysicalAddressInt paPhysicalAddress1 = PhysicalAddressBuilder.builder()
+                .withAddress(EXT_CHANNEL_SEND_NEW_ADDR + EXTCHANNEL_SEND_SUCCESS + " Via Nuova")
+                .build();
+
+        String paymentDocName = "metadata_0_0";
+        NotificationDocumentInt paymentDoc = TestUtils.getDocumentList(paymentDocName).getFirst();
+        List<NotificationDocumentInt> listPaymentDoc = List.of(paymentDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContentForPayments = TestUtils.getDocumentWithContents(paymentDocName, listPaymentDoc );
+        listPaymentDoc = TestUtils.firstFileUploadFromNotification(listDocumentWithContentForPayments, listPaymentDoc, safeStorageClientMock);
+
+        final List<NotificationPaymentInfoInt> paymentWithF24 = TestUtils.getPaymentWithF24(listPaymentDoc.getFirst());
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01")
+                .withPhysicalAddress(paPhysicalAddress1)
+                .withPayments(paymentWithF24)
+                .build();
+
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent, notificationDocumentList, safeStorageClientMock);
+
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withIun(TestUtils.getRandomIun() + F24_VALIDATION_FAIL)
+                .withNotificationDocuments(notificationDocumentList)
+                .withPaId("paId01")
+                .withNotificationRecipient(recipient)
+                .build();
+
+
+        pnDeliveryClientMock.addNotification(notification);
+
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                //Check worfklow is failed
+                Assertions.assertTrue(timelineService.getTimelineElement(
+                        iun,
+                        TimelineEventId.REQUEST_REFUSED.buildEventId(
+                                EventId.builder()
+                                        .iun(iun)
+                                        .build())).isPresent()
+                )
+        );
+        ConsoleAppenderCustom.checkLogs();
+    }
+
+    @Test
+    void validationPaymentInfoKO() {
+        // GIVEN
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withPayments(Collections.singletonList(
+                        NotificationPaymentInfoInt.builder()
+                                .pagoPA(PagoPaInt.builder()
+                                        .creditorTaxId("creditorTaxId_"+ PnExternalRegistriesClientReactiveMock.TO_FAIL+UUID.randomUUID())
+                                        .noticeCode("noticeCode_"+UUID.randomUUID())
+                                        .applyCost(true)
+                                        .attachment(NotificationDocumentInt.builder()
+                                                .ref(NotificationDocumentInt.Ref.builder()
+                                                        .key("keyPagoPaForm")
+                                                        .build())
+                                                .digests(NotificationDocumentInt.Digests.builder()
+                                                        .sha256(Base64.getEncoder().encodeToString("keyPagoPaForm".getBytes()))
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build()
+                ))
+                .build();
+
+
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent, notificationDocumentList, safeStorageClientMock);
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withNotificationRecipient(recipient)
+                .withNotificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .withPagoPaIntMode(PagoPaIntMode.ASYNC)
+                .withPaFee(100)
+                .build();
+
+
+        pnDeliveryClientMock.addNotification(notification);
+
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                //Check worfklow is failed
+                Assertions.assertTrue(timelineService.getTimelineElement(
+                        iun,
+                        TimelineEventId.REQUEST_REFUSED.buildEventId(
+                                EventId.builder()
+                                        .iun(iun)
+                                        .build())).isPresent()
+                )
+        );
+        ConsoleAppenderCustom.checkLogs("Payment information is not valid");
+    }
+    
+    // INIZIO TEST LOOKUP ADDRESS
     @Test
     void testNotificationAddressLookup_MonoRecipient_AcceptedWithAddressFound() {
         /*
@@ -83,7 +298,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
         String expectedValidationCallTimelineId = TestUtils.buildTimelineEventIdNationalRegistryValidationCall(iun);
@@ -137,7 +352,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
 
@@ -159,7 +374,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
                         .recIndex(recIndex)
                         .build()
         );
-        verifyNotificationRejectionForLookupAddress(iun, expectedRefusalReasons);
+        verifyNotificationRejection(iun, expectedRefusalReasons);
     }
 
     @Test
@@ -196,7 +411,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1, recIndex2));
 
@@ -222,7 +437,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
                         .recIndex(recIndex1)
                         .build()
         );
-        verifyNotificationRejectionForLookupAddress(iun, expectedRefusalReasons);
+        verifyNotificationRejection(iun, expectedRefusalReasons);
     }
 
     @Test
@@ -260,7 +475,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1));
 
@@ -317,7 +532,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         await().untilAsserted(() ->
                 Assertions.assertTrue(
@@ -374,7 +589,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex));
 
@@ -396,7 +611,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
                         .recIndex(recIndex)
                         .build()
         );
-        verifyNotificationRejectionForLookupAddress(iun, expectedRefusalReasons);
+        verifyNotificationRejection(iun, expectedRefusalReasons);
     }
 
     @ParameterizedTest()
@@ -444,7 +659,7 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
         pnDeliveryClientMock.addNotification(notification);
 
         //Start del workflow
-        startWorkflowHandler.startWorkflow(iun);
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
 
         checkRecIndexInNationalRegistryValidationCall(iun, List.of(recIndex1, recIndex2, recIndex3));
 
@@ -478,7 +693,199 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
                         .recIndex(recIndex3)
                         .build()
         );
-        verifyNotificationRejectionForLookupAddress(iun, expectedRefusalReasons, expectedCost);
+        verifyNotificationRejection(iun, expectedRefusalReasons, expectedCost);
+    }
+
+    
+    
+    
+    // FINE TEST LOOKUP ADDRESS
+
+    @Test
+    void validationPaymentInfoOK() {
+        String iun = TestUtils.getRandomIun();
+
+        String fileDocPayment = "keyPagoPaForm_doc00";
+        List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
+        List<TestUtils.DocumentWithContent> listPaymentDocumentWithContent = TestUtils.getDocumentWithContents(fileDocPayment, paymentDocuments);
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent,notificationDocumentList, safeStorageClientMock);
+        paymentDocuments = TestUtils.firstFileUploadFromNotification(listPaymentDocumentWithContent, paymentDocuments, safeStorageClientMock);
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withPhysicalAddress(
+                        PhysicalAddressBuilder.builder()
+                                .withAddress(EXTCHANNEL_SEND_SUCCESS + "_Via Nuova")
+                                .build()
+                )
+                .withPayments(Collections.singletonList(
+                        NotificationPaymentInfoInt.builder()
+                                .pagoPA(PagoPaInt.builder()
+                                        .creditorTaxId("creditorTaxId_"+ UUID.randomUUID())
+                                        .noticeCode("noticeCode_"+UUID.randomUUID())
+                                        .applyCost(true)
+                                        .attachment(paymentDocuments.getFirst())
+                                        .build())
+                                .build()
+                ))
+                .build();
+
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withIun(iun)
+                .withPaId("paId01")
+                .withNotificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .withPagoPaIntMode(PagoPaIntMode.ASYNC)
+                .withPaFee(100)
+                .withNotificationRecipient(recipient)
+                .build();
+
+        
+        pnDeliveryClientMock.addNotification(notification);
+        
+        //Start del workflow
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        String timelineId = TimelineEventId.REQUEST_ACCEPTED.buildEventId(
+                EventId.builder()
+                        .iun(iun)
+                        .build()
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(timelineService.getTimelineElement(iun, timelineId).isPresent())
+        );
+
+        TestUtils.GeneratedLegalFactsInfo generatedLegalFactsInfo = TestUtils.GeneratedLegalFactsInfo.builder()
+                .notificationReceivedLegalFactGenerated(true)
+                .build();
+
+
+        TestUtils.checkGeneratedLegalFacts(notification,generatedLegalFactsInfo,legalFactGenerator);
+    }
+
+    @Test
+    void testNotificationValidationComplete() throws PnIdConflictException {
+        String iun = TestUtils.getRandomIun();
+
+        String fileDocPayment = "keyPagoPaForm_doc00";
+        List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
+        List<TestUtils.DocumentWithContent> listPaymentDocumentWithContent = TestUtils.getDocumentWithContents(fileDocPayment, paymentDocuments);
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        notificationDocumentList = TestUtils.firstFileUploadFromNotification(listDocumentWithContent,notificationDocumentList, safeStorageClientMock);
+        paymentDocuments = TestUtils.firstFileUploadFromNotification(listPaymentDocumentWithContent, paymentDocuments, safeStorageClientMock);
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withPhysicalAddress(
+                        PhysicalAddressBuilder.builder()
+                                .withAddress(EXTCHANNEL_SEND_SUCCESS + "_Via Nuova")
+                                .build()
+                )
+                .withPayments(Collections.singletonList(
+                        NotificationPaymentInfoInt.builder()
+                                .pagoPA(PagoPaInt.builder()
+                                        .creditorTaxId("creditorTaxId_"+ UUID.randomUUID())
+                                        .noticeCode("noticeCode_"+UUID.randomUUID())
+                                        .applyCost(true)
+                                        .attachment(paymentDocuments.getFirst())
+                                        .build())
+                                .build()
+                ))
+                .build();
+
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withNotificationDocuments(notificationDocumentList)
+                .withIun(iun)
+                .withPaId("paId01")
+                .withNotificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .withPagoPaIntMode(PagoPaIntMode.ASYNC)
+                .withPaFee(100)
+                .withNotificationRecipient(recipient)
+                .build();
+
+
+        pnDeliveryClientMock.addNotification(notification);
+
+        //Start del workflow
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        String timelineId = TimelineEventId.REQUEST_ACCEPTED.buildEventId(
+                EventId.builder()
+                        .iun(iun)
+                        .build()
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(timelineService.getTimelineElement(iun, timelineId).isPresent())
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
+                )
+        );
+    }
+
+
+    @Test
+    void notificationDeliveryModeAsyncWithoutPayment() throws PnIdConflictException {
+        // GIVEN
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01")
+                .withPayments(null)
+                .build();
+
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+        List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
+        TestUtils.firstFileUploadFromNotification(listDocumentWithContent, notificationDocumentList, safeStorageClientMock);
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withPaId("paId01")
+                .withNotificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
+                .withPagoPaIntMode(PagoPaIntMode.ASYNC)
+                .withNotificationRecipient(recipient)
+                .build();
+        
+        pnDeliveryClientMock.addNotification(notification);
+
+        String iun = notification.getIun();
+        Integer recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                //Check worfklow is failed
+                Assertions.assertTrue(timelineService.getTimelineElement(
+                        iun,
+                        TimelineEventId.REQUEST_REFUSED.buildEventId(
+                                EventId.builder()
+                                        .iun(iun)
+                                        .recIndex(recIndex)
+                                        .build())).isPresent()
+                )
+        );
+        ConsoleAppenderCustom.checkLogs();
     }
 
     private NotificationRecipientInt getNotificationRecipientInt(String taxId, PhysicalAddressInt physicalAddress) {
@@ -500,76 +907,4 @@ public class NotificationLookupAddressTestIT extends CommonTestConfiguration {
                 .province("TS")
                 .build();
     }
-
-    @Builder
-    @Getter
-    private static class RefusalReason {
-        private String errorCode;
-        private Integer recIndex;
-    }
-
-    private void verifyNotificationRejectionForLookupAddress(String iun, List<RefusalReason> expectedRefusalReasons) {
-        verifyNotificationRejectionForLookupAddress(iun, expectedRefusalReasons, null);
-    }
-
-    private void verifyNotificationRejectionForLookupAddress(String iun, List<RefusalReason> expectedRefusalReasons, Integer expectedCost) {
-        TimelineElementInternal timelineElementInternal = TestUtils.getNotificationRejected(iun, timelineService).get();
-        RequestRefusedDetailsInt details = (RequestRefusedDetailsInt) timelineElementInternal.getDetails();
-        Assertions.assertEquals(expectedRefusalReasons.size(), details.getRefusalReasons().size());
-        List<NotificationRefusedErrorInt> actualRefusalReasons = details.getRefusalReasons();
-        for(RefusalReason expectedRefusalReason : expectedRefusalReasons) {
-            Assertions.assertTrue(checkRefusalReason(expectedRefusalReason, actualRefusalReasons),
-                    "Refusal reason not found in the list of refusal reasons for IUN: " + iun);
-
-        }
-        if(expectedCost != null) {
-            Assertions.assertEquals(expectedCost, details.getNotificationCost());
-        }
-    }
-
-    private boolean checkRefusalReason(RefusalReason expectedRefusalReason, List<NotificationRefusedErrorInt> actualRefusalReasons) {
-        return actualRefusalReasons.stream()
-                .anyMatch(r -> r.getErrorCode().equals(expectedRefusalReason.getErrorCode()) &&
-                        r.getRecIndex().equals(expectedRefusalReason.getRecIndex()));
-    }
-
-    private void checkRecIndexInNationalRegistryValidationCall(String iun, List<Integer> recIndexesInput) {
-        // Attendo sia presente l'elemento di timeline di ricerca in fase di validazione sui registri nazionali
-        await().untilAsserted(() ->
-                Assertions.assertTrue(
-                        TestUtils.checkIsPresentNationalRegistryValidationCall(iun, timelineService)
-                )
-        );
-        Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
-                iun,
-                TestUtils.buildTimelineEventIdNationalRegistryValidationCall(iun)
-        );
-
-        if (timelineElementOpt.isPresent()) {
-            TimelineElementInternal timelineElement = timelineElementOpt.get();
-            PublicRegistryValidationCallDetailsInt details =
-                    (PublicRegistryValidationCallDetailsInt) timelineElement.getDetails();
-            List<Integer> recIndexesDetails = details.getRecIndexes();
-            Assertions.assertEquals(recIndexesDetails.size(), details.getRecIndexes().size());
-            Assertions.assertTrue(compareRecIndexesLists(recIndexesDetails, recIndexesInput));
-        } else {
-            Assertions.fail("Timeline element with category NATIONAL_REGISTRY_VALIDATION_CALL not found for IUN: " + iun);
-        }
-    }
-
-    public static boolean compareRecIndexesLists(List<Integer> recIndexesDetails, List<Integer> recIndexesInput) {
-        if (recIndexesDetails == null && recIndexesInput == null) {
-            return true;
-        }
-
-        if (recIndexesDetails == null || recIndexesInput == null) {
-            return false;
-        }
-
-        Set<Integer> integerList1 = new HashSet<>(recIndexesDetails);
-        Set<Integer> integerList2 = new HashSet<>(recIndexesInput);
-
-        return integerList1.equals(integerList2);
-    }
-
 }
