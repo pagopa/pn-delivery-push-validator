@@ -112,8 +112,12 @@ public class NotificationTestBuilder {
     }
 
     public NotificationInt build() {
+        if(communicationType == null) {
+            communicationType = CommunicationType.LEGAL;
+        }
+
         if(iun == null){
-            iun = TestUtils.getRandomIun(4);
+            iun = TestUtils.getRandomIun(4, communicationType);
         }
         
         if(paId == null){
@@ -128,10 +132,6 @@ public class NotificationTestBuilder {
 
         if(pagoPaIntMode == null) {
             pagoPaIntMode = PagoPaIntMode.SYNC;
-        }
-
-        if(communicationType == null) {
-            communicationType = CommunicationType.LEGAL;
         }
 
         if( notificationDocument.isEmpty() && communicationType == CommunicationType.LEGAL) {

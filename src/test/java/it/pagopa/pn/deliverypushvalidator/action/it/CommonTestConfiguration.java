@@ -34,6 +34,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorage
 import it.pagopa.pn.deliverypushvalidator.service.impl.*;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
@@ -129,7 +130,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         MessageValidator.class,
         CampaignServiceImpl.class,
         MVPCampaignsParameterConsumer.class,
-        DigitalAddressValidator.class
+        DigitalAddressValidator.class,
+        CommunicationTypeChecker.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")

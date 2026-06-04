@@ -5,6 +5,7 @@ import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCos
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,9 @@ class NotificationValidationActionHandlerTest {
     @Mock
     private LegalNotificationValidationStrategy legalStrategy;
 
+    @Mock
+    private CommunicationTypeChecker communicationTypeChecker;
+
     @InjectMocks
     private NotificationValidationActionHandler handler;
 
@@ -29,7 +33,6 @@ class NotificationValidationActionHandlerTest {
 
     @Test
     void validateNotification_whenInformal_shouldUseInformalStrategy() {
-
         NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
         handler.validateNotification(IUN, details, CommunicationType.INFORMAL);
 
@@ -42,16 +45,6 @@ class NotificationValidationActionHandlerTest {
 
         NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
         handler.validateNotification(IUN, details, CommunicationType.LEGAL);
-
-        verify(legalStrategy).validate(IUN, details);
-        verifyNoInteractions(informalStrategy);
-    }
-
-    @Test
-    void validateNotification_whenCommunicationTypeIsNull_shouldUseLegalStrategy() {
-        NotificationValidationActionDetails details = mock(NotificationValidationActionDetails.class);
-
-        handler.validateNotification(IUN, details, null);
 
         verify(legalStrategy).validate(IUN, details);
         verifyNoInteractions(informalStrategy);

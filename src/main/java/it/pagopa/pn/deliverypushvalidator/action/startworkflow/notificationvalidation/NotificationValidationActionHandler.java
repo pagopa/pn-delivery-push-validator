@@ -5,6 +5,7 @@ import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCos
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class NotificationValidationActionHandler {
     private final InformalNotificationValidationStrategy informalStrategy;
     private final LegalNotificationValidationStrategy legalStrategy;
+    private final CommunicationTypeChecker communicationTypeChecker;
 
     public void validateNotification(String iun, NotificationValidationActionDetails details, CommunicationType communicationType) {
         log.debug("Start validateNotification - iun={} communicationType={}", iun, communicationType);
@@ -38,11 +40,11 @@ public class NotificationValidationActionHandler {
     }
 
     private NotificationValidationStrategy resolveStrategy(CommunicationType communicationType, String iun) {
-        log.debug("Resolved validation strategy for type={} - iun={}", communicationType, iun);
+        log.debug("Resolve validation strategy for type={} - iun={}", communicationType, iun);
+        communicationTypeChecker.checkAgainstIun(communicationType, iun);
         return switch (communicationType) {
             case INFORMAL -> informalStrategy;
             case LEGAL -> legalStrategy;
-            case null -> legalStrategy;
         };
     }
 
