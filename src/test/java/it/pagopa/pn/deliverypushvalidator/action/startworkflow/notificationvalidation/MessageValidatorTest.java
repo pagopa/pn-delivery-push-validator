@@ -158,8 +158,7 @@ class MessageValidatorTest {
                     Assertions.assertEquals("MESSAGE_NOT_FOUND", ex.getProblem().getErrors().getFirst().getCode());
                     Assertions.assertEquals("recipients[0].messageId", ex.getProblem().getErrors().getFirst().getElement());
                 })
-                .verify();
-    }
+                .verify();}
 
     @Test
     void validateWhenDataVaultReturnsNullThenThrowValidationMessageNotFound() {
@@ -220,7 +219,7 @@ class MessageValidatorTest {
     }
 
     @Test
-    void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsNullThenThrowMismatch() {
+    void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsEmptyThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
         NotificationInt notification = buildNotification(senderId, messageId, Collections.emptyList());
@@ -241,6 +240,36 @@ class MessageValidatorTest {
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("en");
+        when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .verifyComplete();
+    }
+
+    // --- Nuovi test: lingua secondaria presente ma additionalLanguages assente → OK ---
+
+    @Test
+    void validateWhenSecondaryLanguageIsPresentAndAdditionalLanguagesIsNullThenPass() {
+        UUID senderId = UUID.randomUUID();
+        UUID messageId = UUID.randomUUID();
+        NotificationInt notification = buildNotification(senderId, messageId, null);
+
+        MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
+        when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("de");
+        when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
+
+        StepVerifier.create(messageValidator.validate(notification))
+                .verifyComplete();
+    }
+
+    @Test
+    void validateWhenSecondaryLanguageIsPresentAndAdditionalLanguagesIsEmptyThenPass() {
+        UUID senderId = UUID.randomUUID();
+        UUID messageId = UUID.randomUUID();
+        NotificationInt notification = buildNotification(senderId, messageId, Collections.emptyList());
+
+        MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
+        when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("de");
         when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
 
         StepVerifier.create(messageValidator.validate(notification))
@@ -274,4 +303,3 @@ class MessageValidatorTest {
                 .build();
     }
 }
-

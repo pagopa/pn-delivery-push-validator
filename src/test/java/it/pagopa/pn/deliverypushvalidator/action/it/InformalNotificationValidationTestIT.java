@@ -221,9 +221,7 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
 
     private static Stream<Arguments> provideMessageLanguageInconsistenciesScenarios() {
         return Stream.of(
-                Arguments.of(null,                                   List.of("DE")),
-                Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), null),
-                Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), Collections.emptyList()),
+                Arguments.of(null, List.of("DE")),
                 Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), List.of("FR"))
         );
     }

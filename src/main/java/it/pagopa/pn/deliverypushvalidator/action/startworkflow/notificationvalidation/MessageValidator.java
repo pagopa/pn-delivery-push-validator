@@ -129,15 +129,18 @@ public class MessageValidator {
         }
 
         String messageLanguage = secondaryContent.getLanguage().getValue();
-        boolean languageMatches = !CollectionUtils.isEmpty(additionalLanguages)
-                && additionalLanguages.stream().anyMatch(lang -> lang.equalsIgnoreCase(messageLanguage));
 
-        if (!languageMatches) {
-            String detail = "Message language '" + messageLanguage
-                    + "' does not match notification additional languages " + additionalLanguages
-                    + " for messageId: " + recipient.getMessageId();
-            return Mono.error(logValidationFailure(notification, element, detail,
-                    new PnValidationMessageLanguageMismatchException(detail, element)));
+        if (!CollectionUtils.isEmpty(additionalLanguages)) {
+            boolean languageMatches = additionalLanguages.stream()
+                    .anyMatch(lang -> lang.equalsIgnoreCase(messageLanguage));
+
+            if (!languageMatches) {
+                String detail = "Message language '" + messageLanguage
+                        + "' does not match notification additional languages " + additionalLanguages
+                        + " for messageId: " + recipient.getMessageId();
+                return Mono.error(logValidationFailure(notification, element, detail,
+                        new PnValidationMessageLanguageMismatchException(detail, element)));
+            }
         }
 
         return Mono.empty();
