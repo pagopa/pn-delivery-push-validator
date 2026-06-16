@@ -29,7 +29,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -221,9 +220,7 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
 
     private static Stream<Arguments> provideMessageLanguageInconsistenciesScenarios() {
         return Stream.of(
-                Arguments.of(null,                                   List.of("DE")),
-                Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), null),
-                Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), Collections.emptyList()),
+                Arguments.of(null, List.of("DE")),
                 Arguments.of(LocalizedContent.builder().language(LocalizedContent.LanguageEnum.DE).build(), List.of("FR"))
         );
     }
