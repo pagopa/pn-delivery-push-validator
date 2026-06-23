@@ -182,13 +182,22 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageNotInAdditionalLanguagesThenThrowMismatch() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "de"));
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(List.of("it", "de"))
+                .build();
+        NotificationInt notificationInt = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("fr");
         when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
 
-        StepVerifier.create(messageValidator.validate(notification))
+        StepVerifier.create(messageValidator.validate(notificationInt))
                 .expectErrorSatisfies(throwable -> {
                     Assertions.assertInstanceOf(PnValidationMessageLanguageMismatchException.class, throwable);
                     PnValidationMessageLanguageMismatchException ex = (PnValidationMessageLanguageMismatchException) throwable;
@@ -202,13 +211,21 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsPresentThenThrowMismatch() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "de"));
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(List.of("it", "de"))
+                .build();
+        NotificationInt notificationInt = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent()).thenReturn(null);
         when(pnDataVaultClientReactive.getMessageById(messageId, senderId)).thenReturn(Mono.just(message));
 
-        StepVerifier.create(messageValidator.validate(notification))
+        StepVerifier.create(messageValidator.validate(notificationInt))
                 .expectErrorSatisfies(throwable -> {
                     Assertions.assertInstanceOf(PnValidationMessageLanguageMismatchException.class, throwable);
                     PnValidationMessageLanguageMismatchException ex = (PnValidationMessageLanguageMismatchException) throwable;
