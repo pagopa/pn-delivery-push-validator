@@ -120,8 +120,7 @@ public class MessageValidator {
 
         if (secondaryContent == null) {
             if (!CollectionUtils.isEmpty(additionalLanguages)) {
-                String detail = "Notification declares additionalLanguages for the recipient, but the corresponding message has no secondary content"
-                        + additionalLanguages + " for messageId: " + recipient.getMessageId();
+                String detail = "Notification declares " + recipient.getAdditionalLanguages() + " as additionalLanguages for the recipient, but the corresponding message with messageId" + recipient.getMessageId() + " has no secondary content";
                 return Mono.error(logValidationFailure(notification, element, detail,
                         new PnValidationMessageLanguageMismatchException(detail, element)));
             }
