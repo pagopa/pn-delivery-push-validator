@@ -12,5 +12,6 @@ public class PagoPaInt {
     private String noticeCode;
     private String creditorTaxId;
     private Boolean applyCost;
+    private Integer amount;
     private NotificationDocumentInt attachment;
 }

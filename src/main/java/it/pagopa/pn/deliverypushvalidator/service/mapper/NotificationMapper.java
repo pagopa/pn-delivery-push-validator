@@ -194,6 +194,7 @@ public class NotificationMapper {
                             .pagoPA(PagoPaInt.builder()
                                     .creditorTaxId(pagoPa.getCreditorTaxId())
                                     .noticeCode(pagoPa.getNoticeCode())
+                                    .amount(payment.getPagoPa().getAmount())
                                     .attachment(pagoPa.getAttachment() != null ? NotificationDocumentInt.builder()
                                             .ref(NotificationDocumentInt.Ref.builder()
                                                     .key(pagoPa.getAttachment().getRef().getKey())

@@ -105,6 +105,7 @@ public class PaymentMapper {
             pagoPaPaymentBase.setAttachment(getNotificationPaymentAttachment(pagoPa.getAttachment()));
             pagoPaPaymentBase.setCreditorTaxId(pagoPa.getCreditorTaxId());
             pagoPaPaymentBase.setNoticeCode(pagoPa.getNoticeCode());
+            pagoPaPaymentBase.setAmount(pagoPa.getAmount());
         }
         return pagoPaPaymentBase;
     }
