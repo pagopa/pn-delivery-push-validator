@@ -38,7 +38,7 @@ class DigitalAddressValidatorTest {
     @Test
     void validateDigitalAddress_nullRecipients_shouldThrow() {
         Campaign campaign = Campaign.builder()
-                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.PEC).build()))
                 .build();
         NotificationInt notification = NotificationInt.builder().recipients(null).build();
 
