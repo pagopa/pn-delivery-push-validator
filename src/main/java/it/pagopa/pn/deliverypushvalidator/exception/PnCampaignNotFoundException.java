@@ -1,16 +1,14 @@
 package it.pagopa.pn.deliverypushvalidator.exception;
 
-import it.pagopa.pn.commons.exceptions.PnRuntimeException;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
-import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.CAMPAIGN_NOT_FOUND;
+import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_CAMPAIGN_NOT_FOUND;
 
 @Getter
-public class PnCampaignNotFoundException extends PnRuntimeException {
+public class PnCampaignNotFoundException extends PnNotFoundException {
 
-  public PnCampaignNotFoundException(String message, String description) {
-    super(message, description, HttpStatus.NOT_FOUND.value(), String.valueOf(CAMPAIGN_NOT_FOUND), null, null);
+  public PnCampaignNotFoundException(String description) {
+    super("Campaign not found", description, ERROR_CODE_CAMPAIGN_NOT_FOUND);
   }
 
 }

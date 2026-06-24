@@ -41,9 +41,7 @@ class CampaignServiceImplTest {
     @Test
     void getCampaignByCampaignIdAndSenderIdPropagatesConsumerException() {
         PnCampaignNotFoundException expectedException = new PnCampaignNotFoundException(
-                "Campaign not found",
-                "Campaign with campaignId=campaign-id and senderId=sender-id not found"
-        );
+                "Campaign not found for campaignId: " + CAMPAIGN_ID + " and senderId: " + SENDER_ID);
 
         when(mvpCampaignsParameterConsumer.getCampaignByCampaignIdAndSenderId(CAMPAIGN_ID, SENDER_ID))
                 .thenThrow(expectedException);

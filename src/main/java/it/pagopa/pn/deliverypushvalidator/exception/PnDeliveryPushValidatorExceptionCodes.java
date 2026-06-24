@@ -50,6 +50,8 @@ public class PnDeliveryPushValidatorExceptionCodes extends PnExceptionsCodes {
     public static final String ERROR_CODE_TIMELINESERVICE_COMMUNICATION_TYPE_NOT_PRESENT = "PN_TIMELINESERVICE_COMMUNICATIONTYPENOTPRESENT";
     public static final String ERROR_CODE_DELIVERYPUSH_INCOHERENT_COMMUNICATION_TYPE = "PN_DELIVERYPUSH_INCOHERENTCOMMUNICATIONTYPE";
 
+    public static final String ERROR_CODE_CAMPAIGN_NOT_FOUND = "PN_DELIVERYPUSHVALIDATOR_CAMPAIGN_NOT_FOUND";
+
     @Getter
     public enum NotificationRefusedErrorCodeInt {
         FILE_NOTFOUND("FILE_NOTFOUND", false),

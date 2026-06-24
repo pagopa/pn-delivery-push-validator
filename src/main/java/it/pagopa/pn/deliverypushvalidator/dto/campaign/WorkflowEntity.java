@@ -1,16 +1,18 @@
 package it.pagopa.pn.deliverypushvalidator.dto.campaign;
 
+import it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt;
 import lombok.*;
 
-@EqualsAndHashCode
-@ToString
-@Getter
-@Setter
+import java.time.Duration;
+
+@Data
 @Builder(toBuilder = true)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class WorkflowEntity {
     private Channel channel;
+    private RecipientTypeInt recipientType;
+    private Duration timeout;
     private DesiredFeedback desiredFeedback;
-    private boolean includeAttachment;
+    private Boolean includeAttachment;
 }

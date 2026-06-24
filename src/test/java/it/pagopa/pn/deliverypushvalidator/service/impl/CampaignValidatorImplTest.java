@@ -41,7 +41,7 @@ class CampaignValidatorImplTest {
     void validateAndGetCampaign_shouldThrowException_whenCampaignNotFound() {
         NotificationInt notification = buildNotification("camp2", "sender2");
         when(campaignService.getCampaignByCampaignIdAndSenderId("camp2", "sender2"))
-                .thenThrow(new PnCampaignNotFoundException("not found", ""));
+                .thenThrow(new PnCampaignNotFoundException("Campaign with id camp2 not found"));
 
         PnCampaignValidationException ex = assertThrows(
                 PnCampaignValidationException.class,

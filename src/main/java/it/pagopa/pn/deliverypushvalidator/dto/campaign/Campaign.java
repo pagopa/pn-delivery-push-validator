@@ -49,6 +49,8 @@ public class Campaign {
 
     private boolean stopOnViewed;
 
+    private List<Channel> channels;
+
     @Valid
     @NotEmpty
     private List<WorkflowEntity> workflow;
