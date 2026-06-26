@@ -86,7 +86,7 @@ public class PnDeliveryPushValidatorExceptionCodes extends PnExceptionsCodes {
 
         CAMPAIGN_NOT_FOUND( "CAMPAIGN_NOT_FOUND", false),
 
-        CAMPAIGN_CLOSED ("CAMPAIGN_CLOSED", false),
+        CAMPAIGN_INVALID ("CAMPAIGN_INVALID", false),
 
         DIGITAL_ADDRESS_MISSING("DIGITAL_ADDRESS_MISSING", false);
 
