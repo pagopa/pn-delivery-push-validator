@@ -71,7 +71,7 @@ public class NationalRegistriesServiceImpl implements NationalRegistriesService 
 
         List<RecipientAddressRequestBody> recipientAddressRequests = buildRecipientAddressRequest(notification.getRecipients());
         if (CollectionUtils.isEmpty(recipientAddressRequests)) {
-            log.warn("No recipients to send request for get physical address", ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS);
+            log.warn("No recipients to send request for get physical address");
             return Collections.emptyList();
         }
 
