@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS;
@@ -70,7 +71,8 @@ public class NationalRegistriesServiceImpl implements NationalRegistriesService 
 
         List<RecipientAddressRequestBody> recipientAddressRequests = buildRecipientAddressRequest(notification.getRecipients());
         if (CollectionUtils.isEmpty(recipientAddressRequests)) {
-            throw new PnInternalException("No recipients to send request for get physical address", ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS);
+            log.warn("No recipients to send request for get physical address", ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS);
+            return Collections.emptyList();
         }
 
         List<NationalRegistriesResponse> nationalRegistriesResponses = nationalRegistriesClient.sendRequestForGetPhysicalAddresses(buildRequestBody(recipientAddressRequests, eventId));
