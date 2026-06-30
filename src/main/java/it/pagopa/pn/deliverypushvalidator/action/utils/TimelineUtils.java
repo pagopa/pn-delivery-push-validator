@@ -52,6 +52,7 @@ public class TimelineUtils {
                 .elementId(elementId)
                 .details(details)
                 .paId(notification.getSender().getPaId())
+                .communicationType(notification.getCommunicationType())
                 .notificationSentAt(notification.getSentAt())
                 .build();
     }
@@ -102,7 +103,9 @@ public class TimelineUtils {
                 .build();
 
         TimelineElementInternal.TimelineElementInternalBuilder timelineBuilder = TimelineElementInternal.builder()
-                .legalFactsIds(singleLegalFactId(legalFactId, LegalFactCategoryInt.SENDER_ACK));
+                .legalFactsIds(legalFactId != null
+                        ? singleLegalFactId(legalFactId, LegalFactCategoryInt.SENDER_ACK)
+                        : Collections.emptyList());
 
         return buildTimeline(notification, TimelineElementCategoryInt.REQUEST_ACCEPTED, elementId, details, timelineBuilder);
     }

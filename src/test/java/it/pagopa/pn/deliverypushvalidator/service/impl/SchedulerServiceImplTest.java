@@ -1,9 +1,9 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
-import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -37,131 +37,86 @@ class SchedulerServiceImplTest {
         schedulerService = new SchedulerServiceImpl(actionsPool, timelineUtils);
     }
 
-    
     @Test
-    void scheduleEventScheduleNowIfAbsent() {
-        final ActionType actionType = ActionType.NOTIFICATION_VALIDATION;
-        
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(Mockito.anyString()))
-                .thenReturn(false);
+    void scheduleEvent_withCommunicationType_shouldAddAction() {
+        String iun = "IUN01";
+        Instant dateToSchedule = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
+        CommunicationType communicationType = CommunicationType.LEGAL;
 
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
 
-        schedulerService.scheduleEventNowOnlyIfAbsent("01", actionType,    NotificationValidationActionDetails.builder()
-                .startWorkflowTime(Instant.now())
-                .build());
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
-    }
-    
-    @Test
-    void scheduleEvent() {
-        Action action = buildAction(ActionType.NOTIFICATION_REFUSED);
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        schedulerService.scheduleEvent(iun, dateToSchedule, actionType, communicationType);
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(false);
-
-        schedulerService.scheduleEvent("01", 3, instant, ActionType.NOTIFICATION_REFUSED);
-
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
+        Mockito.verify(actionsPool).addOnlyAction(any(Action.class));
     }
 
     @Test
-    void unscheduleEvent() {
-        Action action = buildAction(ActionType.NOTIFICATION_REFUSED);
-        String actionId = action.getType().buildActionId(action);
+    void scheduleEvent_withActionDetails_shouldAddAction() {
+        String iun = "IUN01";
+        Instant dateToSchedule = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
+        ActionDetails actionDetails = Mockito.mock(ActionDetails.class);
+        CommunicationType communicationType = CommunicationType.INFORMAL;
 
-        schedulerService.unscheduleEvent("01", 3, ActionType.NOTIFICATION_REFUSED, "timelineEventId");
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
 
-        Mockito.verify(actionsPool, Mockito.times(1)).unscheduleFutureAction(actionId);
+        schedulerService.scheduleEvent(iun, dateToSchedule, actionType, actionDetails, communicationType);
+
+        Mockito.verify(actionsPool).addOnlyAction(any(Action.class));
     }
 
     @Test
-    void scheduleEvent2(){
-        Action action = buildAction(ActionType.DOCUMENT_CREATION_RESPONSE);
-        ActionDetails actionDetails = DocumentCreationResponseActionDetails.builder()
-                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue())
-                .key("key")
-                .timelineId("timelineId")
-                .build();
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
+    void scheduleEvent_whenNotificationCancelled_shouldNotAddAction() {
+        String iun = "IUN01";
+        Instant dateToSchedule = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
+        CommunicationType communicationType = CommunicationType.LEGAL;
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
 
-        schedulerService.scheduleEvent("01", instant, ActionType.DOCUMENT_CREATION_RESPONSE,actionDetails);
+        schedulerService.scheduleEvent(iun, dateToSchedule, actionType, communicationType);
 
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
-    }
-    @Test
-    void scheduleEvent4(){
-        Action action = buildAction(ActionType.DOCUMENT_CREATION_RESPONSE);
-        ActionDetails actionDetails = DocumentCreationResponseActionDetails.builder()
-                .documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue())
-                .key("key")
-                .timelineId("timelineId")
-                .build();
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
-
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(false);
-
-        schedulerService.scheduleEvent("01", 3, instant, ActionType.DOCUMENT_CREATION_RESPONSE, actionDetails);
-
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
-    }
-    @Test
-    void scheduleEvent8(){
-        Action action = buildAction(ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
-
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
-
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(false);
-
-        schedulerService.scheduleEvent("01", 3, instant, ActionType.POST_ACCEPTED_PROCESSING_COMPLETED,"timelineEventId");
-
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
+        Mockito.verify(actionsPool, Mockito.never()).addOnlyAction(any(Action.class));
     }
 
     @Test
-    void scheduleEvent1(){
-        Action action = buildAction(ActionType.CHECK_ATTACHMENT_RETENTION);
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
+    void scheduleEvent_whenNotificationCancelledButActionIsForCancellation_shouldAddAction() {
+        String iun = "IUN01";
+        Instant dateToSchedule = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
+        DocumentCreationResponseActionDetails actionDetails = Mockito.mock(DocumentCreationResponseActionDetails.class);
+        Mockito.when(actionDetails.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue());
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
 
-        schedulerService.scheduleEvent("01", instant, ActionType.CHECK_ATTACHMENT_RETENTION);
+        schedulerService.scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, null);
 
-        Mockito.verify(actionsPool, Mockito.times(1)).addOnlyAction(any(Action.class));
+        Mockito.verify(actionsPool).addOnlyAction(any(Action.class));
     }
 
     @Test
-    void scheduleEventCancelled() {
-        //GIVEN
-        Action action = buildAction(ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
-        
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(action.getIun()))
-                .thenReturn(true);
-        
-        //WHEN
-        schedulerService.scheduleEvent("01", 3, instant, ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
+    void scheduleEvent_fullSignature_shouldBuildActionWithCorrectFields() {
+        String iun = "IUN01";
+        Integer recIndex = 3;
+        Instant dateToSchedule = Instant.parse("2022-08-30T16:04:13.913859900Z");
+        ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
+        String timelineEventId = "timeline_01";
+        CommunicationType communicationType = CommunicationType.LEGAL;
 
-        Mockito.verify(actionsPool, Mockito.never()).addOnlyAction(action);
-    }
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
 
-    private Action buildAction(ActionType type) {
+        schedulerService.scheduleEvent(iun, recIndex, dateToSchedule, actionType, timelineEventId, null, communicationType);
 
-        Instant instant = Instant.parse("2022-08-30T16:04:13.913859900Z");
-
-        return Action.builder()
-                .iun("01")
-                .actionId("01_analog_workflow_e_3")
-                .notBefore(instant)
-                .type(type)
-                .recipientIndex(3)
-                .build();
+        Mockito.verify(actionsPool).addOnlyAction(Mockito.argThat(action ->
+                iun.equals(action.getIun()) &&
+                        recIndex.equals(action.getRecipientIndex()) &&
+                        dateToSchedule.equals(action.getNotBefore()) &&
+                        actionType.equals(action.getType()) &&
+                        timelineEventId.equals(action.getTimelineId()) &&
+                        communicationType.equals(action.getCommunicationType()) &&
+                        action.getActionId() != null
+        ));
     }
 
 

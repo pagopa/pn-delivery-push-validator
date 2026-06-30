@@ -6,9 +6,12 @@ import it.pagopa.pn.commons.exceptions.ExceptionHelper;
 import it.pagopa.pn.deliverypushvalidator.config.springbootcfg.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.ssm.SsmClient;
 
+@ExtendWith(MockitoExtension.class)
 class ActivatorTest {
     @Mock
     private AwsConfigs awsConfigs;

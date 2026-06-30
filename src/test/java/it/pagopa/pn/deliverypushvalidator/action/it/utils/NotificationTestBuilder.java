@@ -25,6 +25,9 @@ public class NotificationTestBuilder {
     private String group;
 
     private UsedServicesInt usedServices;
+    private List<String> additionalLanguages;
+    private CommunicationType communicationType;
+    private String campaignId;
 
     public NotificationTestBuilder() {
         sentAt = Instant.now();
@@ -93,16 +96,45 @@ public class NotificationTestBuilder {
         return this;
     }
 
+    public NotificationTestBuilder withAdditionalLanguages(List<String> additionalLanguages) {
+        this.additionalLanguages = additionalLanguages;
+        return this;
+    }
+
+    public NotificationTestBuilder withCommunicationType(CommunicationType communicationType) {
+        this.communicationType = communicationType;
+        return this;
+    }
+
+    public NotificationTestBuilder withCampaignId(String campaignId) {
+        this.campaignId = campaignId;
+        return this;
+    }
+
     public NotificationInt build() {
+        if(communicationType == null) {
+            communicationType = CommunicationType.LEGAL;
+        }
+
         if(iun == null){
-            iun = TestUtils.getRandomIun(4);
+            iun = TestUtils.getRandomIun(4, communicationType);
         }
         
         if(paId == null){
             paId = "generatedPaId";
         }
         
-        if( notificationDocument.isEmpty() ){
+
+
+        if(notificationFeePolicy == null) {
+            notificationFeePolicy = NotificationFeePolicy.FLAT_RATE;
+        }
+
+        if(pagoPaIntMode == null) {
+            pagoPaIntMode = PagoPaIntMode.SYNC;
+        }
+
+        if( notificationDocument.isEmpty() && communicationType == CommunicationType.LEGAL) {
             String fileDoc = "sha256_doc00";
 
             notificationDocument = List.of(
@@ -118,14 +150,6 @@ public class NotificationTestBuilder {
                             )
                             .build()
             );
-        }
-
-        if(notificationFeePolicy == null) {
-            notificationFeePolicy = NotificationFeePolicy.FLAT_RATE;
-        }
-
-        if(pagoPaIntMode == null) {
-            pagoPaIntMode = PagoPaIntMode.SYNC;
         }
 
         return NotificationInt.builder()
@@ -150,6 +174,9 @@ public class NotificationTestBuilder {
                 .paFee(paFee)
                 .group(group)
                 .usedServices(usedServices)
+                .additionalLanguages(additionalLanguages)
+                .communicationType(communicationType)
+                .campaignId(campaignId)
                 .build();
     }
 

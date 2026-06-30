@@ -36,7 +36,7 @@ public class NotificationValidationHandler extends AbstractActionEventHandler {
 
             checkNotificationCancelledAndExecute(
                     action,
-                    a -> notificationValidationActionHandler.validateNotification(a.getIun(), (NotificationValidationActionDetails) a.getDetails() )
+                    a -> notificationValidationActionHandler.validateNotification(a.getIun(), (NotificationValidationActionDetails) a.getDetails(), a.getCommunicationType())
             );
             log.logEndingProcess(processName);
         } catch (Exception ex) {

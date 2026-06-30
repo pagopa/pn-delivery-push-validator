@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.configs.MVPParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
+import it.pagopa.pn.deliverypushvalidator.action.refused.LegalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.*;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.*;
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.config.MVPCampaignsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
@@ -18,9 +21,11 @@ import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.DocumentCreationResponseEventHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationRefusedHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.NotificationValidationHandler;
+import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.PostValidationCompletedActionHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.action.ReceivedLegalFactGenerationHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventHandlerRegistry;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.EventRouter;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.impl.TimeParams;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.AddressManagerResponseHandler;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCreationResponseHandler;
@@ -29,6 +34,7 @@ import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.SafeStorage
 import it.pagopa.pn.deliverypushvalidator.service.impl.*;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostServiceMapper;
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
+import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
@@ -47,6 +53,8 @@ import org.springframework.util.unit.DataSize;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.EnumMap;
+import java.util.Map;
 
 import static org.awaitility.Awaitility.setDefaultTimeout;
 
@@ -72,6 +80,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         NotificationValidationActionHandler.class,
         TaxIdPivaValidator.class,
         ReceivedLegalFactCreationRequest.class,
+        CheckAttachmentRetentionScheduler.class,
+        PostValidationCompletedHandler.class,
         NotificationValidationScheduler.class,
         AddressValidator.class,
         AddressManagerServiceImpl.class,
@@ -85,6 +95,8 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         PnExternalRegistriesClientReactiveMock.class,
         PaymentValidator.class,
         NotificationRefusedActionHandler.class,
+        LegalNotificationRefusedStrategy.class,
+        InformalNotificationRefusedStrategy.class,
         F24ResponseHandler.class,
         ActionPoolMock.class,
         //quickWorkAroundForPN-9116
@@ -107,10 +119,19 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         ValidationActionsConsumer.class,
         DocumentCreationResponseHandler.class,
         DocumentCreationResponseEventHandler.class,
+        PostValidationCompletedActionHandler.class,
         NotificationCostServiceImpl.class,
         NotificationCostServiceClientMock.class,
         NotificationCostServiceMapper.class,
-        NotificationCostServiceFeatureFlagUtils.class
+        NotificationCostServiceFeatureFlagUtils.class,
+        LegalNotificationValidationStrategy.class,
+        InformalNotificationValidationStrategy.class,
+        CampaignValidatorImpl.class,
+        MessageValidator.class,
+        CampaignServiceImpl.class,
+        MVPCampaignsParameterConsumer.class,
+        DigitalAddressValidator.class,
+        CommunicationTypeChecker.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
@@ -145,7 +166,7 @@ public class CommonTestConfiguration {
     AddressManagerClientMock addressManagerClientMock;
     @Autowired
     PnDeliveryPushValidatorConfigs cfg;
-    
+
     @BeforeEach
     void setup() {
         setDefaultTimeout(Duration.ofSeconds(120));
@@ -178,7 +199,11 @@ public class CommonTestConfiguration {
         times.setAttachmentRetentionTimeAfterValidation(Duration.ofSeconds(5));
         times.setCheckAttachmentTimeBeforeExpiration(Duration.ofSeconds(2));
 
-        Mockito.when(cfg.getTimeParams()).thenReturn(times);
+        Map<CommunicationType, TimeParams> timeParamsMap = new EnumMap<>(CommunicationType.class);
+        timeParamsMap.put(CommunicationType.LEGAL, times);
+        timeParamsMap.put(CommunicationType.INFORMAL, times);
+
+        Mockito.when(cfg.getTimeParamsMap()).thenReturn(timeParamsMap);
 
         // Impostazione delle proprietà di validazione PDF
         Mockito.when(cfg.isCheckPdfValidEnabled()).thenReturn(true);

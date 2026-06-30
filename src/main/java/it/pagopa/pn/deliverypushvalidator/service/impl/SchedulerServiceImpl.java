@@ -4,6 +4,7 @@ package it.pagopa.pn.deliverypushvalidator.service.impl;
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionDetails;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
@@ -22,28 +23,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final TimelineUtils timelineUtils;
 
     @Override
-    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType) {
-        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, null);
-    }
-    
-    @Override
-    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails){
-        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails);
+    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, CommunicationType communicationType) {
+        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, null, communicationType);
     }
 
     @Override
-    public void scheduleEventNowOnlyIfAbsent(String iun, ActionType actionType, ActionDetails actionDetails){
-        this.scheduleEvent(iun, null, Instant.now(), actionType, null, actionDetails);
-    }
-
-    @Override
-    public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails) {
-        this.scheduleEvent(iun, recIndex, dateToSchedule, actionType, null, actionDetails);
-    }
-    
-    @Override
-    public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule, ActionType actionType) {
-        this.scheduleEvent(iun, recIndex, dateToSchedule, actionType, null, null);
+    public void scheduleEvent(String iun, Instant dateToSchedule, ActionType actionType, ActionDetails actionDetails, CommunicationType communicationType) {
+        this.scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, communicationType);
     }
 
     @Override
@@ -53,7 +39,8 @@ public class SchedulerServiceImpl implements SchedulerService {
             Instant dateToSchedule,
             ActionType actionType,
             String timelineEventId,
-            ActionDetails actionDetails
+            ActionDetails actionDetails,
+            CommunicationType communicationType
     ) {
         log.info("Schedule {} in schedulingDate={} - iun={}", actionType, dateToSchedule, iun);
 
@@ -65,6 +52,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                     .type(actionType)
                     .timelineId(timelineEventId)
                     .details(actionDetails)
+                    .communicationType(communicationType)
                     .build();
 
             action = action.toBuilder()
@@ -89,24 +77,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         if(actionDetails instanceof DocumentCreationResponseActionDetails)
             documentCreationDetails = (DocumentCreationResponseActionDetails) actionDetails;
         return documentCreationDetails;
-    }
-
-    @Override
-    public void unscheduleEvent(String iun, Integer recIndex, ActionType actionType, String timelineEventId) {
-        Action action = Action.builder()
-                .iun(iun)
-                .recipientIndex(recIndex)
-                .type(actionType)
-                .timelineId(timelineEventId)
-                .build();
-
-        this.actionsPool.unscheduleFutureAction (action.getType().buildActionId(action));
-    }
-
-    @Override
-    public void scheduleEvent(String iun, Integer recIndex, Instant dateToSchedule,
-        ActionType actionType, String timelineId) {
-      this.scheduleEvent(iun, recIndex, dateToSchedule, actionType, timelineId, null);
     }
     
 }

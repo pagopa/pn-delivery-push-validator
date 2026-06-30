@@ -91,6 +91,18 @@ public class TestUtils {
         return timelineElementOpt.isPresent();
     }
 
+    public static boolean checkIsPresentValidateNormalizeAddressRequest(String iun, TimelineService timelineService) {
+        Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
+                iun,
+                TimelineEventId.VALIDATE_NORMALIZE_ADDRESSES_REQUEST.buildEventId(
+                        EventId.builder()
+                                .iun(iun)
+                                .build())
+        );
+
+        return timelineElementOpt.isPresent();
+    }
+
 
     public static Optional<TimelineElementInternal> getNotificationRejected(String iun, TimelineService timelineService) {
         return timelineService.getTimelineElement(
@@ -405,22 +417,29 @@ public class TestUtils {
         return ste[depth].getMethodName();
     }
 
-    public static String getRandomIun(int level) {
+    public static String getRandomIun(int level, CommunicationType communicationType) {
         String callerMethod = getMethodName(level);
-        return getIun(callerMethod);
+        return getIun(callerMethod, communicationType);
     }
 
-    public static String getRandomIun() {
+    public static String getRandomIun(CommunicationType communicationType) {
         String callerMethod = getMethodName(3);
-        return getIun(callerMethod);
+        return getIun(callerMethod, communicationType);
     }
     
     @NotNull
-    private static String getIun(String callerMethod) {
+    private static String getIun(String callerMethod, CommunicationType communicationType) {
         Random rand = new Random();
         int upperbound = 10000;
         int intRandom = rand.nextInt(upperbound);
-        return "iun-" + callerMethod + "_" + intRandom;
+        return "iun-" + callerMethod + "_" + intRandom + "_" + retrieveVersionCharFromCommunicationType(communicationType);
+    }
+
+    private static String retrieveVersionCharFromCommunicationType(CommunicationType communicationType) {
+        return switch (communicationType) {
+            case LEGAL -> "1";
+            case INFORMAL -> "A";
+        };
     }
 
 

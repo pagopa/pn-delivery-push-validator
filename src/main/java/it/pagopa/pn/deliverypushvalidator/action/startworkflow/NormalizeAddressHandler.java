@@ -2,15 +2,14 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.MDCUtils;
-
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.NotificationRecipientAddressesDtoInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.service.ConfidentialInformationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
@@ -21,6 +20,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationRecipientAddressesDtoMapper.buildNotificationRecipientAddressesDtoInt;
 
 @Component
 @AllArgsConstructor
@@ -75,12 +76,7 @@ public class NormalizeAddressHandler {
 
         PhysicalAddressInt normalizedAddressEnriched = enrichNormalizeAddress(result, recipient);
 
-        NotificationRecipientAddressesDtoInt normalizedAddressInt = NotificationRecipientAddressesDtoInt.builder()
-                .denomination(recipient.getDenomination())
-                .digitalAddress(recipient.getDigitalDomicile())
-                .physicalAddress(normalizedAddressEnriched)
-                .recIndex(recIndex)
-                .build();
+        NotificationRecipientAddressesDtoInt normalizedAddressInt = buildNotificationRecipientAddressesDtoInt(recipient, normalizedAddressEnriched, recIndex);
         listNormalizedAddress.add(normalizedAddressInt);
 
         timelineService.addTimelineElement(

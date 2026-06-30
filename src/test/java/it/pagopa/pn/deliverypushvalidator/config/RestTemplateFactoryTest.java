@@ -6,10 +6,13 @@ import it.pagopa.pn.deliverypushvalidator.config.springbootcfg.RestTemplateFacto
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
+@ExtendWith(MockitoExtension.class)
 class RestTemplateFactoryTest {
 
     @Mock
@@ -19,7 +22,6 @@ class RestTemplateFactoryTest {
 
     @BeforeEach
     void setUp() {
-        restTemplateFactory = Mockito.mock(it.pagopa.pn.commons.pnclients.RestTemplateFactory.class);
         factory = new RestTemplateFactory(restTemplateFactory);
     }
 

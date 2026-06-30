@@ -5,17 +5,14 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationPaymentInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationDigitalAddress;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationPaymentItem;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationPhysicalAddress;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationRecipientV24;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.UUID;
 
-import static it.pagopa.pn.deliverypushvalidator.service.mapper.PaymentMapper.getNotificationPaymentInfo;
-import static it.pagopa.pn.deliverypushvalidator.service.mapper.PaymentMapper.getNotificationPaymentItem;
+import static it.pagopa.pn.deliverypushvalidator.service.mapper.PaymentMapper.*;
 
 
 public class RecipientMapper {
@@ -127,4 +124,32 @@ public class RecipientMapper {
         return physicalAddress;
     }
 
+    public static InformalNotificationRecipientV1 internalToExternalInformal(NotificationRecipientInt recipient) {
+        InformalNotificationRecipientV1 notificationRecipient = new InformalNotificationRecipientV1();
+        NotificationDigitalAddress notificationDigitalAddress = null;
+
+        LegalDigitalAddressInt internalDigitalDomicile = recipient.getDigitalDomicile();
+        if (internalDigitalDomicile != null) {
+            notificationDigitalAddress = getNotificationDigitalAddress(internalDigitalDomicile);
+        }
+
+        NotificationPhysicalAddress physicalAddress = null;
+        PhysicalAddressInt internalPhysicalAddress = recipient.getPhysicalAddress();
+        if (internalPhysicalAddress != null) {
+            physicalAddress = getNotificationPhysicalAddress(internalPhysicalAddress);
+        }
+
+        notificationRecipient.setEmail(recipient.getEmail());
+        notificationRecipient.setPhoneNumber(recipient.getPhoneNumber());
+
+        notificationRecipient.setTaxId(recipient.getTaxId());
+        notificationRecipient.setDenomination(recipient.getDenomination());
+        notificationRecipient.setDigitalDomicile(notificationDigitalAddress);
+        notificationRecipient.setPhysicalAddress(physicalAddress);
+        notificationRecipient.setPayments(getInformalNotificationPaymentItem(recipient.getPayments()));
+        notificationRecipient.setInternalId(recipient.getInternalId());
+        notificationRecipient.setRecipientType(InformalNotificationRecipientV1.RecipientTypeEnum.valueOf(recipient.getRecipientType().name()));
+        notificationRecipient.setMessageId(recipient.getMessageId() != null ? UUID.fromString(recipient.getMessageId()) : null);
+        return notificationRecipient;
+    }
 }

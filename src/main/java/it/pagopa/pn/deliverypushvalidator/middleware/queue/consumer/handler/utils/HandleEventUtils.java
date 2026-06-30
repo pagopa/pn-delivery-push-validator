@@ -3,6 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.uti
 import it.pagopa.pn.api.dto.events.StandardEventHeader;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.utils.MDCUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.messaging.MessageHeaders;
@@ -56,9 +57,9 @@ public class HandleEventUtils {
         addCorrelationIdToMdc(correlationId);
     }
 
-    public static void addIunAndRecIndexToMdc(String iun, int recIndex) {
+    public static void addIunAndCommunicationTypeToMdc(String iun, CommunicationType communicationType) {
         addIunToMdc(iun);
-        addRecIndexToMdc(recIndex);
+        addCommunicationTypeToMdc(communicationType);
     }
 
     public static void addIunToMdc(String iun) {
@@ -73,5 +74,9 @@ public class HandleEventUtils {
 
     public static void addCorrelationIdToMdc(String correlationId) {
         MDC.put(MDCUtils.MDC_PN_CTX_REQUEST_ID, correlationId);
+    }
+
+    public static void addCommunicationTypeToMdc(CommunicationType communicationType) {
+        MDC.put(MDCUtils.MDC_PN_CTX_COMMUNICATION_TYPE, communicationType != null ? communicationType.name() : CommunicationType.LEGAL.name());
     }
 }

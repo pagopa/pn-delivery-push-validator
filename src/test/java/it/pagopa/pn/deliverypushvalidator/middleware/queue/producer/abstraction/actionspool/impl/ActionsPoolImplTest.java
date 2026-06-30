@@ -39,11 +39,4 @@ class ActionsPoolImplTest {
         Mockito.verify(actionService).addOnlyActionIfAbsent(Mockito.any(Action.class));
     }
 
-    @Test
-    void unscheduleFutureAction_shouldCallUnScheduleOnService() {
-        String actionId = "test-action-id";
-        actionsPool.unscheduleFutureAction(actionId);
-        Mockito.verify(actionService, Mockito.times(1)).unSchedule(actionId);
-    }
-
 }

@@ -4,6 +4,7 @@ import it.pagopa.pn.api.dto.events.*;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidF24Exception;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.f24.PnF24Client;
@@ -50,7 +51,8 @@ public class F24ResponseHandler {
         if (event.getMetadataValidationEnd() != null) {
             PnF24MetadataValidationEndEventPayload metadataValidationEndEvent = event.getMetadataValidationEnd();
             String iun = metadataValidationEndEvent.getSetId();
-            addMdcFilter(iun);
+            CommunicationType communicationType = CommunicationType.LEGAL;
+            HandleEventUtils.addIunAndCommunicationTypeToMdc(iun, communicationType);
             log.info("Async response received from service {} for {} with iun={}",
                     PnF24Client.CLIENT_NAME, PnF24Client.VALIDATE_F24_PROCESS_NAME, event.getMetadataValidationEnd().getSetId());
 
@@ -63,7 +65,7 @@ public class F24ResponseHandler {
 
             try {
                 log.logStartingProcess(processName);
-                validationActionHandler.handleValidateF24Response(metadataValidationEndEvent);
+                validationActionHandler.handleValidateF24Response(metadataValidationEndEvent, communicationType);
                 log.logEndingProcess(processName);
             } catch (Exception ex){
                 log.logEndingProcess(processName, false, ex.getMessage(),ex);
@@ -94,11 +96,7 @@ public class F24ResponseHandler {
         f24Service.handleF24PrepareResponse(iunFromTimelineId,result);
 
         log.debug("scheduleEvent POST_ACCEPTED_PROCESSING_COMPLETED for iun {}", iunFromTimelineId);
-        schedulerService.scheduleEvent(iunFromTimelineId, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED);
+        schedulerService.scheduleEvent(iunFromTimelineId, Instant.now(), ActionType.POST_ACCEPTED_PROCESSING_COMPLETED, CommunicationType.LEGAL);
 
-    }
-
-    private static void addMdcFilter(String iun) {
-        HandleEventUtils.addIunToMdc(iun);
     }
 }

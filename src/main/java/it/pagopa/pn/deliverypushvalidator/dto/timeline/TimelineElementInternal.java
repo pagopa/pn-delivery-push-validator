@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.dto.timeline;
 
 
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactsIdInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementCategoryInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.details.TimelineElementDetailsInt;
@@ -22,6 +23,7 @@ public class TimelineElementInternal implements Comparable<TimelineElementIntern
     private String elementId;
     private Instant timestamp;
     private String paId;
+    private CommunicationType communicationType;
     private List<LegalFactsIdInt> legalFactsIds;
     private TimelineElementCategoryInt category;
     private TimelineElementDetailsInt details;

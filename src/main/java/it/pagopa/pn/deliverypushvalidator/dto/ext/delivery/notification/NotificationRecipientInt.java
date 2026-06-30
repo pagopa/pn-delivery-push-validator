@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder(toBuilder = true)
 @EqualsAndHashCode
 @ToString
@@ -23,4 +24,7 @@ public class NotificationRecipientInt {
     private PhysicalAddressInt physicalAddress;
     private List<NotificationPaymentInfoInt> payments;
     private RecipientTypeInt recipientType;
+    private String email;
+    private String phoneNumber;
+    private String messageId;
 }

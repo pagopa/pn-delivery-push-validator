@@ -37,7 +37,7 @@ public class NotificationRefusedHandler extends AbstractActionEventHandler {
             log.logStartingProcess(processName);
             NotificationRefusedActionDetails details = (NotificationRefusedActionDetails) action.getDetails();
 
-            notificationRefusedActionHandler.notificationRefusedHandler(action.getIun(), details.getErrors(), action.getNotBefore());
+            notificationRefusedActionHandler.notificationRefusedHandler(action.getIun(), details.getErrors(), action.getNotBefore(), action.getCommunicationType());
             log.logEndingProcess(processName);
         } catch (Exception ex) {
             log.logEndingProcess(processName, false, ex.getMessage(),ex);

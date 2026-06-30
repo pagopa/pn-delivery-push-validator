@@ -3,5 +3,4 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstraction
 
 public interface ActionsPool {
     void addOnlyAction(Action action);
-    void unscheduleFutureAction( String actionId );
 }

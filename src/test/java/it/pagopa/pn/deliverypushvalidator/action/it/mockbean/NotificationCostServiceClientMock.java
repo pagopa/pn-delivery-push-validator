@@ -5,6 +5,7 @@ import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCos
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice.NotificationCostServiceClient;
@@ -47,7 +48,7 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
 
             PnNotificationCostValidationEventPayload eventPayload = createEventPayload(iun);
 
-            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload);
+            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload, CommunicationType.LEGAL);
 
             log.info("[TEST] END handle notification cost validation for iun={}", iun);
         }));
