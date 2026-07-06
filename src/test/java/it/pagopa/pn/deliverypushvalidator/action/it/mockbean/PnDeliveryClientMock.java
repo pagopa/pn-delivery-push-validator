@@ -59,10 +59,10 @@ public class PnDeliveryClientMock implements PnDeliveryClient {
     @Override
     public InformalSentNotificationV1 getSentInformalNotification(String iun) {
         InformalSentNotificationV1 informalSentNotificationV1 = NotificationMapper.internalToExternalInformal(getNotification(iun));
-        List<InformalNotificationRecipientV1> listRecipient = informalSentNotificationV1.getRecipients();
+        List<FullInformalNotificationRecipientV1> listRecipient = informalSentNotificationV1.getRecipients();
 
         int recIndex = 0;
-        for (InformalNotificationRecipientV1 recipient : listRecipient){
+        for (FullInformalNotificationRecipientV1 recipient : listRecipient){
             NotificationPhysicalAddress physicalAddress = retrieveNormalizedAddress(iun, recIndex);
             if(physicalAddress != null) {
                 recipient.setPhysicalAddress(retrieveNormalizedAddress(iun, recIndex));
