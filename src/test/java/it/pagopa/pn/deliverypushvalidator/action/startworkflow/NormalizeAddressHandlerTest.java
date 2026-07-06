@@ -57,7 +57,7 @@ class NormalizeAddressHandlerTest {
         NotificationRecipientInt notificationRecipientInt =
                 new NotificationRecipientInt("","","",new LegalDigitalAddressInt(),
                         new PhysicalAddressInt("","","","","","","","",""),
-                        List.of(new NotificationPaymentInfoInt()), RecipientTypeInt.PF, "nomecognome@emeail.it","+390000000000", "");
+                        List.of(new NotificationPaymentInfoInt()), RecipientTypeInt.PF, "nomecognome@emeail.it","+390000000000", "",null);
         Mockito.when(notificationUtils.getRecipientFromIndex(Mockito.any(),Mockito.anyInt())).thenReturn(notificationRecipientInt);
 
         Mockito.when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.empty());

@@ -27,4 +27,5 @@ public class NotificationRecipientInt {
     private String email;
     private String phoneNumber;
     private String messageId;
+    private List<String> additionalLanguages;
 }
