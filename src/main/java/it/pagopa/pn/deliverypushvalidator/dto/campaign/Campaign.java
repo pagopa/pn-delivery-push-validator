@@ -35,7 +35,7 @@ public class Campaign {
     @NotNull
     private Instant endDate;
 
-    private boolean closed;
+    private CampaignStatus status;
 
     private String senderContact;
 
