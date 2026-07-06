@@ -131,13 +131,13 @@ public class NotificationMapper {
         return list;
     }
 
-    private static List<NotificationRecipientInt> mapNotificationRecipientInformal(List<InformalNotificationRecipientV1> recipients) {
+    private static List<NotificationRecipientInt> mapNotificationRecipientInformal(List<FullInformalNotificationRecipientV1> recipients) {
         List<NotificationRecipientInt> list = new ArrayList<>();
 
         if (recipients == null) {
             return list;
         }
-        for (InformalNotificationRecipientV1 recipient : recipients) {
+        for (FullInformalNotificationRecipientV1 recipient : recipients) {
             NotificationRecipientInt.NotificationRecipientIntBuilder recipientIntBuilder = NotificationRecipientInt.builder()
                     .taxId(recipient.getTaxId())
                     .internalId(recipient.getInternalId())
@@ -195,6 +195,7 @@ public class NotificationMapper {
                                     .creditorTaxId(pagoPa.getCreditorTaxId())
                                     .noticeCode(pagoPa.getNoticeCode())
                                     .amount(payment.getPagoPa().getAmount())
+                                    .dueDate(payment.getPagoPa().getDueDate())
                                     .attachment(pagoPa.getAttachment() != null ? NotificationDocumentInt.builder()
                                             .ref(NotificationDocumentInt.Ref.builder()
                                                     .key(pagoPa.getAttachment().getRef().getKey())
@@ -320,7 +321,7 @@ public class NotificationMapper {
                 .map(NotificationMapper::getNotificationDocument).toList();
         informal.setDocuments(documents);
 
-        List<InformalNotificationRecipientV1> recipients = internal.getRecipients().stream()
+        List<FullInformalNotificationRecipientV1> recipients = internal.getRecipients().stream()
                 .map(RecipientMapper::internalToExternalInformal).toList();
 
         informal.setRecipients(recipients);

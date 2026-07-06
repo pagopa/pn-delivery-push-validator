@@ -44,7 +44,7 @@ class PnDeliveryClientImplTest {
         InformalSentNotificationV1 notification = new InformalSentNotificationV1();
         notification.setIun("002");
 
-        Mockito.when(pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo("002")).thenReturn(ResponseEntity.ok(notification));
+        Mockito.when(pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo("002", false)).thenReturn(ResponseEntity.ok(notification));
 
         InformalSentNotificationV1 res = client.getSentInformalNotification("002");
 

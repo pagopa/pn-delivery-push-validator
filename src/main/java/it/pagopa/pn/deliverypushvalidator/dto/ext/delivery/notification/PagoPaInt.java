@@ -2,6 +2,8 @@ package it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,5 +15,6 @@ public class PagoPaInt {
     private String creditorTaxId;
     private Boolean applyCost;
     private Integer amount;
+    private Instant dueDate;
     private NotificationDocumentInt attachment;
 }

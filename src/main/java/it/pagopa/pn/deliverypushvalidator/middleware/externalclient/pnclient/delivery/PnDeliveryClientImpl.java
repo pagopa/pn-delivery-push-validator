@@ -29,7 +29,7 @@ public class PnDeliveryClientImpl implements PnDeliveryClient{
     public InformalSentNotificationV1 getSentInformalNotification(String iun) {
         log.logInvokingExternalService(CLIENT_NAME, GET_INFORMAL_NOTIFICATION);
 
-        ResponseEntity<InformalSentNotificationV1> res = pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo(iun);
+        ResponseEntity<InformalSentNotificationV1> res = pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo(iun, false);
 
         return res.getBody();
     }
