@@ -124,8 +124,8 @@ public class RecipientMapper {
         return physicalAddress;
     }
 
-    public static InformalNotificationRecipientV1 internalToExternalInformal(NotificationRecipientInt recipient) {
-        InformalNotificationRecipientV1 notificationRecipient = new InformalNotificationRecipientV1();
+    public static FullInformalNotificationRecipientV1 internalToExternalInformal(NotificationRecipientInt recipient) {
+        FullInformalNotificationRecipientV1 notificationRecipient = new FullInformalNotificationRecipientV1();
         NotificationDigitalAddress notificationDigitalAddress = null;
 
         LegalDigitalAddressInt internalDigitalDomicile = recipient.getDigitalDomicile();
@@ -148,7 +148,7 @@ public class RecipientMapper {
         notificationRecipient.setPhysicalAddress(physicalAddress);
         notificationRecipient.setPayments(getInformalNotificationPaymentItem(recipient.getPayments()));
         notificationRecipient.setInternalId(recipient.getInternalId());
-        notificationRecipient.setRecipientType(InformalNotificationRecipientV1.RecipientTypeEnum.valueOf(recipient.getRecipientType().name()));
+        notificationRecipient.setRecipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.valueOf(recipient.getRecipientType().name()));
         notificationRecipient.setMessageId(recipient.getMessageId() != null ? UUID.fromString(recipient.getMessageId()) : null);
         notificationRecipient.setAdditionalLanguages(recipient.getAdditionalLanguages());
         return notificationRecipient;
