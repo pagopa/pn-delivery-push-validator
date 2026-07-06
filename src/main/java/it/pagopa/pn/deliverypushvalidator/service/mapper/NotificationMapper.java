@@ -81,7 +81,6 @@ public class NotificationMapper {
                 .recipients(listNotificationRecipientInt)
                 .group(sentInformalNotification.getGroup())
                 .version(sentInformalNotification.getVersion())
-                .additionalLanguages(sentInformalNotification.getAdditionalLanguages())
                 .usedServices(UsedServicesMapper.externalToInternal(sentInformalNotification.getUsedServices()))
                 .idempotenceToken(sentInformalNotification.getIdempotenceToken())
                 .campaignId(sentInformalNotification.getCampaignId())
@@ -146,7 +145,8 @@ public class NotificationMapper {
                     .recipientType(RecipientTypeInt.valueOf(recipient.getRecipientType().name()))
                     .messageId(recipient.getMessageId() != null ? recipient.getMessageId().toString() : null)
                     .email(recipient.getEmail())
-                    .phoneNumber(recipient.getPhoneNumber());
+                    .phoneNumber(recipient.getPhoneNumber())
+                    .additionalLanguages(recipient.getAdditionalLanguages());
 
             NotificationDigitalAddress digitalDomicile = recipient.getDigitalDomicile();
             if (digitalDomicile != null) {
@@ -310,7 +310,6 @@ public class NotificationMapper {
             informal.setSenderPaId( sender.getPaId() );
             informal.setSenderTaxId( sender.getPaTaxId() );
         }
-        informal.setAdditionalLanguages(internal.getAdditionalLanguages());
         informal.setGroup(internal.getGroup());
         informal.setVersion(internal.getVersion());
         informal.setIdempotenceToken(internal.getIdempotenceToken());

@@ -232,6 +232,7 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
         NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
                 .withTaxId("TAXID01")
                 .withMessageId(messageId.toString())
+                .withAdditionalLanguages(additionalLanguages)
                 .build();
         pnDataVaultClientReactiveMock.insertMessage(MessageResponseDto.builder()
                 .messageId(messageId)
@@ -244,7 +245,6 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
                 .withNotificationRecipient(recipient)
                 .withCommunicationType(CommunicationType.INFORMAL)
                 .withCampaignId(CAMPAIGN_ID_DIGITAL_WORKFLOW)
-                .withAdditionalLanguages(additionalLanguages)
                 .build();
 
         pnDeliveryClientMock.addNotification(notification);

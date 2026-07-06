@@ -150,6 +150,7 @@ public class RecipientMapper {
         notificationRecipient.setInternalId(recipient.getInternalId());
         notificationRecipient.setRecipientType(InformalNotificationRecipientV1.RecipientTypeEnum.valueOf(recipient.getRecipientType().name()));
         notificationRecipient.setMessageId(recipient.getMessageId() != null ? UUID.fromString(recipient.getMessageId()) : null);
+        notificationRecipient.setAdditionalLanguages(recipient.getAdditionalLanguages());
         return notificationRecipient;
     }
 }

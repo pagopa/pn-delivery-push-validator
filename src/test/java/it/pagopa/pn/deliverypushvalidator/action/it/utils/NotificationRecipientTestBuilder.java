@@ -20,6 +20,7 @@ public class NotificationRecipientTestBuilder {
     private String denomination;
     private String messageId;
     private String email;
+    private List<String> additionalLanguages;
 
     public static NotificationRecipientTestBuilder builder() {
         return new NotificationRecipientTestBuilder();
@@ -71,6 +72,11 @@ public class NotificationRecipientTestBuilder {
         this.email = email;
         return this;
     }
+
+    public NotificationRecipientTestBuilder withAdditionalLanguages(List<String> additionalLanguages) {
+        this.additionalLanguages = additionalLanguages;
+        return this;
+    }
     
     public NotificationRecipientInt build() {
         if(taxId == null){
@@ -117,6 +123,7 @@ public class NotificationRecipientTestBuilder {
                 .payments(payments)
                 .messageId(messageId)
                 .email(email)
+                .additionalLanguages(additionalLanguages)
                 .build();
     }
 
