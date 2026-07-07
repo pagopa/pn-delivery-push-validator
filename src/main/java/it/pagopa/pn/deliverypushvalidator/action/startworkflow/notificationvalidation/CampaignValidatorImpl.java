@@ -1,4 +1,4 @@
-package it.pagopa.pn.deliverypushvalidator.service.impl;
+package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
@@ -51,7 +51,7 @@ public class CampaignValidatorImpl implements CampaignValidator {
     private void validateCampaignStatus(Campaign campaign, String campaignId) {
         if (!CampaignStatus.IN_PROGRESS.equals(campaign.getStatus())) {
             throw handleValidationException(
-                    NotificationRefusedErrorCodeInt.CAMPAIGN_INVALID,
+                    NotificationRefusedErrorCodeInt.CAMPAIGN_INVALID_STATUS,
                     String.format("Campaign %s has %s status", campaignId, campaign.getStatus())
             );
         }

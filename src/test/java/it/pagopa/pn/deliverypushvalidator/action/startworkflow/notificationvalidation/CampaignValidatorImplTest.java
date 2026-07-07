@@ -1,4 +1,4 @@
-package it.pagopa.pn.deliverypushvalidator.service.impl;
+package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.CampaignStatus;

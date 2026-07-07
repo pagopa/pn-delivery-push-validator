@@ -128,7 +128,7 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
         verifyNotificationRejection(
                 iun,
                 List.of(RefusalReason.builder()
-                        .errorCode(PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.CAMPAIGN_INVALID.name())
+                        .errorCode(PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.CAMPAIGN_INVALID_STATUS.name())
                         .build()),
                 null
         );
