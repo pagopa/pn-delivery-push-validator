@@ -49,6 +49,7 @@ public class TimelineServiceMapper {
                 .notificationSentAt(timelineElement.getNotificationSentAt())
                 .ingestionTimestamp(timelineElement.getIngestionTimestamp())
                 .eventTimestamp(timelineElement.getEventTimestamp())
+                .campaignId(timelineElement.getCampaignId())
                 .communicationType(toInternalCommunicationType(timelineElement))
                 .build();
     }
@@ -67,6 +68,7 @@ public class TimelineServiceMapper {
                 .elementId(timelineElementInternal.getElementId())
                 .timestamp(timelineElementInternal.getTimestamp())
                 .paId(timelineElementInternal.getPaId())
+                .campaignId(timelineElementInternal.getCampaignId())
                 .legalFactsIds(timelineElementInternal.getLegalFactsIds() != null ? toLegalFactsIdList(timelineElementInternal.getLegalFactsIds()) : null)
                 .category(TimelineCategory.valueOf(timelineElementInternal.getCategory().name()))
                 .details(toTimelineElementDetails(timelineElementInternal.getDetails(), timelineElementInternal.getCategory().name()))

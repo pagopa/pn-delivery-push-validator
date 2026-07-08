@@ -43,6 +43,7 @@ class TimelineServiceMapperTest {
                 .iun("IUN123").elementId("EID456")
                 .category(TimelineElementCategoryInt.VALIDATED_F24)
                 .communicationType(it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType.INFORMAL)
+                .campaignId("campaign-123")
                 .build();
 
         NotificationInt notificationInt = NotificationInt.builder()
@@ -53,6 +54,7 @@ class TimelineServiceMapperTest {
 
         assertThat(result.getTimelineElement()).isNotNull();
         assertThat(result.getTimelineElement().getCommunicationType()).isEqualTo(CommunicationType.INFORMAL);
+        assertThat(result.getTimelineElement().getCampaignId()).isEqualTo("campaign-123");
         assertThat(result.getNotificationInfo().getIun()).isEqualTo("IUN123");
         assertThat(result.getNotificationInfo().getNumberOfRecipients()).isEqualTo(1);
     }
@@ -93,6 +95,7 @@ class TimelineServiceMapperTest {
         TimelineElementDetails details = mock(TimelineElementDetails.class);
         TimelineElement timelineElement = new TimelineElement()
                 .iun("IUN123").elementId("EID456").timestamp(Instant.now()).paId("PAID")
+                .campaignId("campaign-123")
                 .legalFactsIds(List.of(legalFactsId))
                 .category(TimelineCategory.VALIDATE_NORMALIZE_ADDRESSES_REQUEST)
                 .details(details)
@@ -105,6 +108,7 @@ class TimelineServiceMapperTest {
         assertThat(result.getIun()).isEqualTo("IUN123");
         assertThat(result.getElementId()).isEqualTo("EID456");
         assertThat(result.getCategory()).isEqualTo(TimelineElementCategoryInt.VALIDATE_NORMALIZE_ADDRESSES_REQUEST);
+        assertThat(result.getCampaignId()).isEqualTo("campaign-123");
         assertThat(result.getLegalFactsIds()).isNotEmpty();
         assertThat(result.getLegalFactsIds().getFirst().getKey()).isEqualTo(legalFactsIdInt.getKey());
         assertThat(result.getLegalFactsIds().getFirst().getCategory()).isEqualTo(legalFactsIdInt.getCategory());
