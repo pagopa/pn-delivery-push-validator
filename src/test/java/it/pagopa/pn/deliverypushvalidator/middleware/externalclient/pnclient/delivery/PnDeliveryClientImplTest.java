@@ -8,9 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.mockito.Mockito.when;
 
 class PnDeliveryClientImplTest {
 
@@ -30,7 +31,7 @@ class PnDeliveryClientImplTest {
         SentNotificationV26 notification = new SentNotificationV26();
         notification.setIun("001");
         
-        Mockito.when(pnDeliveryApi.getSentNotificationPrivateWithHttpInfo("001")).thenReturn(ResponseEntity.ok(notification));
+        when(pnDeliveryApi.getSentNotificationPrivateWithHttpInfo("001")).thenReturn(ResponseEntity.ok(notification));
 
         SentNotificationV26 res = client.getSentNotification("001");
 
@@ -44,7 +45,7 @@ class PnDeliveryClientImplTest {
         InformalSentNotificationV1 notification = new InformalSentNotificationV1();
         notification.setIun("002");
 
-        Mockito.when(pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo("002")).thenReturn(ResponseEntity.ok(notification));
+        when(pnDeliveryApi.getSentInformalNotificationPrivateV1WithHttpInfo("002", false)).thenReturn(ResponseEntity.ok(notification));
 
         InformalSentNotificationV1 res = client.getSentInformalNotification("002");
 

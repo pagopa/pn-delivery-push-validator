@@ -22,7 +22,7 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
                     "descriptionScope": "campaign for test",
                     "startDate": "2026-02-01T00:00:00Z",
                     "endDate": "2027-12-31T23:59:59Z",
-                    "closed": false,
+                    "status": "IN_PROGRESS",
                     "senderContact": "contact@example.com",
                     "serviceId": "service789",
                     "sensitiveContent": true,
@@ -30,12 +30,14 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
                     "workflow": [
                         {
                           "channel": "IO",
-                          "desiredFeedback": "READ",
+                          "recipientType": ["PF"],
+                          "desiredFeedback": ["READ"],
                           "includeAttachment": false
                         },
                         {
                           "channel": "PEC",
-                          "desiredFeedback": "READ",
+                          "recipientType": ["PG"],
+                          "desiredFeedback": ["READ"],
                           "includeAttachment": false
                         }
                     ]
@@ -47,7 +49,7 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
                     "descriptionScope": "campaign for test",
                     "startDate": "2026-02-01T00:00:00Z",
                     "endDate": "2027-12-31T23:59:59Z",
-                    "closed": false,
+                    "status": "IN_PROGRESS",
                     "senderContact": "contact@example.com",
                     "serviceId": "service789",
                     "sensitiveContent": true,
@@ -55,7 +57,8 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
                     "workflow": [
                         {
                           "channel": "ANALOG",
-                          "desiredFeedback": "RECEIVED",
+                          "recipientType": ["PF", "PG"],
+                          "desiredFeedback": ["RECEIVED"],
                           "includeAttachment": false
                         }
                     ]
@@ -67,7 +70,7 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
                     "descriptionScope": "campaign for test",
                     "startDate": "2026-02-01T00:00:00Z",
                     "endDate": "2027-12-31T23:59:59Z",
-                    "closed": true,
+                    "status": "CONCLUDED",
                     "senderContact": "contact@example.com",
                     "serviceId": "service789",
                     "sensitiveContent": true,

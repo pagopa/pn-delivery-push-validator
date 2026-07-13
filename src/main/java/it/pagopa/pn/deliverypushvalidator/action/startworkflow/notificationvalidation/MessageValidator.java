@@ -115,13 +115,12 @@ public class MessageValidator {
                                                NotificationRecipientInt recipient,
                                                String element,
                                                MessageResponseDto message) {
-        List<String> additionalLanguages = notification.getAdditionalLanguages();
+        List<String> additionalLanguages = recipient.getAdditionalLanguages();
         LocalizedContent secondaryContent = message.getSecondaryContent();
 
         if (secondaryContent == null) {
             if (!CollectionUtils.isEmpty(additionalLanguages)) {
-                String detail = "Message has no secondary content but notification declares additional languages "
-                        + additionalLanguages + " for messageId: " + recipient.getMessageId();
+                String detail = "Notification declares " + recipient.getAdditionalLanguages() + " as additionalLanguages for the recipient, but the corresponding message with messageId" + recipient.getMessageId() + " has no secondary content";
                 return Mono.error(logValidationFailure(notification, element, detail,
                         new PnValidationMessageLanguageMismatchException(detail, element)));
             }

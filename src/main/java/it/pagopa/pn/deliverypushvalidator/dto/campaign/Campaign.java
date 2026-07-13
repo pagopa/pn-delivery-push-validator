@@ -35,15 +35,12 @@ public class Campaign {
     @NotNull
     private Instant endDate;
 
-    private boolean closed;
+    private CampaignStatus status;
 
     private String senderContact;
 
     @NotEmpty
     private String serviceId;
-
-    @Valid
-    private List<Message> messages;
 
     private boolean sensitiveContent;
 

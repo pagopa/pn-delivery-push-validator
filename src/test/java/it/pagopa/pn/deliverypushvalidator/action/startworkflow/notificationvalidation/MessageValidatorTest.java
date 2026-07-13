@@ -182,7 +182,16 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageNotInAdditionalLanguagesThenThrowMismatch() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "de"));
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(List.of("it", "de"))
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("fr");
@@ -202,7 +211,16 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsPresentThenThrowMismatch() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "de"));
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(List.of("it", "de"))
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent()).thenReturn(null);
@@ -222,7 +240,16 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageIsNullAndAdditionalLanguagesIsEmptyThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, Collections.emptyList());
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(Collections.emptyList())
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent()).thenReturn(null);
@@ -236,7 +263,16 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageMatchesIgnoringCaseThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, List.of("it", "EN"));
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(List.of("it", "EN"))
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("en");
@@ -246,13 +282,20 @@ class MessageValidatorTest {
                 .verifyComplete();
     }
 
-    // --- Nuovi test: lingua secondaria presente ma additionalLanguages assente → OK ---
-
     @Test
     void validateWhenSecondaryLanguageIsPresentAndAdditionalLanguagesIsNullThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, null);
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(null)
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("de");
@@ -266,7 +309,16 @@ class MessageValidatorTest {
     void validateWhenSecondaryLanguageIsPresentAndAdditionalLanguagesIsEmptyThenPass() {
         UUID senderId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        NotificationInt notification = buildNotification(senderId, messageId, Collections.emptyList());
+
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .messageId(messageId.toString())
+                .additionalLanguages(Collections.emptyList())
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .iun("IUN_01")
+                .sender(NotificationSenderInt.builder().paId(senderId.toString()).build())
+                .recipients(List.of(recipient))
+                .build();
 
         MessageResponseDto message = mock(MessageResponseDto.class, RETURNS_DEEP_STUBS);
         when(message.getSecondaryContent().getLanguage().getValue()).thenReturn("de");

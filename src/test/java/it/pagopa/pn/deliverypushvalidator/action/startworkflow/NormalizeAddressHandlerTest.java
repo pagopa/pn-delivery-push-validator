@@ -26,6 +26,10 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 class NormalizeAddressHandlerTest {
 
     @Mock
@@ -57,16 +61,16 @@ class NormalizeAddressHandlerTest {
         NotificationRecipientInt notificationRecipientInt =
                 new NotificationRecipientInt("","","",new LegalDigitalAddressInt(),
                         new PhysicalAddressInt("","","","","","","","",""),
-                        List.of(new NotificationPaymentInfoInt()), RecipientTypeInt.PF, "nomecognome@emeail.it","+390000000000", "");
-        Mockito.when(notificationUtils.getRecipientFromIndex(Mockito.any(),Mockito.anyInt())).thenReturn(notificationRecipientInt);
+                        List.of(new NotificationPaymentInfoInt()), RecipientTypeInt.PF, "nomecognome@emeail.it","+390000000000", "",null);
+        when(notificationUtils.getRecipientFromIndex(Mockito.any(),Mockito.anyInt())).thenReturn(notificationRecipientInt);
 
-        Mockito.when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.empty());
+        when(confidentialInformationService.updateNotificationAddresses(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.empty());
 
         normalizeAddressHandler.handleNormalizedAddressResponse(notification, normalizeItemsResult);
 
         //WHEN
         ArgumentCaptor<List<NotificationRecipientAddressesDtoInt>> captor = ArgumentCaptor.forClass(List.class);
-        Mockito.verify(confidentialInformationService).updateNotificationAddresses(Mockito.any(),Mockito.any(), captor.capture());
+        verify(confidentialInformationService).updateNotificationAddresses(Mockito.any(),Mockito.any(), captor.capture());
         List<NotificationRecipientAddressesDtoInt> capturedList = captor.getValue();
 
         //THEN

@@ -68,9 +68,9 @@ class NotificationMapperTest {
                 .senderTaxId("taxId")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("Codice Fiscale 01")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
                                 .messageId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                                 .digitalDomicile(
@@ -146,14 +146,14 @@ class NotificationMapperTest {
                 .senderTaxId("taxId")
                 .senderDenomination("Comune")
                 .recipients(List.of(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("CF01")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome 1")
                                 .messageId(firstMessageId),
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("CF02")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome 2")
                                 .messageId(secondMessageId)
                 ));
@@ -176,10 +176,10 @@ class NotificationMapperTest {
                 .senderTaxId("taxId")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("TAXID03")
                                 .messageId(UUID.randomUUID())
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Mario Rossi")
                                 .physicalAddress(
                                         new NotificationPhysicalAddress()
@@ -223,9 +223,9 @@ class NotificationMapperTest {
                 .senderTaxId("taxId")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("TAXID02")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Nome Cognome")
                                 .messageId(UUID.randomUUID())
                                 .digitalDomicile(
@@ -257,9 +257,9 @@ class NotificationMapperTest {
                 .senderTaxId("taxIdPay")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("TAXID_PAY")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore")
                                 .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
@@ -300,9 +300,9 @@ class NotificationMapperTest {
                 .senderTaxId("taxIdPay3")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("TAXID_PAY3")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore3")
                                 .messageId(UUID.randomUUID())
                                 .payments(Collections.singletonList(
@@ -335,9 +335,9 @@ class NotificationMapperTest {
                 .senderTaxId("taxIdPay4")
                 .senderDenomination("Comune")
                 .recipients(Collections.singletonList(
-                        new InformalNotificationRecipientV1()
+                        new FullInformalNotificationRecipientV1()
                                 .taxId("TAXID_PAY4")
-                                .recipientType(InformalNotificationRecipientV1.RecipientTypeEnum.PF)
+                                .recipientType(FullInformalNotificationRecipientV1.RecipientTypeEnum.PF)
                                 .denomination("Pagatore4")
                                 .messageId(UUID.randomUUID())
                                 .payments(Collections.emptyList())

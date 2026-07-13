@@ -1,7 +1,8 @@
-package it.pagopa.pn.deliverypushvalidator.service.impl;
+package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
+import it.pagopa.pn.deliverypushvalidator.dto.campaign.CampaignStatus;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignValidationException;
@@ -30,7 +31,7 @@ public class CampaignValidatorImpl implements CampaignValidator {
         log.debug("Validating campaign [campaignId={}] for sender [senderId={}]", campaignId, senderId);
 
         Campaign campaign = fetchCampaign(campaignId, senderId);
-        validateCampaignIsOpen(campaign, campaignId);
+        validateCampaignStatus(campaign, campaignId);
 
         log.debug("Campaign validated successfully [campaignId={}]", campaignId);
         return campaign;
@@ -47,11 +48,11 @@ public class CampaignValidatorImpl implements CampaignValidator {
         }
     }
 
-    private void validateCampaignIsOpen(Campaign campaign, String campaignId) {
-        if (campaign.isClosed()) {
+    private void validateCampaignStatus(Campaign campaign, String campaignId) {
+        if (!CampaignStatus.IN_PROGRESS.equals(campaign.getStatus())) {
             throw handleValidationException(
-                    NotificationRefusedErrorCodeInt.CAMPAIGN_CLOSED,
-                    String.format("Campaign %s is closed", campaignId)
+                    NotificationRefusedErrorCodeInt.CAMPAIGN_INVALID_STATUS,
+                    String.format("Campaign %s has %s status", campaignId, campaign.getStatus())
             );
         }
     }
