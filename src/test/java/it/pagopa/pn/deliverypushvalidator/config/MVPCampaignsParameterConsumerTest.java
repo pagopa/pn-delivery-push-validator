@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class MVPCampaignsParameterConsumerTest {
 
@@ -30,17 +33,15 @@ class MVPCampaignsParameterConsumerTest {
 
     @BeforeEach
     void setup() {
-        parameterConsumer = Mockito.mock(ParameterConsumer.class);
+        parameterConsumer = mock(ParameterConsumer.class);
         campaignsParameterConsumer = new MVPCampaignsParameterConsumer(parameterConsumer);
     }
-
-
 
     @Test
     void initialize_unexpectedInternalExceptionIsPropagated() {
         PnInternalException exception = new PnInternalException("boom", "GENERIC_ERROR");
 
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenThrow(exception);
 
         Assertions.assertThrows(PnInternalException.class, () -> campaignsParameterConsumer.initialize());
@@ -50,7 +51,7 @@ class MVPCampaignsParameterConsumerTest {
     void getCampaignByCampaignIdAndSenderId_success() {
         Campaign campaign = validCampaign("c1", SENDER_A, CampaignStatus.IN_PROGRESS);
 
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.of(new Campaign[]{campaign}));
         campaignsParameterConsumer.initialize();
 
@@ -67,7 +68,7 @@ class MVPCampaignsParameterConsumerTest {
                 validCampaign("c1", SENDER_A, CampaignStatus.IN_PROGRESS)
         };
 
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.of(campaigns));
         campaignsParameterConsumer.initialize();
 
@@ -81,7 +82,7 @@ class MVPCampaignsParameterConsumerTest {
                 validCampaign("c1", SENDER_B, CampaignStatus.IN_PROGRESS)
         };
 
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.of(campaigns));
         campaignsParameterConsumer.initialize();
 
@@ -91,7 +92,7 @@ class MVPCampaignsParameterConsumerTest {
 
     @Test
     void getCampaignByCampaignIdAndSenderId_parameterNotFound() {
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.empty());
         campaignsParameterConsumer.initialize();
 
@@ -107,7 +108,7 @@ class MVPCampaignsParameterConsumerTest {
                 validCampaign("c3", SENDER_A, CampaignStatus.IN_PROGRESS)
         };
 
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.of(campaigns));
         campaignsParameterConsumer.initialize();
 
@@ -119,7 +120,7 @@ class MVPCampaignsParameterConsumerTest {
 
     @Test
     void initialize_invalidCampaignStatus() {
-        Mockito.when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
+        when(parameterConsumer.getParameterValue(Mockito.anyString(), Mockito.eq(Campaign[].class)))
                 .thenReturn(Optional.of(new Campaign[]{validCampaign("c1", SENDER_A, null)}));
 
         campaignsParameterConsumer.initialize();
