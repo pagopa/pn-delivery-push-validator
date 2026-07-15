@@ -42,6 +42,10 @@ public class Campaign {
     @NotEmpty
     private String serviceId;
 
+    private String serviceName;
+
+    private String taxonomyCode;
+
     private boolean sensitiveContent;
 
     private boolean stopOnViewed;
