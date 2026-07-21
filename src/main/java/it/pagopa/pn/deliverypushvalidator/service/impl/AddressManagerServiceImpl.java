@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @CustomLog
 @AllArgsConstructor
@@ -57,7 +58,13 @@ public class AddressManagerServiceImpl implements AddressManagerService {
 
                 log.debug("Add normalize request for recIndex={} - iun={} corrId={}", recIndex, notification.getIun(), correlationId);
             } else {
-                handleError(notification, correlationId, recIndex);
+                //se è usato il PhysicalAddressLookUp non è necessario loggare a fatal.
+                // è già presente un allarme se si avvicina la scadenza della sla di validazione.
+                boolean isFatalError = !(notification.getUsedServices() != null &&
+                        Boolean.TRUE.equals(notification.getUsedServices().getPhysicalAddressLookUp()));
+
+
+                handleError(notification, correlationId, recIndex, isFatalError);
             }
             
         });
@@ -71,14 +78,20 @@ public class AddressManagerServiceImpl implements AddressManagerService {
         return normalizeItemsRequest;
     }
 
-    private static void handleError(NotificationInt notification, String correlationId, int recIndex) {
+    private static void handleError(NotificationInt notification, String correlationId, int recIndex, boolean isFatalError) {
         String errorMsg = String.format(
                 "Recipient haven't physicalAddress - iun=%s recIndex=%d correlationId=%s",
                 notification.getIun(),
                 recIndex,
                 correlationId
         );
-        log.fatal(errorMsg);
+
+        if(isFatalError){
+            log.fatal(errorMsg);
+        }else{
+            log.warn(errorMsg);
+        }
+
         throw new PnInternalException(errorMsg, PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_PHYSICAL_ADDRESS_NOT_PRESENT);
     }
 }
