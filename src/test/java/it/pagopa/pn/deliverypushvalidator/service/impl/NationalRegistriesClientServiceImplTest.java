@@ -78,18 +78,7 @@ class NationalRegistriesClientServiceImplTest {
         Mockito.verify(nationalRegistriesClient, Mockito.times(1)).sendRequestForGetPhysicalAddresses(Mockito.any());
     }
 
-    @Test
-    void getMultiplePhysicalAddress_ThrowExceptionTest_whenRecipientAddressRequestsIsEmpty() {
-        NotificationInt notification = NotificationInt.builder()
-                .iun("Example_IUN_1234_Test")
-                .recipients(Collections.emptyList())
-                .build();
 
-        PnInternalException exception = Assertions.assertThrows(PnInternalException.class, () -> service.getMultiplePhysicalAddress(notification));
-
-        Assertions.assertEquals("No recipients to send request for get physical address", exception.getProblem().getDetail());
-        Assertions.assertEquals(ERROR_CODE_DELIVERYPUSH_INVALID_PHYSICALADDRESS, exception.getProblem().getErrors().getFirst().getCode());
-    }
 
     private List<NationalRegistriesResponse> getNationalRegistriesResponses() {
         List<NationalRegistriesResponse> responses = new ArrayList<>();

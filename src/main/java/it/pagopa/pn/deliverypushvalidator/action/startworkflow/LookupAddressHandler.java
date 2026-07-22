@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_LOOKUPADDRESS_INCONSISTENT_DATA;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.ADDRESS_NOT_FOUND;
@@ -37,8 +38,10 @@ public class LookupAddressHandler {
 
     public void performValidation(NotificationInt notification) {
         List<NationalRegistriesResponse> responses = nationalRegistriesService.getMultiplePhysicalAddress(notification);
-        validateAddresses(responses);
-        saveAddresses(responses, notification);
+        if(!Objects.isNull(responses) && !responses.isEmpty()){
+            validateAddresses(responses);
+            saveAddresses(responses, notification);
+        }
     }
 
     private void validateAddresses(List<NationalRegistriesResponse> responses) {
