@@ -8,7 +8,7 @@
 		<relativePath />
 	</parent>
 	<artifactId>pn-delivery-push-validator</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.4.0-RC.0</version>
 	<name>pn-delivery-push-validator</name>
 	<description>PN Microservice to manage validaton process</description>
 	<scm>
