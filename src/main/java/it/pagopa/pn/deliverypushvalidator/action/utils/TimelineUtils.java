@@ -261,6 +261,7 @@ public class TimelineUtils {
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
                 EventId.builder()
+                        .iun(notification.getIun())
                         .build());
 
         NotificationCostValidationRequestDetailsInt details = NotificationCostValidationRequestDetailsInt.builder()
@@ -274,6 +275,7 @@ public class TimelineUtils {
 
         String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_RESPONSE.buildEventId(
                 EventId.builder()
+                        .iun(notification.getIun())
                         .build());
 
         NotificationCostValidationResponseDetailsInt details = NotificationCostValidationResponseDetailsInt.builder()
