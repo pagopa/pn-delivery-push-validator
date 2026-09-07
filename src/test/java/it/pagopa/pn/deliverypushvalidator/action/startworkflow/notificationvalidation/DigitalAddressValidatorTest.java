@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
@@ -12,6 +13,7 @@ import it.pagopa.pn.deliverypushvalidator.exception.PnValidationDigitalAddressMi
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,10 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class DigitalAddressValidatorTest {
 
     private DigitalAddressValidator validator;
+    private PnDeliveryPushValidatorConfigs config;
 
     @BeforeEach
     void setUp() {
-        validator = new DigitalAddressValidator();
+        config = new PnDeliveryPushValidatorConfigs();
+        validator = new DigitalAddressValidator(config);
     }
 
     @Test
@@ -33,6 +37,24 @@ class DigitalAddressValidatorTest {
         NotificationInt notification = NotificationInt.builder().build();
 
         assertDoesNotThrow(() -> validator.validateDigitalAddress(notification, campaign));
+    }
+
+    @Test
+    void validateDigitalAddress_noPecWorkflow_searchDateBeforeSentAt_shouldValidate() {
+        config.setSearchDigitalDomicileStartDate(Instant.now().minusSeconds(3600));
+        Campaign campaign = Campaign.builder()
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
+                .build();
+        NotificationInt notification = NotificationInt.builder()
+                .sentAt(Instant.now())
+                .recipients(List.of(NotificationRecipientInt.builder()
+                        .recipientType(RecipientTypeInt.PG)
+                        .digitalDomicile(null)
+                        .build()))
+                .build();
+
+        assertThrows(PnValidationDigitalAddressMissingException.class,
+                () -> validator.validateDigitalAddress(notification, campaign));
     }
 
     @Test
