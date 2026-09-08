@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.WorkflowEntity;
@@ -8,6 +9,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationDigitalAddressMissingException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,14 +17,19 @@ import java.util.List;
 import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NO_RECIPIENT_IN_NOTIFICATION;
 
 @Component
+@AllArgsConstructor
 public class DigitalAddressValidator {
+
+    private final PnDeliveryPushValidatorConfigs config;
 
     public void validateDigitalAddress(NotificationInt notificationInt, Campaign campaign) {
         boolean hasPecWorkflow = campaign.getWorkflow().stream()
                 .map(WorkflowEntity::getChannel)
                 .anyMatch(channel -> channel == Channel.PEC);
 
-        if (!hasPecWorkflow) {
+        boolean featureFlagEnabled =  config.getSearchDigitalDomicileStartDate() != null && config.getSearchDigitalDomicileStartDate().isBefore(notificationInt.getSentAt());
+
+        if (!hasPecWorkflow && !featureFlagEnabled) {
             return;
         }
 
