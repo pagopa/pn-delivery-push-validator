@@ -9,10 +9,12 @@ import java.util.Optional;
 
 public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer {
     private static final String PARAMETER_STORE_MVP_CAMPAIGNS = "MVPCampaigns";
+    private static final String PARAMETER_STORE_SEARCH_DIGITAL_DOMICILE = "/config/workflow/search-digital-domicile";
     public static final String CAMPAIGN_ID_DIGITAL_WORKFLOW = "campaign-digital-workflow";
     public static final String CAMPAIGN_ID_ANALOG_WORKFLOW = "campaign-analog-workflow";
     public static final String CAMPAIGN_ID_CLOSED = "campaign-closed";
     public static final String DEFAULT_CAMPAIGN_SENDER_ID = "5b994d4a-0fa8-47ac-9c7b-354f1d44a1ce";
+    private static final String JSON_CONFIGURATION_SEARCH_DIGITAL_DOMICILE = "[]";
     private static final String JSON_CAMPAIGNS_PARAMETER_CONSUMER = """
             [
                 {
@@ -92,7 +94,17 @@ public class AbstractCachedSsmParameterConsumerMock implements ParameterConsumer
             } catch (JsonProcessingException var7) {
                 throw new PnInternalException("[TEST] Unable to deserialize object", "PN_GENERIC_ERROR", var7);
             }
+        } else if (storeName.startsWith(PARAMETER_STORE_SEARCH_DIGITAL_DOMICILE)) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+            try {
+                result = Optional.of(objectMapper.readValue(JSON_CONFIGURATION_SEARCH_DIGITAL_DOMICILE, aClass));
+            } catch (JsonProcessingException var7) {
+                throw new PnInternalException("[TEST] Unable to deserialize object", "PN_GENERIC_ERROR", var7);
+            }
         }
         return result;
     }
+
 }

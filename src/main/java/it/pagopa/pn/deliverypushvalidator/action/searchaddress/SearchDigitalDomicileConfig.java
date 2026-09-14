@@ -2,12 +2,10 @@ package it.pagopa.pn.deliverypushvalidator.action.searchaddress;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 
-@Component
 @AllArgsConstructor
 @Data
 public class SearchDigitalDomicileConfig {

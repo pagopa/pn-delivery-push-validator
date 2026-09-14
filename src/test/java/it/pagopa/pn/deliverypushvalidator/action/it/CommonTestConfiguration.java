@@ -7,6 +7,8 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.LegalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
+import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileParameterConsumer;
+import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.*;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.*;
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
@@ -131,7 +133,9 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         CampaignServiceImpl.class,
         MVPCampaignsParameterConsumer.class,
         DigitalAddressValidator.class,
-        CommunicationTypeChecker.class
+        CommunicationTypeChecker.class,
+        SearchDigitalDomicileUtils.class,
+        SearchDigitalDomicileParameterConsumer.class
 })
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(value = "classpath:/application-testIT.properties")
