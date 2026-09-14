@@ -381,7 +381,6 @@ Resources:
         ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICESTARTDATE={{resolve:ssm:/config/notification-cost-service/notification-processing-start-date}}'
         ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_INFORMALVALIDATIONINPUTEVENTS=${PnDeliveryPushInformalValidationInputsQueueName}'
-        ContainerEnvEntry24: !Sub "PN_DELIVERYPUSHVALIDATOR_SEARCHDIGITALDOMICILESTARTDATE={{resolve:ssm:/config/workflow/search-digital-domicile-start-date}}"
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
@@ -585,6 +584,7 @@ Resources:
             Resource:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MVPCampaigns'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/workflow/search-digital-domicile'
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
