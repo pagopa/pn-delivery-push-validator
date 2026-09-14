@@ -6,7 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Configuration
+@Component
 @AllArgsConstructor
 @CustomLog
 @Getter

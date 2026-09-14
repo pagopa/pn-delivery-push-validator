@@ -85,4 +85,16 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
 	--value "[{\"validFrom\": \"1970-01-01T00:00:00.000Z\",\"pec\": [],\"sms\": [],\"email\": []},{\"validFrom\": \"2026-10-01T00:00:00.000Z\",\"pec\": [],\"sms\": [\"PLATFORM\", \"SPECIAL\"],\"email\": [\"PLATFORM\", \"SPECIAL\"]}]"\
 	--type String \
 
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+	ssm put-parameter \
+	--name "MVPCampaigns" \
+	--value ""\
+	--type String \
+
+aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
+  ssm put-parameter \
+  --name "MapPaMVP" \
+  --type String \
+  --value "[]"
+
 echo "Initialization terminated"

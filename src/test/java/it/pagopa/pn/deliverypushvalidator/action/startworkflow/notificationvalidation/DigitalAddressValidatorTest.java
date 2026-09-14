@@ -13,23 +13,22 @@ import it.pagopa.pn.deliverypushvalidator.exception.PnValidationDigitalAddressMi
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class DigitalAddressValidatorTest {
 
     private DigitalAddressValidator validator;
 
-    @Mock
-    private SearchDigitalDomicileUtils searchDigitalDomicileUtils;
-
     @BeforeEach
     void setUp() {
+        SearchDigitalDomicileUtils searchDigitalDomicileUtils = mock(SearchDigitalDomicileUtils.class);
         validator = new DigitalAddressValidator(searchDigitalDomicileUtils);
     }
 
