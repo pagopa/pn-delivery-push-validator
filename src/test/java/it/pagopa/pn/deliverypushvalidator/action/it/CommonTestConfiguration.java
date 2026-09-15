@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.action.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.configs.MVPParameterConsumer;
+import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
@@ -12,7 +13,6 @@ import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalid
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.config.MVPCampaignsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
@@ -129,7 +129,6 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         CampaignValidatorImpl.class,
         MessageValidator.class,
         CampaignServiceImpl.class,
-        MVPCampaignsParameterConsumer.class,
         DigitalAddressValidator.class,
         CommunicationTypeChecker.class
 })
@@ -166,6 +165,9 @@ public class CommonTestConfiguration {
     AddressManagerClientMock addressManagerClientMock;
     @Autowired
     PnDeliveryPushValidatorConfigs cfg;
+
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    private CampaignServiceCachedProvider campaignServiceCachedProvider;
 
     @BeforeEach
     void setup() {

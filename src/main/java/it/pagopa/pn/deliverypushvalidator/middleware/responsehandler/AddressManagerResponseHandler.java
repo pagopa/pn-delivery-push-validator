@@ -51,7 +51,7 @@ public class AddressManagerResponseHandler {
             notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);
             log.logEndingProcess(processName);
         } catch (Exception ex){
-            log.logEndingProcess(processName, false, ex.getMessage(),ex);
+            log.logEndingProcess(processName);
             throw ex;
         }
         
