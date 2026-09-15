@@ -1,7 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
+import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.WorkflowEntity;
@@ -20,16 +20,14 @@ import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidat
 @AllArgsConstructor
 public class DigitalAddressValidator {
 
-    private final PnDeliveryPushValidatorConfigs config;
+    private final SearchDigitalDomicileUtils searchDigitalDomicileUtils;
 
     public void validateDigitalAddress(NotificationInt notificationInt, Campaign campaign) {
         boolean hasPecWorkflow = campaign.getWorkflow().stream()
                 .map(WorkflowEntity::getChannel)
                 .anyMatch(channel -> channel == Channel.PEC);
 
-        boolean featureFlagEnabled =  config.getSearchDigitalDomicileStartDate() != null && config.getSearchDigitalDomicileStartDate().isBefore(notificationInt.getSentAt());
-
-        if (!hasPecWorkflow && !featureFlagEnabled) {
+        if (!hasPecWorkflow && !searchDigitalDomicileUtils.isPecFullSearchEnabled(notificationInt.getSentAt())) {
             return;
         }
 

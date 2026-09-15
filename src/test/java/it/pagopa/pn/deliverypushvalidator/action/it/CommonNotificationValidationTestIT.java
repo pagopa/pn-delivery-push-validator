@@ -26,9 +26,11 @@ import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
 import lombok.Builder;
 import lombok.Getter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +39,7 @@ import java.util.Set;
 
 import static org.awaitility.Awaitility.await;
 
+@ExtendWith(SpringExtension.class)
 class CommonNotificationValidationTestIT extends CommonTestConfiguration{
 
 

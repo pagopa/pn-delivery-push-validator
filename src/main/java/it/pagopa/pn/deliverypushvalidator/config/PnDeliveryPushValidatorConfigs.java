@@ -56,7 +56,6 @@ public class PnDeliveryPushValidatorConfigs {
     private boolean additionalLangsEnabled;
     private String technicalRefusalCostMode;
     private Instant notificationCostServiceStartDate;
-    private Instant searchDigitalDomicileStartDate;
 
     @Data
     public static class Topics {
