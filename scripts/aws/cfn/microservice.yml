@@ -330,6 +330,17 @@ Parameters:
     Type: CommaDelimitedList
     Default: ''
     Description: 'List of action detail type to accept in event bridge rule'
+    
+  CpuArchitecture:
+    Type: String
+    Default: 'ARM'
+    Description: CPU architecture for the Fargate tasks
+
+  JavaToolOptions:
+    Type: String
+    Default: '-Dreactor.netty.ioWorkerCount=50'
+    Description: Java tool options for the Fargate tasks
+
 
 Resources:
 
@@ -385,7 +396,7 @@ Resources:
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
         ParentMicroserviceName: !Sub '${ProjectName}-delivery-push-validator'
-        JavaToolOptions: '-Dreactor.netty.ioWorkerCount=50'
+        JavaToolOptions: !Ref JavaToolOptions
         MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Join [ ',', !Ref SubnetsIds ]
@@ -397,6 +408,7 @@ Resources:
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
+        CpuArchitecture: !Ref CpuArchitecture
 
   ## Dashboard
   DeliveryPushValidatorMicroserviceCloudWatchDashboard:
