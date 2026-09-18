@@ -1,8 +1,8 @@
 package it.pagopa.pn.deliverypushvalidator;
 
 
+import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
 import io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration;
-import it.pagopa.pn.deliverypushvalidator.config.MVPCampaignsParameterConsumer;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cloud.function.context.config.ContextFunctionCatalogAutoConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,5 +19,5 @@ public abstract class MockAWSObjectsTest extends MockActionPoolTest {
     private DynamoDbClient dynamoDbClient;
 
     @MockitoBean
-    private MVPCampaignsParameterConsumer mvpCampaignsParameterConsumer;
+    private CampaignServiceCachedProvider campaignServiceCachedProvider;
 }

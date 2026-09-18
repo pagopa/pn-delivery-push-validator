@@ -1,6 +1,5 @@
 package it.pagopa.pn.deliverypushvalidator.config;
 
-import it.pagopa.pn.commons.abstractions.impl.AbstractCachedSsmParameterConsumer;
 import it.pagopa.pn.commons.configs.aws.AwsConfigs;
 import it.pagopa.pn.commons.exceptions.ExceptionHelper;
 import it.pagopa.pn.deliverypushvalidator.config.springbootcfg.*;
@@ -16,8 +15,6 @@ class ActivatorTest {
     @Mock
     private AwsConfigs awsConfigs;
     @Mock
-    private AbstractCachedSsmParameterConsumer abstractCachedSsmParameterConsumer;
-    @Mock
     private SsmClient ssmClient;
     @Mock
     private ExceptionHelper exceptionHelper;
@@ -28,7 +25,6 @@ class ActivatorTest {
             new AbstractCachedSsmParameterConsumerActivation(ssmClient);
             new AwsConfigsActivation();
             new AwsServicesClientsConfigActivation(awsConfigs);
-            new MVPParameterConsumerActivation(abstractCachedSsmParameterConsumer);
             new PnErrorWebExceptionHandlerActivation(exceptionHelper);
             new PnResponseEntityExceptionHandlerActivation(exceptionHelper);
         });

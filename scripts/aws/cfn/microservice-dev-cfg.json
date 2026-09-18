@@ -6,6 +6,7 @@
     "MaxTasksNumberValidator": "1",
     "AutoscalingThresholdValidator": "650",
     "DocumentCreationRequestTableName": "pn-DocumentCreationRequestTable",
+    "CampaignsTableName": "pn-Campaigns",
     "ConsumedQueueMessagePerMinuteValidator": "3000",
     "PnCronAnalyzer": "-",
     "WireTapLogActivation": "false",

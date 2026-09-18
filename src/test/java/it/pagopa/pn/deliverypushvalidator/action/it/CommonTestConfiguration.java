@@ -2,6 +2,13 @@ package it.pagopa.pn.deliverypushvalidator.action.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.configs.MVPParameterConsumer;
+import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
+import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
+import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
+import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
+import it.pagopa.pn.commons.db.campaign.entity.DesiredFeedback;
+import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
@@ -12,7 +19,6 @@ import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalid
 import it.pagopa.pn.deliverypushvalidator.action.utils.InstantNowSupplier;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
-import it.pagopa.pn.deliverypushvalidator.config.MVPCampaignsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.legalfact.DocumentComposition;
@@ -54,8 +60,11 @@ import org.springframework.util.unit.DataSize;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.AbstractCachedSsmParameterConsumerMock.*;
 import static org.awaitility.Awaitility.setDefaultTimeout;
 
 @ContextConfiguration(classes = {
@@ -129,7 +138,6 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         CampaignValidatorImpl.class,
         MessageValidator.class,
         CampaignServiceImpl.class,
-        MVPCampaignsParameterConsumer.class,
         DigitalAddressValidator.class,
         CommunicationTypeChecker.class
 })
@@ -167,6 +175,9 @@ public class CommonTestConfiguration {
     @Autowired
     PnDeliveryPushValidatorConfigs cfg;
 
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    private CampaignServiceCachedProvider campaignServiceCachedProvider;
+
     @BeforeEach
     void setup() {
         setDefaultTimeout(Duration.ofSeconds(120));
@@ -177,6 +188,7 @@ public class CommonTestConfiguration {
         Mockito.when(instantNowSupplier.get()).thenAnswer(answer);
         
         setCommonsConfigurationPropertiesForTest(cfg);
+        setCampaignServiceMock();
 
         ConsoleAppenderCustom.initializeLog();
 
@@ -220,6 +232,98 @@ public class CommonTestConfiguration {
 
 
         Mockito.when(cfg.getTemplatesEngineBaseUrl()).thenReturn("http://localhost:8090");
+    }
+
+    private void setCampaignServiceMock() {
+        Mockito.when(campaignServiceCachedProvider.getByCampaignIdAndSenderId(Mockito.anyString(), Mockito.anyString()))
+                .thenAnswer(invocation -> {
+                    String campaignId = invocation.getArgument(0);
+                    String senderId = invocation.getArgument(1);
+
+                    if (CAMPAIGN_ID_DIGITAL_WORKFLOW.equals(campaignId) && DEFAULT_CAMPAIGN_SENDER_ID.equals(senderId)) {
+                        return buildDigitalCampaign();
+                    }
+                    if (CAMPAIGN_ID_ANALOG_WORKFLOW.equals(campaignId) && DEFAULT_CAMPAIGN_SENDER_ID.equals(senderId)) {
+                        return buildAnalogCampaign();
+                    }
+                    if (CAMPAIGN_ID_CLOSED.equals(campaignId) && DEFAULT_CAMPAIGN_SENDER_ID.equals(senderId)) {
+                        return buildClosedCampaign();
+                    }
+
+                    String message = String.format(
+                            "Campaign with campaignId=%s and senderId=%s not found",
+                            campaignId,
+                            senderId
+                    );
+                    throw new PnCampaignNotFoundException(message);
+                });
+    }
+
+    private CampaignEntity buildDigitalCampaign() {
+        return buildCampaign(
+                CAMPAIGN_ID_DIGITAL_WORKFLOW,
+                List.of(
+                        buildWorkflowEntity(CampaignChannel.IO, Set.of(it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt.PF), DesiredFeedback.READ),
+                        buildWorkflowEntity(CampaignChannel.PEC, Set.of(it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt.PG), DesiredFeedback.READ)
+                ),
+                CampaignStatus.IN_PROGRESS
+        );
+    }
+
+    private CampaignEntity buildAnalogCampaign() {
+        return buildCampaign(
+                CAMPAIGN_ID_ANALOG_WORKFLOW,
+                List.of(
+                        buildWorkflowEntity(
+                                CampaignChannel.ANALOG,
+                                Set.of(
+                                        it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt.PF,
+                                        it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt.PG
+                                ),
+                                DesiredFeedback.RECEIVED
+                        )
+                ),
+                CampaignStatus.IN_PROGRESS
+        );
+    }
+
+    private CampaignEntity buildClosedCampaign() {
+        return buildCampaign(
+                CAMPAIGN_ID_CLOSED,
+                List.of(
+                        buildWorkflowEntity(CampaignChannel.IO, Set.of(it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt.PF), DesiredFeedback.READ)
+                ),
+                CampaignStatus.CONCLUDED
+        );
+    }
+
+    private CampaignEntity buildCampaign(String campaignId, List<WorkflowEntity> workflow, CampaignStatus status) {
+        return CampaignEntity.builder()
+                .campaignId(campaignId)
+                .senderId(DEFAULT_CAMPAIGN_SENDER_ID)
+                .title("campaign for test")
+                .descriptionScope("campaign for test")
+                .startDate(Instant.parse("2026-02-01T00:00:00Z"))
+                .endDate(Instant.parse("2027-12-31T23:59:59Z"))
+                .status(status)
+                .senderContact("contact@example.com")
+                .serviceId("service789")
+                .serviceName("Service")
+                .taxonomyCode("taxonomy")
+                .sensitiveContent(Boolean.TRUE)
+                .stopOnViewed(Boolean.FALSE)
+                .workflow(workflow)
+                .build();
+    }
+
+    private WorkflowEntity buildWorkflowEntity(CampaignChannel channel, Set<it.pagopa.pn.commons.utils.qr.models.RecipientTypeInt> recipientTypes, DesiredFeedback desiredFeedback) {
+        return WorkflowEntity.builder()
+                .channel(channel)
+                .recipientType(recipientTypes)
+                .timeout(Duration.ofHours(2))
+                .desiredFeedback(Set.of(desiredFeedback))
+                .includeAttachment(Boolean.FALSE)
+                .build();
     }
 
 }
