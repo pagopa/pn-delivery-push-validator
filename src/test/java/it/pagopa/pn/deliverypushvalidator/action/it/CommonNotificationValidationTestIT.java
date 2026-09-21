@@ -9,7 +9,6 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilde
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
-import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationDocumentInt;
@@ -36,6 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.awaitility.Awaitility.await;
+import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.AbstractCachedSsmParameterConsumerMock.CAMPAIGN_ID_DIGITAL_WORKFLOW;
+import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.AbstractCachedSsmParameterConsumerMock.DEFAULT_CAMPAIGN_SENDER_ID;
 
 class CommonNotificationValidationTestIT extends CommonTestConfiguration{
 
@@ -68,10 +69,15 @@ class CommonNotificationValidationTestIT extends CommonTestConfiguration{
                 .withDigitalDomicile(digitalDomicile)
                 .build();
 
+        String fileDoc = "sha256_doc00";
+        List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
+
         NotificationInt notification = NotificationTestBuilder.builder()
-                .withPaId("paId01")
+                .withPaId(DEFAULT_CAMPAIGN_SENDER_ID)
                 .withNotificationRecipient(recipient)
                 .withCommunicationType(communicationType)
+                .withNotificationDocuments(notificationDocumentList)
+                .withCampaignId(CAMPAIGN_ID_DIGITAL_WORKFLOW)
                 .build();
 
         byte[] differentFileSha = "error".getBytes();
@@ -79,7 +85,6 @@ class CommonNotificationValidationTestIT extends CommonTestConfiguration{
         pnDeliveryClientMock.addNotification(notification);
 
         String iun = notification.getIun();
-        Integer recIndex = NotificationUtils.getRecipientIndexFromTaxId(notification, recipient.getTaxId());
 
         //WHEN the workflow start
         startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
@@ -92,9 +97,15 @@ class CommonNotificationValidationTestIT extends CommonTestConfiguration{
                         TimelineEventId.REQUEST_REFUSED.buildEventId(
                                 EventId.builder()
                                         .iun(iun)
-                                        .recIndex(recIndex)
                                         .build())).isPresent()
                 )
+        );
+        verifyNotificationRejection(
+                iun,
+                List.of(RefusalReason.builder()
+                        .errorCode(it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes.NotificationRefusedErrorCodeInt.FILE_SHA_ERROR.name())
+                        .build()),
+                null
         );
         ConsoleAppenderCustom.checkLogs();
     }
@@ -121,9 +132,10 @@ class CommonNotificationValidationTestIT extends CommonTestConfiguration{
 
         NotificationInt notification = NotificationTestBuilder.builder()
                 .withNotificationDocuments(notificationDocumentList)
-                .withPaId("paId01")
+                .withPaId(DEFAULT_CAMPAIGN_SENDER_ID)
                 .withNotificationRecipient(recipient)
                 .withCommunicationType(communicationType)
+                .withCampaignId(CAMPAIGN_ID_DIGITAL_WORKFLOW)
                 .build();
 
 
@@ -170,9 +182,10 @@ class CommonNotificationValidationTestIT extends CommonTestConfiguration{
 
         NotificationInt notification = NotificationTestBuilder.builder()
                 .withNotificationDocuments(notificationDocumentList)
-                .withPaId("paId01")
+                .withPaId(DEFAULT_CAMPAIGN_SENDER_ID)
                 .withNotificationRecipient(recipient)
                 .withCommunicationType(communicationType)
+                .withCampaignId(CAMPAIGN_ID_DIGITAL_WORKFLOW)
                 .build();
 
 
