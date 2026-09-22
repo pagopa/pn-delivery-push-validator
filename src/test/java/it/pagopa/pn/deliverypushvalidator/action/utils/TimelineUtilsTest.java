@@ -16,7 +16,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
@@ -249,7 +252,7 @@ class TimelineUtilsTest {
         NotificationInt notification = buildNotification();
 
         TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationRequest(notification);
-        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_REQUEST";
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_REQUEST.IUN_Example_IUN_1234_Test";
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),
@@ -265,7 +268,7 @@ class TimelineUtilsTest {
         NotificationInt notification = buildNotification();
         
         TimelineElementInternal actual = timelineUtils.buildNotificationCostValidationResponse(notification);
-        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_RESPONSE";
+        String timelineEventIdExpected = "NOTIFICATION_COST_VALIDATION_RESPONSE.IUN_Example_IUN_1234_Test";
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(timelineEventIdExpected, actual.getElementId()),

@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator;
 
 
 import io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration;
+import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
 import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.config.MVPCampaignsParameterConsumer;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,4 +25,7 @@ public abstract class MockAWSObjectsTest extends MockActionPoolTest {
 
     @MockitoBean
     private SearchDigitalDomicileParameterConsumer searchDigitalDomicileParameterConsumer;
+
+    @MockitoBean
+    private CampaignServiceCachedProvider campaignServiceCachedProvider;
 }

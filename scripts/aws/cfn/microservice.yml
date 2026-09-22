@@ -171,6 +171,10 @@ Parameters:
     Type: String
     Description: 'Name of dynamodb table containing unreacheble notifications recipients'
 
+  CampaignsTableName:
+    Type: String
+    Description: Nome della tabella Campaigns
+
   ConsumedQueueMessagePerMinuteValidator:
     Type: Number
     Default: 0
@@ -331,6 +335,17 @@ Parameters:
     Default: ''
     Description: 'List of action detail type to accept in event bridge rule'
 
+  CpuArchitecture:
+    Type: String
+    Default: 'ARM'
+    Description: CPU architecture for the Fargate tasks
+
+  JavaToolOptions:
+    Type: String
+    Default: '-Dreactor.netty.ioWorkerCount=50'
+    Description: Java tool options for the Fargate tasks
+
+
 Resources:
 
   # PN-Delivery-push validator microservice
@@ -381,11 +396,12 @@ Resources:
         ContainerEnvEntry21: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICEBASEURL=http://${ApplicationLoadBalancerDomain}:8080'
         ContainerEnvEntry22: !Sub 'PN_DELIVERYPUSHVALIDATOR_NOTIFICATIONCOSTSERVICESTARTDATE={{resolve:ssm:/config/notification-cost-service/notification-processing-start-date}}'
         ContainerEnvEntry23: !Sub 'PN_DELIVERYPUSHVALIDATOR_TOPICS_INFORMALVALIDATIONINPUTEVENTS=${PnDeliveryPushInformalValidationInputsQueueName}'
+        ContainerEnvEntry24: !Sub 'PN_DELIVERYPUSHVALIDATOR_CAMPAIGNS_TABLE_NAME=${CampaignsTableName}'
         ContainerSecret1: !Sub 'PN_DELIVERYPUSHVALIDATOR_ADDRESSMANAGERAPIKEY=arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:pn-DeliveryPush-Secrets:AddressManagerApiKey:AWSCURRENT:'
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
         ParentMicroserviceName: !Sub '${ProjectName}-delivery-push-validator'
-        JavaToolOptions: '-Dreactor.netty.ioWorkerCount=50'
+        JavaToolOptions: !Ref JavaToolOptions
         MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Join [ ',', !Ref SubnetsIds ]
@@ -397,6 +413,7 @@ Resources:
         AlbSecurityGroup: !Ref AlbSecurityGroup
         EcsLogGroup: !Ref EcsValidatorLogGroup
         LogAlarmStrategyV1: !Ref LogAlarmStrategy
+        CpuArchitecture: !Ref CpuArchitecture
 
   ## Dashboard
   DeliveryPushValidatorMicroserviceCloudWatchDashboard:
@@ -585,6 +602,12 @@ Resources:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MVPCampaigns'
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/workflow/search-digital-domicile'
+          - Effect: Allow
+            Action:
+              - 'dynamodb:Scan'
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CampaignsTableName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CampaignsTableName}/*
           - Effect: Allow
             Action:
               - 'dynamodb:GetItem'
