@@ -3,7 +3,6 @@ package it.pagopa.pn.deliverypushvalidator.action.searchaddress;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@AllArgsConstructor
 @CustomLog
 @Getter
 public class SearchDigitalDomicileParameterConsumer {
@@ -24,6 +22,11 @@ public class SearchDigitalDomicileParameterConsumer {
 
     private final ParameterConsumer parameterConsumer;
     private List<SearchDigitalDomicileConfig> searchDigitalDomicileConfigs;
+
+    public SearchDigitalDomicileParameterConsumer(ParameterConsumer parameterConsumer) {
+        this.parameterConsumer = parameterConsumer;
+        this.searchDigitalDomicileConfigs = Collections.emptyList();
+    }
 
     @PostConstruct
     protected void initialize() {

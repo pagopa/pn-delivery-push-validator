@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ class SearchDigitalDomicileParameterConsumerTest {
 
     @BeforeEach
     void setUp() {
-        consumer = new SearchDigitalDomicileParameterConsumer(parameterConsumer, new ArrayList<>());
+        consumer = new SearchDigitalDomicileParameterConsumer(parameterConsumer);
     }
 
     @Test

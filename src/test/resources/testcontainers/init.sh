@@ -86,12 +86,6 @@ aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
 	--type String \
 
 aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
-	ssm put-parameter \
-	--name "MVPCampaigns" \
-	--value ""\
-	--type String \
-
-aws --profile default --region us-east-1 --endpoint-url=http://localstack:4566 \
   ssm put-parameter \
   --name "MapPaMVP" \
   --type String \
