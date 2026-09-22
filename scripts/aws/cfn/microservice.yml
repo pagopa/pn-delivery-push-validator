@@ -334,7 +334,7 @@ Parameters:
     Type: CommaDelimitedList
     Default: ''
     Description: 'List of action detail type to accept in event bridge rule'
-    
+
   CpuArchitecture:
     Type: String
     Default: 'ARM'
@@ -600,6 +600,8 @@ Resources:
               - 'ssm:GetParameters'
             Resource:
               - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MapPaSendMoreThan20Grams'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/MVPCampaigns'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/workflow/search-digital-domicile'
           - Effect: Allow
             Action:
               - 'dynamodb:Scan'

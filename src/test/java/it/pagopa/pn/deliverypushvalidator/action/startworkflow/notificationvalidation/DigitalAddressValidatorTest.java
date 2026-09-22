@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
@@ -11,18 +12,26 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationDigitalAddressMissingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class DigitalAddressValidatorTest {
 
     private DigitalAddressValidator validator;
+    private SearchDigitalDomicileUtils searchDigitalDomicileUtils;
 
     @BeforeEach
     void setUp() {
-        validator = new DigitalAddressValidator();
+        searchDigitalDomicileUtils = mock(SearchDigitalDomicileUtils.class);
+        validator = new DigitalAddressValidator(searchDigitalDomicileUtils);
     }
 
     @Test
@@ -145,5 +154,35 @@ class DigitalAddressValidatorTest {
         NotificationInt notification = NotificationInt.builder().recipients(List.of()).build();
 
         assertThrows(PnInternalException.class, () -> validator.validateDigitalAddress(notification, campaign));
+    }
+
+    @Test
+    void validateDigitalAddress_noPecWorkflowButFullSearchEnabled_pgWithValidDigitalAddress_shouldNotThrow() {
+        Campaign campaign = Campaign.builder()
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
+                .build();
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .recipientType(RecipientTypeInt.PG)
+                .digitalDomicile(LegalDigitalAddressInt.builder().address("test@pec.it").build())
+                .build();
+        NotificationInt notification = NotificationInt.builder().recipients(List.of(recipient)).build();
+        when(searchDigitalDomicileUtils.isPecFullSearchEnabled(notification.getSentAt())).thenReturn(true);
+
+        assertDoesNotThrow(() -> validator.validateDigitalAddress(notification, campaign));
+    }
+
+    @Test
+    void validateDigitalAddress_noPecWorkflowButFullSearchEnabled_pgWithMissingDigitalAddress_shouldThrow() {
+        Campaign campaign = Campaign.builder()
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
+                .build();
+        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
+                .recipientType(RecipientTypeInt.PG)
+                .digitalDomicile(null)
+                .build();
+        NotificationInt notification = NotificationInt.builder().recipients(List.of(recipient)).build();
+        when(searchDigitalDomicileUtils.isPecFullSearchEnabled(notification.getSentAt())).thenReturn(true);
+
+        assertThrows(PnValidationDigitalAddressMissingException.class, () -> validator.validateDigitalAddress(notification, campaign));
     }
 }

@@ -1,8 +1,9 @@
 package it.pagopa.pn.deliverypushvalidator;
 
 
-import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
 import io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration;
+import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
+import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileParameterConsumer;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cloud.function.context.config.ContextFunctionCatalogAutoConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,6 +18,9 @@ public abstract class MockAWSObjectsTest extends MockActionPoolTest {
 
     @MockitoBean
     private DynamoDbClient dynamoDbClient;
+
+    @MockitoBean
+    private SearchDigitalDomicileParameterConsumer searchDigitalDomicileParameterConsumer;
 
     @MockitoBean
     private CampaignServiceCachedProvider campaignServiceCachedProvider;
