@@ -157,24 +157,9 @@ class DigitalAddressValidatorTest {
     }
 
     @Test
-    void validateDigitalAddress_noPecWorkflowButFullSearchEnabled_pgWithValidDigitalAddress_shouldNotThrow() {
+    void validateDigitalAddress_pecWorkflowButFullSearchEnabled_shouldNotThrow() {
         Campaign campaign = Campaign.builder()
-                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
-                .build();
-        NotificationRecipientInt recipient = NotificationRecipientInt.builder()
-                .recipientType(RecipientTypeInt.PG)
-                .digitalDomicile(LegalDigitalAddressInt.builder().address("test@pec.it").build())
-                .build();
-        NotificationInt notification = NotificationInt.builder().recipients(List.of(recipient)).build();
-        when(searchDigitalDomicileUtils.isPecFullSearchEnabled(notification.getSentAt())).thenReturn(true);
-
-        assertDoesNotThrow(() -> validator.validateDigitalAddress(notification, campaign));
-    }
-
-    @Test
-    void validateDigitalAddress_noPecWorkflowButFullSearchEnabled_pgWithMissingDigitalAddress_shouldThrow() {
-        Campaign campaign = Campaign.builder()
-                .workflow(List.of(WorkflowEntity.builder().channel(Channel.IO).build()))
+                .workflow(List.of(WorkflowEntity.builder().channel(Channel.PEC).build()))
                 .build();
         NotificationRecipientInt recipient = NotificationRecipientInt.builder()
                 .recipientType(RecipientTypeInt.PG)
@@ -183,6 +168,6 @@ class DigitalAddressValidatorTest {
         NotificationInt notification = NotificationInt.builder().recipients(List.of(recipient)).build();
         when(searchDigitalDomicileUtils.isPecFullSearchEnabled(notification.getSentAt())).thenReturn(true);
 
-        assertThrows(PnValidationDigitalAddressMissingException.class, () -> validator.validateDigitalAddress(notification, campaign));
+        assertDoesNotThrow(() -> validator.validateDigitalAddress(notification, campaign));
     }
 }

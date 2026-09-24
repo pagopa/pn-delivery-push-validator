@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -21,21 +22,18 @@ public class SearchDigitalDomicileUtils {
         if (CollectionUtils.isEmpty(configs)) {
             return false;
         } else {
-            SearchDigitalDomicileConfig config = configs.stream().filter(internalConfig -> !sentAt.isBefore(internalConfig.getValidFrom()))
-                    .max((internalConfig1, internalConfig2) -> internalConfig1.getValidFrom().compareTo(internalConfig2.getValidFrom()))
+            SearchDigitalDomicileConfig activeSearchDigitalDomicileConfig = configs.stream()
+                    .filter(internalConfig -> !sentAt.isBefore(internalConfig.getValidFrom())) // !isBefore per accettare anche il caso in cui sentAt == validFrom
+                    .max(Comparator.comparing(SearchDigitalDomicileConfig::getValidFrom))
                     .orElse(null);
 
-            if (config == null) {
+            if (activeSearchDigitalDomicileConfig == null) {
                 return false;
             }
 
-            boolean fullSearchEnabled = config.getPec().stream().toList().containsAll(List.of(DigitalAddressSourceInt.GENERAL, DigitalAddressSourceInt.PLATFORM, DigitalAddressSourceInt.SPECIAL));
+            boolean fullSearchEnabled = activeSearchDigitalDomicileConfig.getPec().stream().toList().containsAll(List.of(DigitalAddressSourceInt.GENERAL, DigitalAddressSourceInt.PLATFORM, DigitalAddressSourceInt.SPECIAL));
 
-            if (fullSearchEnabled) {
-                return true;
-            }
+            return fullSearchEnabled;
         }
-
-        return false;
     }
 }

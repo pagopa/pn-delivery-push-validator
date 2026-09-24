@@ -27,7 +27,9 @@ public class DigitalAddressValidator {
                 .map(WorkflowEntity::getChannel)
                 .anyMatch(channel -> channel == Channel.PEC);
 
-        if (!hasPecWorkflow && !searchDigitalDomicileUtils.isPecFullSearchEnabled(notificationInt.getSentAt())) {
+        if (!hasPecWorkflow || searchDigitalDomicileUtils.isPecFullSearchEnabled(notificationInt.getSentAt())) {
+            // Se non è previsto il workflow PEC o se la ricerca domicilio digitale delle PEC è abilitata per tutte le sorgenti,
+            // possiamo evitare di richiedere obbligatoriamente l'indirizzo digitale.
             return;
         }
 
