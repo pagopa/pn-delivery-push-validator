@@ -1,11 +1,12 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
-import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
+
 import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
 import it.pagopa.pn.commons.db.campaign.entity.DesiredFeedback;
 import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.db.campaign.provider.CampaignServiceCachedProvider;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.exception.PnCampaignNotFoundException;

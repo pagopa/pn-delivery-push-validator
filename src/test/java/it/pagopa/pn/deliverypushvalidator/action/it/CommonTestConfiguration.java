@@ -2,12 +2,12 @@ package it.pagopa.pn.deliverypushvalidator.action.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.pn.commons.configs.MVPParameterConsumer;
-import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignChannel;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignStatus;
 import it.pagopa.pn.commons.db.campaign.entity.DesiredFeedback;
 import it.pagopa.pn.commons.db.campaign.entity.WorkflowEntity;
+import it.pagopa.pn.commons.db.campaign.provider.CampaignServiceCachedProvider;
 import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.action.it.mockbean.*;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
