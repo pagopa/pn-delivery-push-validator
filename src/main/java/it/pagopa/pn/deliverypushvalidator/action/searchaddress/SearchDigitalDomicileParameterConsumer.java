@@ -5,7 +5,6 @@ import it.pagopa.pn.commons.exceptions.PnInternalException;
 import jakarta.annotation.PostConstruct;
 import lombok.CustomLog;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 
 import java.util.ArrayList;
@@ -13,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 @CustomLog
 @Getter
-public class SearchDigitalDomicileParameterConsumer {
+public class SearchDigitalDomicileParameterConsumer
+        implements SearchDigitalDomicileConfigProvider {
 
     private static final String PARAMETER_STORE_SEARCH_DIGITAL_DOMICILE = "/config/workflow/search-digital-domicile";
 

@@ -1,11 +1,11 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
-import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
+import it.pagopa.pn.commons.db.campaign.CampaignProvider;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
 import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
-import it.pagopa.pn.deliverypushvalidator.service.mapper.CampaignMapper;
 import it.pagopa.pn.deliverypushvalidator.service.CampaignService;
+import it.pagopa.pn.deliverypushvalidator.service.mapper.CampaignMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CampaignServiceImpl implements CampaignService {
 
-    private final CampaignServiceCachedProvider campaignServiceCachedProvider;
-
+    private final CampaignProvider campaignServiceCachedProvider;
     @Override
     public Campaign getCampaignByCampaignIdAndSenderId(String campaignId, String senderId) {
         log.debug("Start getCampaignByCampaignIdAndSenderId for campaignId={} and senderId={}", campaignId, senderId);
