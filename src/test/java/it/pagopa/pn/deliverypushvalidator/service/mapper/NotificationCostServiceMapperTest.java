@@ -1,12 +1,13 @@
 package it.pagopa.pn.deliverypushvalidator.service.mapper;
 
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.PagoPaIntMode;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.model.NotificationFeePolicy;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PaymentData;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.RecipientCostData;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -88,7 +89,7 @@ class NotificationCostServiceMapperTest {
         NotificationInt notification = buildCompleteNotification();
 
         // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
+        NewNotificationCostRequest result = mapper.mapNotificationToNewNotificationCostRequest(notification);
 
         // Then
         assertNotNull(result);
@@ -142,7 +143,7 @@ class NotificationCostServiceMapperTest {
                 .build();
 
         // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
+        NewNotificationCostRequest result = mapper.mapNotificationToNewNotificationCostRequest(notification);
 
         // Then
         assertNotNull(result);
@@ -150,8 +151,9 @@ class NotificationCostServiceMapperTest {
         assertTrue(result.getCostRecipients().isEmpty());
     }
 
-    @Test
-    void testMapNotificationToRequest_WithRecipientWithoutPayments() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testMapNotificationToRequest_WithRecipientWithoutPayments(List<NotificationPaymentInfoInt> payments) {
         // Given
         NotificationInt notification = NotificationInt.builder()
                 .sender(NotificationSenderInt.builder()
@@ -164,13 +166,13 @@ class NotificationCostServiceMapperTest {
                         NotificationRecipientInt.builder()
                                 .internalId("recipient-internal-1")
                                 .taxId("RSSMRA80A01H501U")
-                                .payments(null)
+                                .payments(payments)
                                 .build()
                 ))
                 .build();
 
         // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
+        NewNotificationCostRequest result = mapper.mapNotificationToNewNotificationCostRequest(notification);
 
         // Then
         assertNotNull(result);
@@ -182,154 +184,6 @@ class NotificationCostServiceMapperTest {
         assertEquals("recipient-internal-1", recipient.getRecipientInternalId());
         assertNotNull(recipient.getPayments());
         assertTrue(recipient.getPayments().isEmpty());
-    }
-
-    @Test
-    void testMapNotificationToRequest_WithRecipientWithEmptyPayments() {
-        // Given
-        NotificationInt notification = NotificationInt.builder()
-                .sender(NotificationSenderInt.builder()
-                        .paId("pa-123")
-                        .paTaxId("12345678901")
-                        .build())
-                .vat(22)
-                .paFee(100)
-                .recipients(List.of(
-                        NotificationRecipientInt.builder()
-                                .internalId("recipient-internal-1")
-                                .taxId("RSSMRA80A01H501U")
-                                .payments(Collections.emptyList())
-                                .build()
-                ))
-                .build();
-
-        // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.getCostRecipients().size());
-        RecipientCostData recipient = result.getCostRecipients().getFirst();
-        assertNotNull(recipient.getPayments());
-        assertTrue(recipient.getPayments().isEmpty());
-    }
-
-    @Test
-    void testMapNotificationToRequest_WithRecipientWithF24Payment() {
-        // Given
-        NotificationInt notification = NotificationInt.builder()
-                .sender(NotificationSenderInt.builder()
-                        .paId("pa-123")
-                        .paTaxId("12345678901")
-                        .build())
-                .vat(22)
-                .paFee(100)
-                .recipients(List.of(
-                        NotificationRecipientInt.builder()
-                                .internalId("recipient-internal-1")
-                                .taxId("RSSMRA80A01H501U")
-                                .payments(List.of(
-                                        NotificationPaymentInfoInt.builder()
-                                                .f24(F24Int.builder()
-                                                        .title("F24 Title")
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
-        // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.getCostRecipients().size());
-        RecipientCostData recipient = result.getCostRecipients().getFirst();
-        assertNotNull(recipient.getPayments());
-        // F24 payments don't have PagoPA, so they should not be included
-        assertTrue(recipient.getPayments().isEmpty());
-    }
-
-    @Test
-    void testMapNotificationToRequest_WithMixedPaymentTypes() {
-        // Given
-        NotificationInt notification = NotificationInt.builder()
-                .sender(NotificationSenderInt.builder()
-                        .paId("pa-123")
-                        .paTaxId("12345678901")
-                        .build())
-                .vat(22)
-                .paFee(100)
-                .recipients(List.of(
-                        NotificationRecipientInt.builder()
-                                .internalId("recipient-internal-1")
-                                .taxId("RSSMRA80A01H501U")
-                                .payments(List.of(
-                                        NotificationPaymentInfoInt.builder()
-                                                .pagoPA(PagoPaInt.builder()
-                                                        .creditorTaxId("77777777777")
-                                                        .noticeCode("302000100000019421")
-                                                        .applyCost(true)
-                                                        .build())
-                                                .build(),
-                                        NotificationPaymentInfoInt.builder()
-                                                .f24(F24Int.builder()
-                                                        .title("F24 Title")
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
-        // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.getCostRecipients().size());
-        RecipientCostData recipient = result.getCostRecipients().getFirst();
-        assertEquals(1, Objects.requireNonNull(recipient.getPayments()).size());
-        assertEquals("77777777777##302000100000019421", recipient.getPayments().getFirst().getIuv());
-    }
-
-    @Test
-    void testMapNotificationToRequest_WithApplyCostFalse() {
-        // Given
-        NotificationInt notification = NotificationInt.builder()
-                .sender(NotificationSenderInt.builder()
-                        .paId("pa-123")
-                        .paTaxId("12345678901")
-                        .build())
-                .vat(22)
-                .paFee(100)
-                .recipients(List.of(
-                        NotificationRecipientInt.builder()
-                                .internalId("recipient-internal-1")
-                                .taxId("RSSMRA80A01H501U")
-                                .payments(List.of(
-                                        NotificationPaymentInfoInt.builder()
-                                                .pagoPA(PagoPaInt.builder()
-                                                        .creditorTaxId("77777777777")
-                                                        .noticeCode("302000100000019421")
-                                                        .applyCost(false)
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
-        // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.getCostRecipients().size());
-        RecipientCostData recipient = result.getCostRecipients().getFirst();
-        assertEquals(1, Objects.requireNonNull(recipient.getPayments()).size());
-        assertFalse(recipient.getPayments().getFirst().getApplyCost());
     }
 
     @Test
@@ -386,7 +240,7 @@ class NotificationCostServiceMapperTest {
                 .build();
 
         // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
+        NewNotificationCostRequest result = mapper.mapNotificationToNewNotificationCostRequest(notification);
 
         // Then
         assertNotNull(result);
@@ -409,81 +263,104 @@ class NotificationCostServiceMapperTest {
     }
 
     @Test
-    void testMapNotificationToRequest_WithDifferentNotificationFeePolicies() {
-        // Test FLAT_RATE
-        NotificationInt notificationFlatRate = buildCompleteNotification()
-                .toBuilder()
-                .notificationFeePolicy(NotificationFeePolicy.FLAT_RATE)
-                .build();
+    void mapNotificationToNewInformalNotificationCostRequest_shouldMapSenderAndPayments() {
+        NotificationInt notification = buildNotificationWithRecipients();
 
-        NewNotificationCostRequest resultFlatRate = mapper.mapNotificationToRequest(notificationFlatRate);
+        NewInformalNotificationCostRequest result =
+                mapper.mapNotificationToNewInformalNotificationCostRequest(notification);
+
+        assertNotNull(result);
+        assertEquals("12345678901", result.getSenderTaxId());
+        assertEquals("pa-123", result.getSenderPaId());
+        assertNotNull(result.getCostRecipients());
+        assertEquals(2, result.getCostRecipients().size());
+
+        InformalRecipientCostData recipient1 = result.getCostRecipients().getFirst();
+        assertEquals(0, recipient1.getRecIndex());
+        assertEquals("recipient-internal-1", recipient1.getRecipientInternalId());
+        assertNotNull(recipient1.getPayments());
+        assertEquals(1, recipient1.getPayments().size());
+        assertEquals("77777777777##302000100000019421", recipient1.getPayments().getFirst().getIuv());
+
+        InformalRecipientCostData recipient2 = result.getCostRecipients().get(1);
+        assertEquals(1, recipient2.getRecIndex());
+        assertEquals("recipient-internal-2", recipient2.getRecipientInternalId());
+        assertNotNull(recipient2.getPayments());
+        assertEquals(2, recipient2.getPayments().size());
         assertEquals(
-                it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NotificationFeePolicy.FLAT_RATE,
-                resultFlatRate.getNotificationFeePolicy()
-        );
-
-        // Test DELIVERY_MODE
-        NotificationInt notificationDeliveryMode = buildCompleteNotification()
-                .toBuilder()
-                .notificationFeePolicy(NotificationFeePolicy.DELIVERY_MODE)
-                .build();
-
-        NewNotificationCostRequest resultDeliveryMode = mapper.mapNotificationToRequest(notificationDeliveryMode);
-        assertEquals(
-                it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NotificationFeePolicy.DELIVERY_MODE,
-                resultDeliveryMode.getNotificationFeePolicy()
-        );
-    }
-
-    @Test
-    void testMapNotificationToRequest_WithDifferentPagoPaIntModes() {
-        // Test NONE
-        NotificationInt notificationNone = buildCompleteNotification()
-                .toBuilder()
-                .pagoPaIntMode(PagoPaIntMode.NONE)
-                .build();
-
-        NewNotificationCostRequest resultNone = mapper.mapNotificationToRequest(notificationNone);
-        assertEquals(
-                it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PagoPaIntMode.NONE,
-                resultNone.getPagoPaIntMode()
-        );
-
-        // Test SYNC
-        NotificationInt notificationSync = buildCompleteNotification()
-                .toBuilder()
-                .pagoPaIntMode(PagoPaIntMode.SYNC)
-                .build();
-
-        NewNotificationCostRequest resultSync = mapper.mapNotificationToRequest(notificationSync);
-        assertEquals(
-                it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PagoPaIntMode.SYNC,
-                resultSync.getPagoPaIntMode()
-        );
-
-        // Test ASYNC
-        NotificationInt notificationAsync = buildCompleteNotification()
-                .toBuilder()
-                .pagoPaIntMode(PagoPaIntMode.ASYNC)
-                .build();
-
-        NewNotificationCostRequest resultAsync = mapper.mapNotificationToRequest(notificationAsync);
-        assertEquals(
-                it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PagoPaIntMode.ASYNC,
-                resultAsync.getPagoPaIntMode()
+                List.of("88888888888##302000100000019422", "99999999999##302000100000019423"),
+                recipient2.getPayments().stream().map(InformalPaymentData::getIuv).toList()
         );
     }
 
     @Test
-    void testMapNotificationToRequest_IuvFormatting() {
-        // Given
+    void mapNotificationToNewInformalNotificationCostRequest_shouldReturnEmptyRecipientsWhenNotificationHasNoRecipients() {
         NotificationInt notification = NotificationInt.builder()
                 .sender(NotificationSenderInt.builder()
                         .paId("pa-123")
                         .paTaxId("12345678901")
                         .build())
-                .vat(22)
-                .paFee(100)
+                .recipients(Collections.emptyList())
+                .build();
+
+        NewInformalNotificationCostRequest result =
+                mapper.mapNotificationToNewInformalNotificationCostRequest(notification);
+
+        assertNotNull(result);
+        assertEquals("12345678901", result.getSenderTaxId());
+        assertEquals("pa-123", result.getSenderPaId());
+        assertNotNull(result.getCostRecipients());
+        assertTrue(result.getCostRecipients().isEmpty());
+    }
+
+    @Test
+    void mapNotificationToNewInformalNotificationCostRequest_shouldReturnEmptyRequestWhenNotificationIsNull() {
+        NewInformalNotificationCostRequest result =
+                mapper.mapNotificationToNewInformalNotificationCostRequest(null);
+
+        assertNotNull(result);
+        assertNull(result.getSenderTaxId());
+        assertNull(result.getSenderPaId());
+        assertNotNull(result.getCostRecipients());
+        assertTrue(result.getCostRecipients().isEmpty());
+    }
+
+    @Test
+    void mapNotificationToNewInformalNotificationCostRequest_shouldMapEmptyPaymentListForRecipientWithoutPayments() {
+        NotificationInt notification = NotificationInt.builder()
+                .sender(NotificationSenderInt.builder()
+                        .paId("pa-123")
+                        .paTaxId("12345678901")
+                        .build())
+                .recipients(List.of(
+                        NotificationRecipientInt.builder()
+                                .internalId("recipient-internal-1")
+                                .taxId("RSSMRA80A01H501U")
+                                .payments(null)
+                                .build()
+                ))
+                .build();
+
+        NewInformalNotificationCostRequest result =
+                mapper.mapNotificationToNewInformalNotificationCostRequest(notification);
+
+        assertNotNull(result);
+        assertNotNull(result.getCostRecipients());
+        assertEquals(1, result.getCostRecipients().size());
+
+        InformalRecipientCostData recipient = result.getCostRecipients().getFirst();
+        assertEquals(0, recipient.getRecIndex());
+        assertEquals("recipient-internal-1", recipient.getRecipientInternalId());
+        assertNotNull(recipient.getPayments());
+        assertTrue(recipient.getPayments().isEmpty());
+    }
+
+    private NotificationInt buildNotificationWithRecipients() {
+        return NotificationInt.builder()
+                .sender(NotificationSenderInt.builder()
+                        .paId("pa-123")
+                        .paTaxId("12345678901")
+                        .build())
                 .recipients(List.of(
                         NotificationRecipientInt.builder()
                                 .internalId("recipient-internal-1")
@@ -491,8 +368,28 @@ class NotificationCostServiceMapperTest {
                                 .payments(List.of(
                                         NotificationPaymentInfoInt.builder()
                                                 .pagoPA(PagoPaInt.builder()
-                                                        .creditorTaxId("12345678901")
-                                                        .noticeCode("987654321098765432")
+                                                        .creditorTaxId("77777777777")
+                                                        .noticeCode("302000100000019421")
+                                                        .applyCost(true)
+                                                        .build())
+                                                .build()
+                                ))
+                                .build(),
+                        NotificationRecipientInt.builder()
+                                .internalId("recipient-internal-2")
+                                .taxId("RSSMRA80A01H502U")
+                                .payments(List.of(
+                                        NotificationPaymentInfoInt.builder()
+                                                .pagoPA(PagoPaInt.builder()
+                                                        .creditorTaxId("88888888888")
+                                                        .noticeCode("302000100000019422")
+                                                        .applyCost(false)
+                                                        .build())
+                                                .build(),
+                                        NotificationPaymentInfoInt.builder()
+                                                .pagoPA(PagoPaInt.builder()
+                                                        .creditorTaxId("99999999999")
+                                                        .noticeCode("302000100000019423")
                                                         .applyCost(true)
                                                         .build())
                                                 .build()
@@ -500,22 +397,5 @@ class NotificationCostServiceMapperTest {
                                 .build()
                 ))
                 .build();
-
-        // When
-        NewNotificationCostRequest result = mapper.mapNotificationToRequest(notification);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(1, result.getCostRecipients().size());
-        assertNotNull(result.getCostRecipients().getFirst().getPayments());
-        assertEquals(1, Objects.requireNonNull(result.getCostRecipients().getFirst().getPayments()).size());
-
-        PaymentData payment = result.getCostRecipients().getFirst().getPayments().getFirst();
-        assertEquals("12345678901##987654321098765432", payment.getIuv());
-        assertTrue(payment.getIuv().contains("##"));
-        String[] parts = payment.getIuv().split("##");
-        assertEquals(2, parts.length);
-        assertEquals("12345678901", parts[0]);
-        assertEquals("987654321098765432", parts[1]);
     }
 }

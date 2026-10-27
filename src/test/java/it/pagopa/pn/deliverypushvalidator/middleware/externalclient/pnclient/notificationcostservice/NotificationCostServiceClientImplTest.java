@@ -1,9 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice;
 
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.api.NotificationCostRecipientApi;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.PaymentData;
-import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.RecipientCostData;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +48,30 @@ class NotificationCostServiceClientImplTest {
         Mockito.verify(notificationCostRecipientApi).initializeNotificationCost(eq(iun), eq(request));
     }
 
+    @Test
+    void initializeInformalNotificationCost() {
+        // Given
+        String iun = "testIun";
+        String expectedResponse = "cost-uuid-123";
+        NewInformalNotificationCostRequest request = buildMockNewInformalNotificationCostRequest();
+
+        Mockito.when(notificationCostRecipientApi.initializeInformalNotificationCost(iun, request))
+                .thenReturn(Mono.just(expectedResponse));
+
+        // When
+        Mono<String> response = client.initializeInformalNotificationCost(iun, request);
+
+        // Then
+        StepVerifier.create(response)
+                .assertNext(result -> {
+                    Assertions.assertNotNull(result);
+                    Assertions.assertEquals(expectedResponse, result);
+                })
+                .verifyComplete();
+
+        Mockito.verify(notificationCostRecipientApi).initializeInformalNotificationCost(eq(iun), eq(request));
+    }
+
     private NewNotificationCostRequest buildMockNewNotificationCostRequest() {
         PaymentData paymentData = new PaymentData()
                 .iuv("302000100000019421")
@@ -61,6 +83,19 @@ class NotificationCostServiceClientImplTest {
                 .payments(Collections.singletonList(paymentData));
 
         return new NewNotificationCostRequest()
+                .costRecipients(Collections.singletonList(recipientCostData));
+    }
+
+    private NewInformalNotificationCostRequest buildMockNewInformalNotificationCostRequest() {
+        InformalPaymentData paymentData = new InformalPaymentData()
+                .iuv("302000100000019421");
+
+        InformalRecipientCostData recipientCostData = new InformalRecipientCostData()
+                .recIndex(0)
+                .recipientInternalId("PF-4fc75df3-0913-407e-bdaa-e50329708b7d")
+                .payments(Collections.singletonList(paymentData));
+
+        return new NewInformalNotificationCostRequest()
                 .costRecipients(Collections.singletonList(recipientCostData));
     }
 }

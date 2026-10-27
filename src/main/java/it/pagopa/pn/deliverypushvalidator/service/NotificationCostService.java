@@ -4,4 +4,5 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 
 public interface NotificationCostService {
     void initializeAndValidateNotificationCost(NotificationInt notificationInt);
+    boolean shouldValidateInformalNotificationCost(NotificationInt notificationInt);
 }

@@ -4,10 +4,10 @@ import it.pagopa.pn.api.dto.events.notificationcost.utils.ValidationStatus;
 import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
-import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewInformalNotificationCostRequest;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
 import it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice.NotificationCostServiceClient;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
@@ -23,14 +23,11 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
 
     private NotificationValidationActionHandler notificationValidationActionHandler;
     private TimelineService timelineService;
-    private TimelineUtils timelineUtils;
 
     public NotificationCostServiceClientMock(@Lazy NotificationValidationActionHandler notificationValidationActionHandler,
-                                             @Lazy TimelineService timelineService,
-                                             @Lazy TimelineUtils timelineUtils) {
+                                             @Lazy TimelineService timelineService) {
         this.notificationValidationActionHandler = notificationValidationActionHandler;
         this.timelineService = timelineService;
-        this.timelineUtils = timelineUtils;
     }
 
     public void clear() {
@@ -39,7 +36,17 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
 
     @Override
     public Mono<String> initializeNotificationCost(String iun, NewNotificationCostRequest newNotificationCostRequest) {
+        handleAsyncInvocationOfTargetConsumer(iun, CommunicationType.LEGAL);
+        return Mono.just(iun);
+    }
 
+    @Override
+    public Mono<String> initializeInformalNotificationCost(String iun, NewInformalNotificationCostRequest newInformalNotificationCostRequest) {
+        handleAsyncInvocationOfTargetConsumer(iun, CommunicationType.INFORMAL);
+        return Mono.just(iun);
+    }
+
+    private void handleAsyncInvocationOfTargetConsumer(String iun, CommunicationType communicationType) {
         ThreadPool.start(new Thread(() -> {
             MethodExecutor.waitForExecution(
                     () -> timelineService.getTimelineElement(
@@ -52,16 +59,14 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
                     )
             );
 
-            log.info("[TEST] Start handle notification cost validation for iun={}", iun);
+            log.info("[TEST] Start handle notification cost validation for iun={} with communicationType={}", iun, communicationType);
 
             PnNotificationCostValidationEventPayload eventPayload = createEventPayload(iun);
 
-            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload, CommunicationType.LEGAL);
+            notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload, communicationType);
 
-            log.info("[TEST] END handle notification cost validation for iun={}", iun);
+            log.info("[TEST] END handle informal notification cost validation for iun={} with communicationType={}", iun, communicationType);
         }));
-
-        return Mono.just(iun);
     }
 
     private PnNotificationCostValidationEventPayload createEventPayload(String iun) {
