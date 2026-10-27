@@ -11,8 +11,6 @@ import reactor.test.StepVerifier;
 
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.eq;
-
 class NotificationCostServiceClientImplTest {
     private NotificationCostRecipientApi notificationCostRecipientApi;
 
@@ -45,7 +43,7 @@ class NotificationCostServiceClientImplTest {
                 })
                 .verifyComplete();
 
-        Mockito.verify(notificationCostRecipientApi).initializeNotificationCost(eq(iun), eq(request));
+        Mockito.verify(notificationCostRecipientApi).initializeNotificationCost(iun, request);
     }
 
     @Test
@@ -69,7 +67,7 @@ class NotificationCostServiceClientImplTest {
                 })
                 .verifyComplete();
 
-        Mockito.verify(notificationCostRecipientApi).initializeInformalNotificationCost(eq(iun), eq(request));
+        Mockito.verify(notificationCostRecipientApi).initializeInformalNotificationCost(iun, request);
     }
 
     private NewNotificationCostRequest buildMockNewNotificationCostRequest() {
