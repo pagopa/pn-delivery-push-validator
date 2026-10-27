@@ -50,6 +50,8 @@ public class Campaign {
 
     private boolean stopOnViewed;
 
+    private Boolean stopOnPaid;
+
     @Valid
     @NotEmpty
     private List<WorkflowEntity> workflow;
