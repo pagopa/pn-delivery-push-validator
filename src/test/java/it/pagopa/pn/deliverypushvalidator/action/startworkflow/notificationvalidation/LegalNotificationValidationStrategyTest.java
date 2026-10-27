@@ -2,8 +2,6 @@ package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvali
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationIssue;
-import it.pagopa.pn.api.dto.events.notificationcost.utils.ValidationStatus;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.commons.abstractions.ParameterConsumer;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.dto.ProblemError;
@@ -21,6 +19,8 @@ import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.ValidationStatus;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadInfoInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
@@ -974,7 +974,7 @@ class LegalNotificationValidationStrategyTest {
         Mockito.when(timelineUtils.buildNotificationCostValidationResponse(notification))
                 .thenReturn(timelineElement);
 
-        PnNotificationCostValidationEventPayload event = PnNotificationCostValidationEventPayload.builder()
+        NotificationCostValidationResponse event = NotificationCostValidationResponse.builder()
                 .iun(iun)
                 .status(ValidationStatus.OK)
                 .build();
@@ -1015,7 +1015,7 @@ class LegalNotificationValidationStrategyTest {
                 .thenReturn(auditLogEvent);
         Mockito.when(auditLogEvent.generateWarning(Mockito.anyString(), any())).thenReturn(auditLogEvent);
 
-        PnNotificationCostValidationEventPayload event = PnNotificationCostValidationEventPayload.builder()
+        NotificationCostValidationResponse event = NotificationCostValidationResponse.builder()
                 .iun(iun)
                 .status(ValidationStatus.KO)
                 .build();

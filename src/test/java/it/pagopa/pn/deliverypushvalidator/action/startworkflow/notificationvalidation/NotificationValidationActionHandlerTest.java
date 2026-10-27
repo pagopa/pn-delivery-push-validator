@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
 import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,7 +99,7 @@ class NotificationValidationActionHandlerTest {
     @Test
     void handleValidateNotificationCost_whenInformal_shouldUseInformalStrategy() {
 
-        PnNotificationCostValidationEventPayload event = mock(PnNotificationCostValidationEventPayload.class);
+        NotificationCostValidationResponse event = mock(NotificationCostValidationResponse.class);
 
         handler.handleValidateNotificationCost(IUN, event, CommunicationType.INFORMAL);
 
@@ -110,7 +110,7 @@ class NotificationValidationActionHandlerTest {
     @Test
     void handleValidateNotificationCost_whenLegal_shouldUseLegalStrategy() {
 
-        PnNotificationCostValidationEventPayload event = mock(PnNotificationCostValidationEventPayload.class);
+        NotificationCostValidationResponse event = mock(NotificationCostValidationResponse.class);
 
         handler.handleValidateNotificationCost(IUN, event, CommunicationType.LEGAL);
 
