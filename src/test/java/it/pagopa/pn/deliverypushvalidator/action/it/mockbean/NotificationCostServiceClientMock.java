@@ -1,11 +1,11 @@
 package it.pagopa.pn.deliverypushvalidator.action.it.mockbean;
 
-import it.pagopa.pn.api.dto.events.notificationcost.utils.ValidationStatus;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.MethodExecutor;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.ValidationStatus;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
@@ -54,7 +54,7 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
 
             log.info("[TEST] Start handle notification cost validation for iun={}", iun);
 
-            PnNotificationCostValidationEventPayload eventPayload = createEventPayload(iun);
+            NotificationCostValidationResponse eventPayload = createEventPayload(iun);
 
             notificationValidationActionHandler.handleValidateNotificationCost(iun, eventPayload, CommunicationType.LEGAL);
 
@@ -64,12 +64,12 @@ public class NotificationCostServiceClientMock implements NotificationCostServic
         return Mono.just(iun);
     }
 
-    private PnNotificationCostValidationEventPayload createEventPayload(String iun) {
+    private NotificationCostValidationResponse createEventPayload(String iun) {
         // L'evento deve avere:
         // - iun: l'identificativo della notifica
         // - status: OK o KO
 
-        return PnNotificationCostValidationEventPayload.builder()
+        return NotificationCostValidationResponse.builder()
                 .iun(iun)
                 .status(ValidationStatus.OK)
                 .build();

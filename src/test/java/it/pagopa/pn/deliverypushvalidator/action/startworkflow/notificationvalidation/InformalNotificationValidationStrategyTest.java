@@ -1,9 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
-import it.pagopa.pn.commons.exceptions.dto.ProblemError;
 import it.pagopa.pn.commons.log.PnAuditLogEvent;
 import it.pagopa.pn.commons.log.PnAuditLogEventType;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
@@ -16,15 +14,19 @@ import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.WorkflowEntity;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeResultInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotMatchingShaException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidAddressException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
-import it.pagopa.pn.deliverypushvalidator.service.*;
+import it.pagopa.pn.deliverypushvalidator.service.AuditLogService;
+import it.pagopa.pn.deliverypushvalidator.service.CampaignValidator;
+import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
+import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -468,7 +470,7 @@ class InformalNotificationValidationStrategyTest {
     void handleValidateNotificationCost_throwsPnInternalException() {
         // GIVEN
         String iun = "testIun";
-        PnNotificationCostValidationEventPayload event = PnNotificationCostValidationEventPayload.builder()
+        NotificationCostValidationResponse event = NotificationCostValidationResponse.builder()
                 .iun(iun)
                 .build();
 
