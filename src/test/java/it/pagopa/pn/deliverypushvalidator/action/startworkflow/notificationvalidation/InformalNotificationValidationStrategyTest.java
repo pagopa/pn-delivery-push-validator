@@ -8,6 +8,7 @@ import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationA
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.LookupAddressHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.NormalizeAddressHandler;
+import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
@@ -18,15 +19,13 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Communic
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
-import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
-import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
-import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotMatchingShaException;
-import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidAddressException;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.ValidationStatus;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
+import it.pagopa.pn.deliverypushvalidator.exception.*;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
-import it.pagopa.pn.deliverypushvalidator.service.AuditLogService;
-import it.pagopa.pn.deliverypushvalidator.service.CampaignValidator;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
-import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
+import it.pagopa.pn.deliverypushvalidator.service.*;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,6 +69,14 @@ class InformalNotificationValidationStrategyTest {
     private LookupAddressHandler lookupAddressHandler;
     @Mock
     private DigitalAddressValidator digitalAddressValidator;
+    @Mock
+    private NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
+    @Mock
+    private NotificationCostService notificationCostService;
+    @Mock
+    private TimelineService timelineService;
+    @Mock
+    private TimelineUtils timelineUtils;
 
     private InformalNotificationValidationStrategy handler;
     private static final String IUN = "TEST-IUN-001";
@@ -129,7 +136,11 @@ class InformalNotificationValidationStrategyTest {
                 campaignValidator,
                 messageValidator,
                 lookupAddressHandler,
-                digitalAddressValidator
+                digitalAddressValidator,
+                notificationCostServiceFeatureFlagUtils,
+                notificationCostService,
+                timelineService,
+                timelineUtils
         );
     }
 
@@ -150,10 +161,11 @@ class InformalNotificationValidationStrategyTest {
 
     /**
      * Campaign has NO analog channel → lookup and normalize steps are skipped,
-     * end-validation action is scheduled immediately.
+     * Notification doesn't require payment validation -> payment validation is skipped
+     * end-validation action is scheduled immediately
      */
     @Test
-    void validate_campaignWithoutAnalog_skipsLookupAndNormalize() {
+    void validate_campaignWithoutAnalog_skipsLookupAndNormalize_skipsPaymentValidation() {
         // GIVEN
         NotificationInt notification = TestUtils.getNotification();
         Mockito.when(notificationService.getInformalNotificationByIun(Mockito.anyString()))
@@ -162,9 +174,11 @@ class InformalNotificationValidationStrategyTest {
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
         Mockito.when(campaignValidator.validateAndGetCampaign(notification)).thenReturn(campaignWithoutAnalog());
         Mockito.when(messageValidator.validate(notification)).thenReturn(Mono.empty());
+        Mockito.when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification)).thenReturn(true);
+        Mockito.when(notificationCostService.shouldValidateInformalNotificationCost(notification)).thenReturn(false);
 
         // WHEN
-        handler.validate(IUN, defaultDetails());
+        handler.validate(notification.getIun(), defaultDetails());
 
         // THEN
         Mockito.verify(attachmentUtils).validateAttachment(notification);
@@ -173,6 +187,8 @@ class InformalNotificationValidationStrategyTest {
         // lookup and normalize must NOT be invoked
         Mockito.verify(lookupAddressHandler, never()).performValidation(any());
         Mockito.verify(addressValidator, never()).requestValidateAndNormalizeAddresses(any());
+        // payment validation must NOT be invoked
+        Mockito.verify(notificationCostService, never()).initializeAndValidateNotificationCost(any());
         // end-validation must be scheduled
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(notification.getIun()),
@@ -180,7 +196,7 @@ class InformalNotificationValidationStrategyTest {
                 Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
                 Mockito.eq(CommunicationType.INFORMAL)
         );
-        Mockito.verify(auditLogEvent, times(3)).generateSuccess(); // step-1 + 2x generateSkipAuditLog (step-2 and step-3)
+        Mockito.verify(auditLogEvent, times(4)).generateSuccess(); // step-1 + 3x generateSkipAuditLog (step-2, step-3, step-4)
     }
 
     /**
@@ -395,10 +411,10 @@ class InformalNotificationValidationStrategyTest {
     }
 
     @Test
-    void handleValidateAndNormalizeAddressResponse_OK_schedulesEndValidation() {
+    void handleValidateAndNormalizeAddressResponse_OK_invokesNotificationCostService() {
         // GIVEN
-        String iun = "testIun";
         NotificationInt notification = TestUtils.getNotification();
+        String iun = notification.getIun();
         Mockito.when(notificationService.getInformalNotificationByIun(iun)).thenReturn(notification);
 
         PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
@@ -410,6 +426,8 @@ class InformalNotificationValidationStrategyTest {
 
         Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification)).thenReturn(true);
+        Mockito.when(notificationCostService.shouldValidateInformalNotificationCost(notification)).thenReturn(true);
 
         // WHEN
         assertDoesNotThrow(() -> handler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult));
@@ -417,13 +435,42 @@ class InformalNotificationValidationStrategyTest {
         // THEN
         Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
         Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.verify(auditLogEvent).generateSuccess();
+        Mockito.verify(notificationCostService).initializeAndValidateNotificationCost(notification);
+    }
+
+    @Test
+    void handleValidateAndNormalizeAddressResponse_OK_skipsNotificationCostService_schedulesEndValidation() {
+        // GIVEN
+        NotificationInt notification = TestUtils.getNotification();
+        String iun = notification.getIun();
+        Mockito.when(notificationService.getInformalNotificationByIun(iun)).thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
+
+        NormalizeItemsResultInt normalizeItemsResult = NormalizeItemsResultInt.builder()
+                .correlationId("corrId")
+                .resultItems(List.of(NormalizeResultInt.builder().id("0").build()))
+                .build();
+
+        Mockito.doNothing().when(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.doNothing().when(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.when(notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification)).thenReturn(false);
+
+        // WHEN
+        assertDoesNotThrow(() -> handler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult));
+
+        // THEN
+        Mockito.verify(addressValidator).handleAddressValidation(iun, normalizeItemsResult);
+        Mockito.verify(normalizeAddressHandler).handleNormalizedAddressResponse(notification, normalizeItemsResult);
+        Mockito.verify(auditLogEvent, times(2)).generateSuccess(); // step-3 and skip-step-4
         Mockito.verify(schedulerService).scheduleEvent(
                 Mockito.eq(iun),
                 Mockito.any(Instant.class),
                 Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
                 Mockito.eq(CommunicationType.INFORMAL)
         );
-        Mockito.verify(auditLogEvent).generateSuccess();
+        Mockito.verify(notificationCostService, times(0)).initializeAndValidateNotificationCost(notification);
     }
 
     @Test
@@ -467,15 +514,76 @@ class InformalNotificationValidationStrategyTest {
     }
 
     @Test
-    void handleValidateNotificationCost_throwsPnInternalException() {
-        // GIVEN
-        String iun = "testIun";
+    void handleValidateNotificationCostOK() {
+        //GIVEN
+        NotificationInt notification = TestUtils.getNotification();
+        String iun = notification.getIun();
+
+        Mockito.when(notificationService.getInformalNotificationByIun(iun))
+            .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
+
+        TimelineElementInternal timelineElement = TimelineElementInternal.builder().build();
+        Mockito.when(timelineUtils.buildNotificationCostValidationResponse(notification))
+                .thenReturn(timelineElement);
+
         NotificationCostValidationResponse event = NotificationCostValidationResponse.builder()
                 .iun(iun)
+                .status(ValidationStatus.OK)
                 .build();
 
-        // WHEN / THEN
-        assertThrows(PnInternalException.class, () -> handler.handleValidateNotificationCost(iun, event));
+        //WHEN
+        Assertions.assertDoesNotThrow(() ->
+                handler.handleValidateNotificationCost(iun, event));
+
+        //THEN
+        Mockito.verify(notificationService).getInformalNotificationByIun(iun);
+        Mockito.verify(timelineService).addTimelineElement(timelineElement, notification);
+        Mockito.verify(schedulerService).scheduleEvent(
+                Mockito.eq(iun),
+                Mockito.any(Instant.class),
+                Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
+                Mockito.eq(CommunicationType.INFORMAL)
+        );
+        Mockito.verify(auditLogEvent).generateSuccess();
+        Mockito.verify(auditLogEvent).log();
+    }
+
+    @Test
+    void handleValidateNotificationCostKO() {
+        //GIVEN
+        NotificationInt notification = TestUtils.getNotification();
+        String iun = notification.getIun();
+
+        Mockito.when(notificationService.getInformalNotificationByIun(iun))
+                .thenReturn(notification);
+
+        PnAuditLogEvent auditLogEvent = mockAuditLogEvent(notification);
+
+        NotificationCostValidationResponse event = NotificationCostValidationResponse.builder()
+                .iun(iun)
+                .status(ValidationStatus.KO)
+                .build();
+
+        //WHEN
+        PnInternalException exception = Assertions.assertThrows(PnInternalException.class, () ->
+                handler.handleValidateNotificationCost(iun, event));
+
+        //THEN
+        Assertions.assertEquals("Internal Server Error", exception.getMessage());
+        Assertions.assertEquals(PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTIFICATION_COST_ERROR,
+                exception.getProblem().getErrors().getFirst().getCode());
+        Mockito.verify(notificationService).getInformalNotificationByIun(iun);
+        Mockito.verify(auditLogEvent).generateWarning(Mockito.anyString(), any());
+        Mockito.verify(auditLogEvent).log();
+        Mockito.verify(timelineService, Mockito.never()).addTimelineElement(any(), any());
+        Mockito.verify(schedulerService, never()).scheduleEvent(
+                Mockito.eq(iun),
+                Mockito.any(Instant.class),
+                Mockito.eq(ActionType.POST_VALIDATION_COMPLETED),
+                Mockito.eq(CommunicationType.INFORMAL)
+        );
     }
 
     @Test

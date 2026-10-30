@@ -79,6 +79,18 @@ public class TestUtils {
         return getNotificationRejected(iun, timelineService).isPresent();
     }
 
+    public static boolean checkIsPresentNotificationCostValidationRequest(String iun, TimelineService timelineService) {
+        Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
+                iun,
+                TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
+                        EventId.builder()
+                                .iun(iun)
+                                .build())
+        );
+
+        return timelineElementOpt.isPresent();
+    }
+
     public static boolean checkIsPresentNotificationCostValidationResponse(String iun, TimelineService timelineService) {
         Optional<TimelineElementInternal> timelineElementOpt = timelineService.getTimelineElement(
                 iun,

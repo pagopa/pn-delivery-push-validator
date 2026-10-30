@@ -9,21 +9,22 @@ import it.pagopa.pn.commons.utils.MDCUtils;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.LookupAddressHandler;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.NormalizeAddressHandler;
+import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Channel;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
+import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
+import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
 import it.pagopa.pn.deliverypushvalidator.exception.PnLookupAddressValidationFailedException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationFileNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.exception.PnValidationNotValidAddressException;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.ActionType;
-import it.pagopa.pn.deliverypushvalidator.service.AuditLogService;
-import it.pagopa.pn.deliverypushvalidator.service.CampaignValidator;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
-import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
+import it.pagopa.pn.deliverypushvalidator.service.*;
+import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
 import lombok.CustomLog;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,10 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     private static final int FIRST_VALIDATION_STEP = 1;
     private static final int SECOND_VALIDATION_STEP = 2;
     private static final int THIRD_VALIDATION_STEP = 3;
+    private static final int FOURTH_VALIDATION_STEP = 4;
+    private static final int NUMBER_OF_STEPS = 4;
     private static final String NOTIFICATION_IS_NOT_VALID_MSG = "Notification is not valid - iun={} ex={}";
+    private static final String NOTIFICATION_IS_NOT_VALID_MSG_WITHOUT_EX = "Notification is not valid - iun={}";
     private final NotificationService notificationService;
     private final SchedulerService schedulerService;
     private final AddressValidator addressValidator;
@@ -50,8 +54,12 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     private final MessageValidator messageValidator;
     private final LookupAddressHandler lookupAddressHandler;
     private final DigitalAddressValidator digitalAddressValidator;
+    private final NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils;
+    private final NotificationCostService notificationCostService;
+    private final TimelineService timelineService;
+    private final TimelineUtils timelineUtils;
 
-    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler, DigitalAddressValidator digitalAddressValidator) {
+    public InformalNotificationValidationStrategy(NotificationValidationScheduler notificationValidationScheduler, SchedulerService schedulerService, NotificationService notificationService, AddressValidator addressValidator, NormalizeAddressHandler normalizeAddressHandler, AuditLogService auditLogService, PnDeliveryPushValidatorConfigs cfg, AttachmentUtils attachmentUtils, CampaignValidator campaignValidator, MessageValidator messageValidator, LookupAddressHandler lookupAddressHandler, DigitalAddressValidator digitalAddressValidator, NotificationCostServiceFeatureFlagUtils notificationCostServiceFeatureFlagUtils, NotificationCostService notificationCostService, TimelineService timelineService, TimelineUtils timelineUtils) {
         super(notificationValidationScheduler, schedulerService, cfg);
         this.notificationService = notificationService;
         this.schedulerService = schedulerService;
@@ -64,6 +72,10 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
         this.messageValidator = messageValidator;
         this.lookupAddressHandler = lookupAddressHandler;
         this.digitalAddressValidator = digitalAddressValidator;
+        this.notificationCostServiceFeatureFlagUtils = notificationCostServiceFeatureFlagUtils;
+        this.notificationCostService = notificationCostService;
+        this.timelineService = timelineService;
+        this.timelineUtils = timelineUtils;
     }
 
     @Override
@@ -91,7 +103,7 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
             } else {
                 generateSkipAuditLog(notification, SECOND_VALIDATION_STEP, "Lookup address validation will be skipped because campaign has no analog channel").generateSuccess().log();
                 generateSkipAuditLog(notification, THIRD_VALIDATION_STEP, "Normalize address validation will be skipped because campaign has no analog channel").generateSuccess().log();
-                scheduleEndValidationAction(notification.getIun());
+                this.checkFeatureFlagAndInitializeAndValidateNotificationCost(iun, notification);
             }
 
         } catch (PnValidationFileNotFoundException ex) {
@@ -120,10 +132,20 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
             addressValidator.handleAddressValidation(iun, normalizeItemsResult);
             normalizeAddressHandler.handleNormalizedAddressResponse(notification, normalizeItemsResult);
             logEvent.generateSuccess().log();
-            this.scheduleEndValidationAction(iun);
+            this.checkFeatureFlagAndInitializeAndValidateNotificationCost(iun, notification);
         } catch (PnValidationNotValidAddressException ex) {
             logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG, notification.getIun(), ex).log();
             handleValidationError(notification, ex);
+        }
+    }
+
+    private void checkFeatureFlagAndInitializeAndValidateNotificationCost(String iun, NotificationInt notification) {
+        if (notificationCostServiceFeatureFlagUtils.checkNotificationCostServiceStartDate(notification) && notificationCostService.shouldValidateInformalNotificationCost(notification)) {
+            notificationCostService.initializeAndValidateNotificationCost(notification);
+        } else {
+            scheduleEndValidationAction(iun);
+            generateSkipAuditLog(notification, FOURTH_VALIDATION_STEP,
+                    "Notification cost validation will be skipped due to feature flag or absence of pagopa payments").generateSuccess().log();
         }
     }
 
@@ -134,7 +156,28 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
 
     @Override
     public void handleValidateNotificationCost(String iun, NotificationCostValidationResponse event) {
-        throw new PnInternalException("Notification cost validation is not implemented for informal notification", ERROR_CODE_DELIVERYPUSH_VALIDATION_STEP_NOT_IMPLEMENTED);
+        NotificationInt notification = getNotification(iun);
+        PnAuditLogEvent logEvent = generateAuditLog(notification, FOURTH_VALIDATION_STEP);
+        processNotificationCostValidationResponse(iun, event, notification, logEvent);
+    }
+
+    private void processNotificationCostValidationResponse(String iun, NotificationCostValidationResponse event, NotificationInt notification, PnAuditLogEvent logEvent) {
+        switch (event.getStatus()) {
+            case OK -> {
+                TimelineElementInternal buildNotificationCostValidationResponse = timelineUtils.buildNotificationCostValidationResponse(notification);
+                timelineService.addTimelineElement(buildNotificationCostValidationResponse, notification);
+                log.debug("Notification validated successfully - iun={}", iun);
+                scheduleEndValidationAction(iun);
+                logEvent.generateSuccess().log();
+            }
+            case KO -> {
+                logEvent.generateWarning(NOTIFICATION_IS_NOT_VALID_MSG_WITHOUT_EX, notification.getIun()).log();
+                throw new PnInternalException(
+                        String.format("Error Notification Cost Validation for iun=%s, status=%s", iun, event.getStatus()),
+                        PnDeliveryPushValidatorExceptionCodes.ERROR_CODE_DELIVERYPUSH_NOTIFICATION_COST_ERROR
+                );
+            }
+        }
     }
 
     @Override
@@ -145,14 +188,14 @@ public class InformalNotificationValidationStrategy extends BaseNotificationVali
     }
 
     private PnAuditLogEvent generateAuditLog(NotificationInt notification, int validationStep) {
-        String message = "Informal notification validation step {} of 3. ";
+        String message = "Informal notification validation step {} of " + NUMBER_OF_STEPS + ".";
 
         return auditLogService.buildAuditLogEvent(notification.getIun(), PnAuditLogEventType.AUD_COM_VALID, message, validationStep);
     }
 
     @NotNull
     private PnAuditLogEvent generateSkipAuditLog(NotificationInt notification, int validationStep, String detail) {
-        String message = "Notification validation step {} of 3. " + detail;
+        String message = "Notification validation step {} of " + NUMBER_OF_STEPS + ". " + detail;
 
         return auditLogService.buildAuditLogEvent(notification.getIun(), PnAuditLogEventType.AUD_COM_VALID, message, validationStep);
     }

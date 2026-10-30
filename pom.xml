@@ -721,7 +721,7 @@
 						</goals>
 						<configuration>
 							<!-- Da cambiare: attualmente punta al branch contenitore della story -->
-							<inputSpec>https://raw.githubusercontent.com/pagopa/pn-notification-cost-service/c31d26f44109a05b99f4c327441c6d674821a4f3/docs/openapi/api-private.yaml</inputSpec>							<templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
+							<inputSpec>https://raw.githubusercontent.com/pagopa/pn-notification-cost-service/d20d8b8148aeed8ce20eae21fc294e1f50068b5c/docs/openapi/api-private.yaml</inputSpec>							<templateDirectory>${project.build.directory}/dependency-resources/scripts/openapi/templates/7.4.0/client</templateDirectory>
 							<generatorName>java</generatorName>
 							<library>webclient</library>
 							<generateApiDocumentation>false</generateApiDocumentation>
