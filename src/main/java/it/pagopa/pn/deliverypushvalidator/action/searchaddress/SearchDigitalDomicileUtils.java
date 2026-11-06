@@ -14,8 +14,7 @@ import java.util.List;
 @CustomLog
 public class SearchDigitalDomicileUtils {
 
-    private final SearchDigitalDomicileParameterConsumer searchDigitalDomicileParameterConsumer;
-
+    private final SearchDigitalDomicileConfigProvider searchDigitalDomicileParameterConsumer;
     public boolean isPecFullSearchEnabled(Instant sentAt) {
         List<SearchDigitalDomicileConfig> configs = searchDigitalDomicileParameterConsumer.getSearchDigitalDomicileConfigs();
 

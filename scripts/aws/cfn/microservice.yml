@@ -401,7 +401,11 @@ Resources:
         ApplicativeEnvFileChecksum: !Ref ApplicativeEnvFileChecksum
         MicroServiceSecretPrefix: pn-DeliveryPush-Secrets
         ParentMicroserviceName: !Sub '${ProjectName}-delivery-push-validator'
-        JavaToolOptions: !Ref JavaToolOptions
+        JavaToolOptions: !Join
+          - ' '
+          - - '--add-modules=java.instrument --add-opens=java.base/java.lang=ALL-UNNAMED'
+            - !Ref JavaToolOptions
+        JavaVersion: '25'
         MappedPaths: '/delivery-push-validator-not-available'
         ECSClusterName: !Ref ECSClusterName
         Subnets: !Join [ ',', !Ref SubnetsIds ]
