@@ -6,6 +6,8 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationRecipientT
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.NotificationTestBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.PhysicalAddressBuilder;
 import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
+import it.pagopa.pn.deliverypushvalidator.action.refused.RefusalCostPolicy;
+import it.pagopa.pn.deliverypushvalidator.action.refused.RefusalCostPolicyProvider;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.NotificationUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
@@ -20,14 +22,12 @@ import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.delivery.mo
 import it.pagopa.pn.deliverypushvalidator.legalfact.LegalFactGenerator;
 import it.pagopa.pn.deliverypushvalidator.logtest.ConsoleAppenderCustom;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
-import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.Base64;
@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static it.pagopa.pn.deliverypushvalidator.action.it.AbstractWorkflowTestConfiguration.SEND_FEE;
 import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.F24ClientMock.F24_VALIDATION_FAIL;
 import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.NationalRegistriesClientMock.PHYS_ADDR_ERROR;
 import static it.pagopa.pn.deliverypushvalidator.action.it.mockbean.NationalRegistriesClientMock.PHYS_ADDR_NOT_FOUND;
@@ -59,8 +60,8 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
     SafeStorageClientMock safeStorageClientMock;
     @Autowired
     PnDeliveryClientMock pnDeliveryClientMock;
-    @MockitoBean
-    PnTechnicalRefusalCostMode pnTechnicalRefusalCostMode;
+    @MockitoSpyBean
+    RefusalCostPolicyProvider refusalCostPolicyProvider;
 
     @Test
     void taxIdNotValidTest() throws PnIdConflictException {
@@ -563,8 +564,6 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
             Scenario 6:
             Notifica monodestinatario con lookupAddress attivo che riscontra errore tecnico in fase di ricerca del physicalAddress su National Registries.
          */
-        Mockito.when(pnTechnicalRefusalCostMode.getMode()).thenReturn(RefusalCostMode.RECIPIENT_BASED);
-        Mockito.when(pnTechnicalRefusalCostMode.getCost()).thenReturn(100);
         String fileDoc = "sha256_doc00";
         List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
         List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
@@ -629,8 +628,11 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
             Terzo destinatario: errore tecnico in fase di ricerca su National Registries.
             Ci aspettiamo la notifica sia rifiutata e nelle refusalReasons ci siano solo il secondo e terzo destinatario.
          */
-        Mockito.when(pnTechnicalRefusalCostMode.getMode()).thenReturn(refusalCostMode);
-        Mockito.when(pnTechnicalRefusalCostMode.getCost()).thenReturn(refusalCost);
+        // GIVEN: sovrascrivo la policy LEGAL con i parametri del test
+        Mockito.doReturn(new RefusalCostPolicy(refusalCostMode, refusalCost, SEND_FEE))
+                .when(refusalCostPolicyProvider)
+                .get(CommunicationType.LEGAL);
+
         String fileDoc = "sha256_doc00";
         List<NotificationDocumentInt> notificationDocumentList = TestUtils.getDocumentList(fileDoc);
         List<TestUtils.DocumentWithContent> listDocumentWithContent = TestUtils.getDocumentWithContents(fileDoc, notificationDocumentList);
@@ -696,9 +698,9 @@ class LegalNotificationValidationTestIT extends CommonNotificationValidationTest
         verifyNotificationRejection(iun, expectedRefusalReasons, expectedCost);
     }
 
-    
-    
-    
+
+
+
     // FINE TEST LOOKUP ADDRESS
 
     @Test

@@ -20,5 +20,6 @@ public interface NotificationProcessCostService {
 
     int getNotificationBaseCost(int paFee);
     int getSendFee();
+    int getInformalSendFee();
     Mono<Integer> notificationProcessCostF24(String iun, int recIndex, NotificationFeePolicy notificationFeePolicy, Integer paFee, Integer vat, String version);
 }
