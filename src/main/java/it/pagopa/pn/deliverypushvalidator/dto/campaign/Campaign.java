@@ -26,9 +26,6 @@ public class Campaign {
     @NotEmpty
     private String title;
 
-    @NotEmpty
-    private String descriptionScope;
-
     @NotNull
     private Instant startDate;
 
@@ -37,20 +34,10 @@ public class Campaign {
 
     private CampaignStatus status;
 
-    private String senderContact;
-
     @NotEmpty
     private String serviceId;
 
-    private String serviceName;
-
     private String taxonomyCode;
-
-    private boolean sensitiveContent;
-
-    private boolean stopOnViewed;
-
-    private Boolean stopOnPaid;
 
     @Valid
     @NotEmpty

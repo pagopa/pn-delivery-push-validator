@@ -1,6 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.service.impl;
 
-import it.pagopa.pn.commons.db.campaign.CampaignServiceCachedProvider;
+import it.pagopa.pn.commons.db.campaign.provider.CampaignServiceCachedProvider;
 import it.pagopa.pn.commons.db.campaign.entity.CampaignEntity;
 import it.pagopa.pn.commons.exceptions.PnCampaignNotFoundException;
 import it.pagopa.pn.deliverypushvalidator.dto.campaign.Campaign;
