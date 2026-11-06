@@ -256,13 +256,17 @@ public class TimelineUtils {
         return isNotificationCancelled;
     }
 
+    public static String buildNotificationCostValidationRequestElementId(String iun) {
+        return TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
+                EventId.builder()
+                        .iun(iun)
+                        .build());
+    }
+
     public TimelineElementInternal buildNotificationCostValidationRequest(NotificationInt notification) {
         log.debug("buildNotificationCostValidationRequest - IUN={}", notification.getIun());
 
-        String elementId = TimelineEventId.NOTIFICATION_COST_VALIDATION_REQUEST.buildEventId(
-                EventId.builder()
-                        .iun(notification.getIun())
-                        .build());
+        String elementId = buildNotificationCostValidationRequestElementId(notification.getIun());
 
         NotificationCostValidationRequestDetailsInt details = NotificationCostValidationRequestDetailsInt.builder()
                 .build();

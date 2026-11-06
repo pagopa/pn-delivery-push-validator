@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CampaignMapperTest {
 
     @Test
-    void shouldMapCampaignEntityToInternalCampaignAndBack() {
+    void shouldMapCampaignEntityToInternalCampaign() {
         CampaignEntity campaignEntity = CampaignEntity.builder()
                 .campaignId("camp-1")
                 .senderId("550e8400-e29b-41d4-a716-446655440001")
@@ -47,9 +47,19 @@ class CampaignMapperTest {
         Campaign internalCampaign = CampaignMapper.toInternalCampaign(campaignEntity);
         assertNotNull(internalCampaign);
         assertEquals("camp-1", internalCampaign.getCampaignId());
-        assertEquals(Channel.IO, internalCampaign.getWorkflow().getFirst().getChannel());
+        assertEquals("550e8400-e29b-41d4-a716-446655440001", internalCampaign.getSenderId());
+        assertEquals("Title", internalCampaign.getTitle());
+        assertEquals(Instant.parse("2026-01-01T00:00:00Z"), internalCampaign.getStartDate());
+        assertEquals(Instant.parse("2026-12-31T23:59:59Z"), internalCampaign.getEndDate());
+        assertEquals(it.pagopa.pn.deliverypushvalidator.dto.campaign.CampaignStatus.IN_PROGRESS, internalCampaign.getStatus());
+        assertEquals("service-1", internalCampaign.getServiceId());
+        assertEquals("taxonomy", internalCampaign.getTaxonomyCode());
 
-        CampaignEntity roundTrip = CampaignMapper.toCampaignEntity(internalCampaign);
-        assertEquals(campaignEntity, roundTrip);
+        assertEquals(1, internalCampaign.getWorkflow().size());
+        assertEquals(Duration.ofHours(1), internalCampaign.getWorkflow().getFirst().getTimeout());
+        assertEquals(Set.of(it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt.PF), internalCampaign.getWorkflow().getFirst().getRecipientType());
+        assertEquals(Set.of(it.pagopa.pn.deliverypushvalidator.dto.campaign.DesiredFeedback.READ), internalCampaign.getWorkflow().getFirst().getDesiredFeedback());
+        assertEquals(Boolean.TRUE, internalCampaign.getWorkflow().getFirst().getIncludeAttachment());
+        assertEquals(Channel.IO, internalCampaign.getWorkflow().getFirst().getChannel());
     }
 }

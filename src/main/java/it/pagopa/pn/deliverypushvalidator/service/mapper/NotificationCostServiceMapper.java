@@ -15,7 +15,7 @@ import static it.pagopa.pn.deliverypushvalidator.action.utils.PaymentUtils.getAl
 @Component
 public class NotificationCostServiceMapper {
 
-    public NewNotificationCostRequest mapNotificationToRequest(NotificationInt notificationInt) {
+    public NewNotificationCostRequest mapNotificationToNewNotificationCostRequest(NotificationInt notificationInt) {
         NewNotificationCostRequest newNotificationCostRequest = new NewNotificationCostRequest();
         if (notificationInt != null) {
             mapBasicInfo(notificationInt, newNotificationCostRequest);
@@ -68,6 +68,44 @@ public class NotificationCostServiceMapper {
                     PaymentData paymentData = new PaymentData();
                     paymentData.setIuv(paymentInt.getCreditorTaxId() + "##" + paymentInt.getNoticeCode());
                     paymentData.setApplyCost(paymentInt.isApplyCost());
+                    return paymentData;
+                }).toList();
+    }
+
+    public NewInformalNotificationCostRequest mapNotificationToNewInformalNotificationCostRequest(NotificationInt notificationInt) {
+        NewInformalNotificationCostRequest newInformalNotificationCostRequest = new NewInformalNotificationCostRequest();
+        if (notificationInt != null) {
+            newInformalNotificationCostRequest.setSenderTaxId(notificationInt.getSender().getPaTaxId());
+            newInformalNotificationCostRequest.setSenderPaId(notificationInt.getSender().getPaId());
+            newInformalNotificationCostRequest.setCostRecipients(mapInformalRecipients(notificationInt));
+        }
+        return newInformalNotificationCostRequest;
+    }
+
+    private static List<InformalRecipientCostData> mapInformalRecipients(NotificationInt notificationInt) {
+        List<InformalRecipientCostData> recipientCostDataList = new ArrayList<>();
+
+        Map<Integer, List<PaymentsInfoForRecipientInt>> paymentsByRecipient =
+                getAllPaymentsInfoFromNotification(notificationInt)
+                        .stream()
+                        .collect(Collectors.groupingBy(PaymentsInfoForRecipientInt::getRecIndex));
+
+        for (int i = 0; i < notificationInt.getRecipients().size(); i++) {
+            InformalRecipientCostData recipient = new InformalRecipientCostData();
+            recipient.setRecIndex(i);
+            recipient.setRecipientInternalId(notificationInt.getRecipients().get(i).getInternalId());
+            recipient.setPayments(mapInformalPaymentsInfo(paymentsByRecipient.getOrDefault(i, List.of())));
+            recipientCostDataList.add(recipient);
+        }
+        return recipientCostDataList;
+    }
+
+    private static List<InformalPaymentData> mapInformalPaymentsInfo(List<PaymentsInfoForRecipientInt> paymentsForRecipient) {
+        return paymentsForRecipient
+                .stream()
+                .map(paymentInt -> {
+                    InformalPaymentData paymentData = new InformalPaymentData();
+                    paymentData.setIuv(paymentInt.getCreditorTaxId() + "##" + paymentInt.getNoticeCode());
                     return paymentData;
                 }).toList();
     }

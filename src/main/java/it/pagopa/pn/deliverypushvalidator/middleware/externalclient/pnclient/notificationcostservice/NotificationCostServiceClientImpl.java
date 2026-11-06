@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.middleware.externalclient.pnclient.notificationcostservice;
 
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.api.NotificationCostRecipientApi;
+import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewInformalNotificationCostRequest;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.notificationcostservice.model.NewNotificationCostRequest;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +18,11 @@ public class NotificationCostServiceClientImpl implements NotificationCostServic
     public Mono<String> initializeNotificationCost(String iun, NewNotificationCostRequest newNotificationCostRequest) {
         log.logInvokingExternalService(CLIENT_NAME, INITIALIZE_NOTIFICATION_COST);
         return notificationCostRecipientApi.initializeNotificationCost(iun, newNotificationCostRequest);
+    }
+
+    @Override
+    public Mono<String> initializeInformalNotificationCost(String iun, NewInformalNotificationCostRequest newNotificationCostRequest) {
+        log.logInvokingExternalService(CLIENT_NAME, INITIALIZE_INFORMAL_NOTIFICATION_COST);
+        return notificationCostRecipientApi.initializeInformalNotificationCost(iun, newNotificationCostRequest);
     }
 }
