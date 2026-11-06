@@ -25,6 +25,7 @@ import static it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidat
 public class NotificationProcessCostServiceImpl implements NotificationProcessCostService {
     public static final double MIN_VERSION_PAFEE_VAT_MANDATORY = 2.3;
     private final int sendFee;
+    private final int informalSendFee;
     private final PnExternalRegistriesClientReactive pnExternalRegistriesClientReactive;
     private final PnDeliveryPushClientReactive pnDeliveryPushClientReactive;
     
@@ -35,12 +36,18 @@ public class NotificationProcessCostServiceImpl implements NotificationProcessCo
     ) {
         this.pnExternalRegistriesClientReactive = pnExternalRegistriesClientReactive;
         this.sendFee = cfg.getPagoPaNotificationBaseCost();
+        this.informalSendFee = cfg.getPagoPaInformalNotificationBaseCost();
         this.pnDeliveryPushClientReactive = pnDeliveryPushClientReactive;
     }
 
     @Override
     public int getSendFee() {
         return sendFee;
+    }
+
+    @Override
+    public int getInformalSendFee() {
+        return informalSendFee;
     }
     
     @Override

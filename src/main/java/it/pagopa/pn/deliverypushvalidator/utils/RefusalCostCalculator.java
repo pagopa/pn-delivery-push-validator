@@ -1,10 +1,11 @@
 package it.pagopa.pn.deliverypushvalidator.utils;
 
 import it.pagopa.pn.commons.exceptions.PnInternalException;
+import it.pagopa.pn.deliverypushvalidator.action.refused.RefusalCostPolicy;
+import it.pagopa.pn.deliverypushvalidator.action.refused.RefusalCostPolicyProvider;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
-import it.pagopa.pn.deliverypushvalidator.service.NotificationProcessCostService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,31 +18,28 @@ import java.util.List;
 @Component
 @Slf4j
 public class RefusalCostCalculator {
-    private final PnTechnicalRefusalCostMode pnTechnicalRefusalCostMode;
-    private final NotificationProcessCostService notificationProcessCostService;
+    private final RefusalCostPolicyProvider policyProvider;
     private static final String ERROR_MESSAGE = "Invalid number of recipients not affected by technical errors";
     private static final String ERROR_CODE = "INVALID_NUMBER_OF_RECIPIENTS";
 
     public int calculateRefusalCost(NotificationInt notification, List<NotificationRefusedErrorInt> errors) {
-        // Numero totale di destinatari della notifica
-        int numOfRecipients = notification.getRecipients().size();
-        int numOfRecipientsAffectedFromTechnicalError = countRecipientsWithTechnicalErrors(errors, notification.getIun());
+        RefusalCostPolicy policy = policyProvider.get(notification.getCommunicationType());
 
-        // Se non ci sono destinatari legati a errori tecnici, applica la logica attuale
-        if (numOfRecipientsAffectedFromTechnicalError == 0) {
-            return numOfRecipients * notificationProcessCostService.getSendFee();
+        int numOfRecipients = notification.getRecipients().size();
+        int technical = countRecipientsWithTechnicalErrors(errors, notification.getIun());
+
+        if (technical == 0) {
+            return numOfRecipients * policy.sendFee();
         }
 
-        // Calcolo del costo di rifiuto della notifica in base alla modalità di costo del rifiuto tecnico
-        return switch (pnTechnicalRefusalCostMode.getMode()) {
-            case UNIFORM -> pnTechnicalRefusalCostMode.getCost();
+        return switch (policy.mode()) {
+            case UNIFORM -> policy.technicalRefusalCost();
             case RECIPIENT_BASED -> {
-                int numOfRecipientsNotAffectedFromTechnicalError = numOfRecipients - numOfRecipientsAffectedFromTechnicalError;
-                if (numOfRecipientsNotAffectedFromTechnicalError < 0) {
+                int notAffected = numOfRecipients - technical;
+                if (notAffected < 0) {
                     throw new PnInternalException(ERROR_MESSAGE, ERROR_CODE);
                 }
-                yield (numOfRecipientsAffectedFromTechnicalError * pnTechnicalRefusalCostMode.getCost()) +
-                        (numOfRecipientsNotAffectedFromTechnicalError * notificationProcessCostService.getSendFee());
+                yield technical * policy.technicalRefusalCost() + notAffected * policy.sendFee();
             }
         };
     }
