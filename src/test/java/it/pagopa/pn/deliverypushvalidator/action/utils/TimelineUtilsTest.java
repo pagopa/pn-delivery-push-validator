@@ -248,6 +248,16 @@ class TimelineUtilsTest {
     }
 
     @Test
+    void buildNotificationCostValidationRequestElementId() {
+        String iun = "Test_IUN_456";
+        String expectedElementId = "NOTIFICATION_COST_VALIDATION_REQUEST.IUN_Test_IUN_456";
+
+        String actualElementId = TimelineUtils.buildNotificationCostValidationRequestElementId(iun);
+
+        Assertions.assertEquals(expectedElementId, actualElementId);
+    }
+
+    @Test
     void buildNotificationCostValidationRequest() {
         NotificationInt notification = buildNotification();
 

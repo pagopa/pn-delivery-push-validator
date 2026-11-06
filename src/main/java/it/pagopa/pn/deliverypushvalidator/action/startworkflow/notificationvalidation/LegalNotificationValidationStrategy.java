@@ -1,7 +1,6 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.commons.exceptions.PnInternalException;
 import it.pagopa.pn.commons.exceptions.PnValidationException;
 import it.pagopa.pn.commons.log.PnAuditLogEvent;
@@ -15,6 +14,7 @@ import it.pagopa.pn.deliverypushvalidator.config.PnDeliveryPushValidatorConfigs;
 import it.pagopa.pn.deliverypushvalidator.config.SendMoreThan20GramsParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.safestorage.FileDownloadResponseInt;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineElementInternal;
 import it.pagopa.pn.deliverypushvalidator.exception.*;
@@ -186,7 +186,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
     }
 
     @Override
-    public void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event) {
+    public void handleValidateNotificationCost(String iun, NotificationCostValidationResponse event) {
 
         NotificationInt notification = getNotification(iun);
         PnAuditLogEvent logEvent = generateAuditLog(notification, FIFTH_VALIDATION_STEP);
@@ -265,7 +265,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
         }
     }
 
-    private void processNotificationCostValidationResponse(String iun, PnNotificationCostValidationEventPayload event, NotificationInt notification, PnAuditLogEvent logEvent) {
+    private void processNotificationCostValidationResponse(String iun, NotificationCostValidationResponse event, NotificationInt notification, PnAuditLogEvent logEvent) {
         switch (event.getStatus()) {
             case OK -> {
                 TimelineElementInternal buildNotificationCostValidationResponse = timelineUtils.buildNotificationCostValidationResponse(notification);

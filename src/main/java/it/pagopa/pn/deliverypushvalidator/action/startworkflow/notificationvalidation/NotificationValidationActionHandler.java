@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
 import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -34,9 +34,9 @@ public class NotificationValidationActionHandler {
         strategy.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult);
     }
 
-    public void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event, CommunicationType communicationType) {
+    public void handleValidateNotificationCost(String iun, NotificationCostValidationResponse response, CommunicationType communicationType) {
         NotificationValidationStrategy strategy = resolveStrategy(communicationType, iun);
-        strategy.handleValidateNotificationCost(iun, event);
+        strategy.handleValidateNotificationCost(iun, response);
     }
 
     private NotificationValidationStrategy resolveStrategy(CommunicationType communicationType, String iun) {
