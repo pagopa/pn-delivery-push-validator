@@ -36,7 +36,7 @@ public class NotificationProcessCostServiceImpl implements NotificationProcessCo
     ) {
         this.pnExternalRegistriesClientReactive = pnExternalRegistriesClientReactive;
         this.sendFee = cfg.getPagoPaNotificationBaseCost();
-        this.informalSendFee = cfg.getPagoPaNotificationBaseCost();
+        this.informalSendFee = cfg.getPagoPaInformalNotificationBaseCost();
         this.pnDeliveryPushClientReactive = pnDeliveryPushClientReactive;
     }
 
