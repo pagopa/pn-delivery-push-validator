@@ -32,6 +32,7 @@ public class PnDeliveryPushValidatorConfigs {
     @NotEmpty(message = "timeParamsMap must not be empty")
     private Map<CommunicationType, @Valid TimeParams> timeParamsMap;
     private int pagoPaNotificationBaseCost;
+    private int pagoPaInformalNotificationBaseCost;
     private Duration[] validationRetryIntervals;
     private String nationalRegistriesBaseUrl;
     private String addressManagerBaseUrl;
@@ -55,6 +56,7 @@ public class PnDeliveryPushValidatorConfigs {
     private boolean sendMoreThan20GramsDefaultValue;
     private boolean additionalLangsEnabled;
     private String technicalRefusalCostMode;
+    private String informalTechnicalRefusalCostMode;
     private Instant notificationCostServiceStartDate;
 
     @Data

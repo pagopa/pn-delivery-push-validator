@@ -5,6 +5,7 @@ import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.Notifica
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.NotificationRefusedErrorInt;
 import it.pagopa.pn.deliverypushvalidator.service.NotificationService;
 import it.pagopa.pn.deliverypushvalidator.service.TimelineService;
+import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class InformalNotificationRefusedStrategy implements NotificationRefusedS
     private final NotificationService notificationService;
     private final TimelineUtils timelineUtils;
     private final TimelineService timelineService;
+    private final RefusalCostCalculator refusalCostCalculator;
 
     @Override
     public NotificationInt getNotification(String iun) {
@@ -31,9 +33,10 @@ public class InformalNotificationRefusedStrategy implements NotificationRefusedS
         log.debug("Start handleNotificationRefused for informal notification - iun={}, notBefore={}", iun, notBefore);
 
         NotificationInt notification = getNotification(iun);
+        int notificationCost = refusalCostCalculator.calculateRefusalCost(notification, errors);
 
         timelineService.addTimelineElement(
-                timelineUtils.buildRefusedRequestTimelineElement(notification, errors, null),
+                timelineUtils.buildRefusedRequestTimelineElement(notification, errors, notificationCost),
                 notification
         );
     }

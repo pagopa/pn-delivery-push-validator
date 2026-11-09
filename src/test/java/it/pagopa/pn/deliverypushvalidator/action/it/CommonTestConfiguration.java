@@ -14,6 +14,7 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.refused.InformalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.LegalNotificationRefusedStrategy;
 import it.pagopa.pn.deliverypushvalidator.action.refused.NotificationRefusedActionHandler;
+import it.pagopa.pn.deliverypushvalidator.action.refused.RefusalCostPolicyProvider;
 import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileParameterConsumer;
 import it.pagopa.pn.deliverypushvalidator.action.searchaddress.SearchDigitalDomicileUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.*;
@@ -44,7 +45,6 @@ import it.pagopa.pn.deliverypushvalidator.service.mapper.NotificationCostService
 import it.pagopa.pn.deliverypushvalidator.service.mapper.SmartMapper;
 import it.pagopa.pn.deliverypushvalidator.utils.CommunicationTypeChecker;
 import it.pagopa.pn.deliverypushvalidator.utils.NotificationCostServiceFeatureFlagUtils;
-import it.pagopa.pn.deliverypushvalidator.utils.PnTechnicalRefusalCostMode;
 import it.pagopa.pn.deliverypushvalidator.utils.RefusalCostCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,7 +115,7 @@ import static org.awaitility.Awaitility.setDefaultTimeout;
         SmartMapper.class,
         DocumentComposition.class,
         RefusalCostCalculator.class,
-        PnTechnicalRefusalCostMode.class,
+        RefusalCostPolicyProvider.class,
         LookupAddressHandler.class,
         EventRouter.class,
         EventHandlerRegistry.class,
