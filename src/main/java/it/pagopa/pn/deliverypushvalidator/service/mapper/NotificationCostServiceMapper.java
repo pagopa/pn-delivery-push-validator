@@ -95,7 +95,9 @@ public class NotificationCostServiceMapper {
             recipient.setRecIndex(i);
             recipient.setRecipientInternalId(notificationInt.getRecipients().get(i).getInternalId());
             recipient.setPayments(mapInformalPaymentsInfo(paymentsByRecipient.getOrDefault(i, List.of())));
-            recipientCostDataList.add(recipient);
+            if (!recipient.getPayments().isEmpty()) {
+                recipientCostDataList.add(recipient);
+            }
         }
         return recipientCostDataList;
     }

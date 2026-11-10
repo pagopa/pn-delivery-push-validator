@@ -326,7 +326,7 @@ class NotificationCostServiceMapperTest {
     }
 
     @Test
-    void mapNotificationToNewInformalNotificationCostRequest_shouldMapEmptyPaymentListForRecipientWithoutPayments() {
+    void mapNotificationToNewInformalNotificationCostRequest_shouldMapOnlyOneRecipientIfThereAreTwosRecipientAndOneIsWithoutPayments() {
         NotificationInt notification = NotificationInt.builder()
                 .sender(NotificationSenderInt.builder()
                         .paId("pa-123")
@@ -337,6 +337,17 @@ class NotificationCostServiceMapperTest {
                                 .internalId("recipient-internal-1")
                                 .taxId("RSSMRA80A01H501U")
                                 .payments(null)
+                                .build(),
+                        NotificationRecipientInt.builder()
+                                .internalId("recipient-internal-1")
+                                .taxId("RSSMRA80A01H501U")
+                                .payments(List.of(NotificationPaymentInfoInt.builder()
+                                        .pagoPA(PagoPaInt.builder()
+                                                .creditorTaxId("77777777777")
+                                                .noticeCode("302000100000019421")
+                                                .applyCost(true)
+                                                .build())
+                                        .build()))
                                 .build()
                 ))
                 .build();
@@ -352,7 +363,8 @@ class NotificationCostServiceMapperTest {
         assertEquals(0, recipient.getRecIndex());
         assertEquals("recipient-internal-1", recipient.getRecipientInternalId());
         assertNotNull(recipient.getPayments());
-        assertTrue(recipient.getPayments().isEmpty());
+        assertFalse(recipient.getPayments().isEmpty());
+        assertEquals(1, recipient.getPayments().size());
     }
 
     private NotificationInt buildNotificationWithRecipients() {
