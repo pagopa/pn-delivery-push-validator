@@ -11,10 +11,7 @@ import it.pagopa.pn.deliverypushvalidator.action.it.utils.TestUtils;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.StartWorkflowHandler;
 import it.pagopa.pn.deliverypushvalidator.dto.address.LegalDigitalAddressInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.datavault.RecipientTypeInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationRecipientInt;
-import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.UsedServicesInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.*;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.EventId;
 import it.pagopa.pn.deliverypushvalidator.dto.timeline.TimelineEventId;
 import it.pagopa.pn.deliverypushvalidator.exception.PnDeliveryPushValidatorExceptionCodes;
@@ -593,6 +590,166 @@ class InformalNotificationValidationTestIT extends CommonNotificationValidationT
 
         // Verifichiamo sia stata richiesta la normalizzazione dell'indirizzo
         Assertions.assertTrue(checkIsPresentValidateNormalizeAddressRequest(iun, timelineService));
+
+        ConsoleAppenderCustom.checkLogs();
+    }
+
+    @Test
+    void notificationValidationComplete_digitalWorkflow_withPagoPaPayments() {
+        UUID messageId = UUID.randomUUID();
+
+        // Configura pagamento pagopa
+        String fileDocPayment = "keyPagoPaForm_doc00";
+        List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
+        List<TestUtils.DocumentWithContent> listPaymentDocumentWithContent = TestUtils.getDocumentWithContents(fileDocPayment, paymentDocuments);
+        paymentDocuments = TestUtils.firstFileUploadFromNotification(listPaymentDocumentWithContent, paymentDocuments, safeStorageClientMock);
+
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01")
+                .withMessageId(messageId.toString())
+                .withDigitalDomicile(LegalDigitalAddressInt.builder()
+                        .address("test@mail.it")
+                        .type(LegalDigitalAddressInt.LEGAL_DIGITAL_ADDRESS_TYPE.PEC)
+                        .build())
+                .withRecipientType(RecipientTypeInt.PG)
+                .withPayments(List.of(
+                        NotificationPaymentInfoInt.builder()
+                            .pagoPA(PagoPaInt.builder()
+                                    .creditorTaxId("creditorTaxId_"+ UUID.randomUUID())
+                                    .noticeCode("noticeCode_"+UUID.randomUUID())
+                                    .applyCost(true)
+                                    .attachment(paymentDocuments.getFirst())
+                                    .build())
+                            .build()
+                ))
+                .build();
+
+        pnDataVaultClientReactiveMock.insertMessage(MessageResponseDto.builder()
+                .messageId(messageId)
+                .senderId(DEFAULT_CAMPAIGN_SENDER_ID)
+                .build());
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withPaId(DEFAULT_CAMPAIGN_SENDER_ID)
+                .withNotificationRecipient(recipient)
+                .withCommunicationType(CommunicationType.INFORMAL)
+                .withCampaignId(CAMPAIGN_ID_DIGITAL_WORKFLOW)
+                .build();
+
+        pnDeliveryClientMock.addNotification(notification);
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationRequest(iun, timelineService)
+                )
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
+                )
+        );
+
+        ConsoleAppenderCustom.checkLogs();
+    }
+
+    @Test
+    void notificationValidationComplete_analogWorkflow_withLookupAddress_withPagoPaPayments() {
+        UUID messageId = UUID.randomUUID();
+
+        // Configura pagamento pagopa
+        String fileDocPayment = "keyPagoPaForm_doc00";
+        List<NotificationDocumentInt> paymentDocuments = TestUtils.getDocumentList(fileDocPayment);
+        List<TestUtils.DocumentWithContent> listPaymentDocumentWithContent = TestUtils.getDocumentWithContents(fileDocPayment, paymentDocuments);
+        paymentDocuments = TestUtils.firstFileUploadFromNotification(listPaymentDocumentWithContent, paymentDocuments, safeStorageClientMock);
+
+
+        NotificationRecipientInt recipient = NotificationRecipientTestBuilder.builder()
+                .withTaxId("TAXID01")
+                .withMessageId(messageId.toString())
+                .withPayments(List.of(
+                        NotificationPaymentInfoInt.builder()
+                                .pagoPA(PagoPaInt.builder()
+                                        .creditorTaxId("creditorTaxId_"+ UUID.randomUUID())
+                                        .noticeCode("noticeCode_"+UUID.randomUUID())
+                                        .applyCost(true)
+                                        .attachment(paymentDocuments.getFirst())
+                                        .build())
+                                .build()
+                ))
+                .build();
+        recipient.setPhysicalAddress(null); // Per essere sicuri che non ci sia l'indirizzo nella notifica
+
+        pnDataVaultClientReactiveMock.insertMessage(MessageResponseDto.builder()
+                .messageId(messageId)
+                .senderId(DEFAULT_CAMPAIGN_SENDER_ID)
+                .build());
+
+        UsedServicesInt usedServices = new UsedServicesInt().toBuilder()
+                .physicalAddressLookUp(true)
+                .build();
+
+        NotificationInt notification = NotificationTestBuilder.builder()
+                .withPaId(DEFAULT_CAMPAIGN_SENDER_ID)
+                .withNotificationRecipient(recipient)
+                .withCommunicationType(CommunicationType.INFORMAL)
+                .withCampaignId(CAMPAIGN_ID_ANALOG_WORKFLOW)
+                .withUsedServices(usedServices)
+                .build();
+
+        pnDeliveryClientMock.addNotification(notification);
+        String iun = notification.getIun();
+
+        //WHEN the workflow start
+        startWorkflowHandler.startWorkflow(iun, notification.getCommunicationType());
+
+        //THEN
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentRequestAccepted(iun, timelineService)
+                )
+        );
+
+        //Verifichiamo che sia stata richiesta la ricerca dell'indirizzo su NR (VAS)
+        Assertions.assertTrue(TestUtils.checkIsPresentNationalRegistryValidationCall(iun, timelineService));
+
+        checkRecIndexInNationalRegistryValidationCall(iun, List.of(0));
+
+        String expectedValidationCallTimelineId = TestUtils.buildTimelineEventIdNationalRegistryValidationCall(iun);
+
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNationalRegistryValidationResponse(expectedValidationCallTimelineId, iun, 0, timelineService)
+                )
+        );
+
+        // Verifichiamo sia stata richiesta la normalizzazione dell'indirizzo
+        Assertions.assertTrue(checkIsPresentValidateNormalizeAddressRequest(iun, timelineService));
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationRequest(iun, timelineService)
+                )
+        );
+
+        await().untilAsserted(() ->
+                Assertions.assertTrue(
+                        TestUtils.checkIsPresentNotificationCostValidationResponse(iun, timelineService)
+                )
+        );
 
         ConsoleAppenderCustom.checkLogs();
     }

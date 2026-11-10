@@ -1,10 +1,10 @@
 package it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation;
 
 import it.pagopa.pn.api.dto.events.PnF24MetadataValidationEndEventPayload;
-import it.pagopa.pn.api.dto.events.notificationcost.validation.PnNotificationCostValidationEventPayload;
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.addressmanager.NormalizeItemsResultInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.notificationcost.NotificationCostValidationResponse;
 
 public interface NotificationValidationStrategy {
 
@@ -31,7 +31,7 @@ public interface NotificationValidationStrategy {
     /**
      * Handles the async notification cost validation response.
      */
-    void handleValidateNotificationCost(String iun, PnNotificationCostValidationEventPayload event);
+    void handleValidateNotificationCost(String iun, NotificationCostValidationResponse validationResponse);
 
     /**
      * Schedule the action which will perform the required operations to accept the notification.
