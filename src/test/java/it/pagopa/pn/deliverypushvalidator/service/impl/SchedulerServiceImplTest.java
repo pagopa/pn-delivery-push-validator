@@ -44,7 +44,7 @@ class SchedulerServiceImplTest {
         ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
         CommunicationType communicationType = CommunicationType.LEGAL;
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(false);
 
         schedulerService.scheduleEvent(iun, dateToSchedule, actionType, communicationType);
 
@@ -59,7 +59,7 @@ class SchedulerServiceImplTest {
         ActionDetails actionDetails = Mockito.mock(ActionDetails.class);
         CommunicationType communicationType = CommunicationType.INFORMAL;
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(false);
 
         schedulerService.scheduleEvent(iun, dateToSchedule, actionType, actionDetails, communicationType);
 
@@ -73,7 +73,7 @@ class SchedulerServiceImplTest {
         ActionType actionType = ActionType.POST_ACCEPTED_PROCESSING_COMPLETED;
         CommunicationType communicationType = CommunicationType.LEGAL;
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(true);
 
         schedulerService.scheduleEvent(iun, dateToSchedule, actionType, communicationType);
 
@@ -88,7 +88,7 @@ class SchedulerServiceImplTest {
         DocumentCreationResponseActionDetails actionDetails = Mockito.mock(DocumentCreationResponseActionDetails.class);
         Mockito.when(actionDetails.getDocumentCreationType()).thenReturn(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue());
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(true);
 
         schedulerService.scheduleEvent(iun, null, dateToSchedule, actionType, null, actionDetails, null);
 
@@ -104,7 +104,7 @@ class SchedulerServiceImplTest {
         String timelineEventId = "timeline_01";
         CommunicationType communicationType = CommunicationType.LEGAL;
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(false);
 
         schedulerService.scheduleEvent(iun, recIndex, dateToSchedule, actionType, timelineEventId, null, communicationType);
 

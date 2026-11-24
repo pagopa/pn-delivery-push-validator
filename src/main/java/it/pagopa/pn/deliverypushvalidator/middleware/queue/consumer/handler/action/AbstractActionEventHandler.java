@@ -16,7 +16,7 @@ public abstract class AbstractActionEventHandler implements EventHandler<Action>
     }
 
     protected void checkNotificationCancelledAndExecute(Action action, Consumer<Action> functionToCall) {
-        if (! timelineUtils.checkIsNotificationCancellationRequested(action.getIun())) {
+        if (! timelineUtils.checkIsNotificationCancellationRequested(action.getIun(), action.getCommunicationType())) {
             functionToCall.accept(action);
         } else {
             log.info("Notification is cancelled, the action will not be executed - iun={}", action.getIun());

@@ -3,6 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.responsehandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationRequest;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.generated.openapi.msclient.pnsafestorage.model.FileDownloadResponse;
 import it.pagopa.pn.deliverypushvalidator.service.DocumentCreationRequestService;
 import it.pagopa.pn.deliverypushvalidator.service.SchedulerService;
@@ -42,7 +43,7 @@ class SafeStorageResponseHandlerTest {
         String iun = "IUN-handleResponseCancelled";
         String fileKey = "fileKey";
         //GIVEN
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(true);
         Mockito.when(fileDownloadResponse.getKey()).thenReturn(fileKey);
 
         DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).documentCreationType("TEST").build();
@@ -57,7 +58,7 @@ class SafeStorageResponseHandlerTest {
         String iun = "IUN-handleResponseCancelled";
         String fileKey = "fileKey";
         //GIVEN
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(true);
         Mockito.when(fileDownloadResponse.getKey()).thenReturn(fileKey);
 
         DocumentCreationRequest documentCreationRequest = DocumentCreationRequest.builder().iun(iun).documentCreationType(DocumentCreationTypeInt.NOTIFICATION_CANCELLED.getValue()).build();

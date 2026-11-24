@@ -3,6 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 import it.pagopa.pn.deliverypushvalidator.action.details.NotificationValidationActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.notificationvalidation.NotificationValidationActionHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import org.junit.jupiter.api.Test;
@@ -41,27 +42,28 @@ class NotificationValidationHandlerTest {
         NotificationValidationActionDetails details = new NotificationValidationActionDetails();
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .details(details)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
 
         handler.handle(action, headers);
 
-        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, null);
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, CommunicationType.LEGAL);
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
     void handleDoesNotExecuteValidationWhenNotificationCancelled() {
-        Action action = Action.builder().iun("iun_123").build();
+        Action action = Action.builder().iun("iun_123").communicationType(CommunicationType.LEGAL).build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(true);
 
         handler.handle(action, headers);
 
         Mockito.verify(notificationValidationActionHandler, Mockito.never()).validateNotification(Mockito.anyString(), Mockito.any(), Mockito.isNull());
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
@@ -69,15 +71,16 @@ class NotificationValidationHandlerTest {
         NotificationValidationActionDetails details = new NotificationValidationActionDetails();
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .details(details)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
-        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationValidationActionHandler).validateNotification("iun_123", details, null);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
+        Mockito.doThrow(new RuntimeException("Validation error")).when(notificationValidationActionHandler).validateNotification("iun_123", details, CommunicationType.LEGAL);
 
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
-        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, null);
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(notificationValidationActionHandler).validateNotification("iun_123", details, CommunicationType.LEGAL);
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 }

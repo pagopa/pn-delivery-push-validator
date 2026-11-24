@@ -44,7 +44,7 @@ class F24ResponseHandlerTest {
         CommunicationType communicationType = CommunicationType.LEGAL;
         when(event.getMetadataValidationEnd()).thenReturn(mock(PnF24MetadataValidationEndEventPayload.class));
         when(event.getMetadataValidationEnd().getSetId()).thenReturn("IUN123");
-        when(timelineUtils.checkIsNotificationCancellationRequested("IUN123")).thenReturn(false);
+        when(timelineUtils.checkIsNotificationCancellationRequested("IUN123", CommunicationType.LEGAL)).thenReturn(false);
 
         handler.handleEventF24(event);
 

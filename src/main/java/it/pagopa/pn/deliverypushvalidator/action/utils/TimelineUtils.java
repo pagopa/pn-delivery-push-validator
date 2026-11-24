@@ -1,6 +1,7 @@
 package it.pagopa.pn.deliverypushvalidator.action.utils;
 
 import it.pagopa.pn.deliverypushvalidator.dto.address.PhysicalAddressInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.NotificationInt;
 import it.pagopa.pn.deliverypushvalidator.dto.ext.publicregistry.NationalRegistriesResponse;
 import it.pagopa.pn.deliverypushvalidator.dto.legalfacts.LegalFactCategoryInt;
@@ -247,8 +248,12 @@ public class TimelineUtils {
                 .build());
     }
 
-    public boolean checkIsNotificationCancellationRequested(String iun) {
+    public boolean checkIsNotificationCancellationRequested(String iun, CommunicationType communicationType) {
         log.debug("checkIsNotificationCancellationRequested - iun={}", iun);
+
+        if (CommunicationType.INFORMAL.equals(communicationType)) {
+            return false;
+        }
 
         boolean isNotificationCancelled = timelineService.isNotificationCancellationRequested(iun);
         log.debug("NotificationCancellationRequested value is={}", isNotificationCancelled);
