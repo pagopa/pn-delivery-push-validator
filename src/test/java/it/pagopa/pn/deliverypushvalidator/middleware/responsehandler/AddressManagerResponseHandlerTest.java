@@ -42,8 +42,13 @@ class AddressManagerResponseHandlerTest {
         //GIVEN
         String correlationId = "corr-123";
         String iun = "iun-123";
+
+        TimelineElementInternal timelineElement = new TimelineElementInternal();
+        timelineElement.setCommunicationType(CommunicationType.LEGAL);
+
         Mockito.when(timelineUtils.getIunFromTimelineId(correlationId)).thenReturn(iun);
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(true);
+        Mockito.when(timelineService.getTimelineElement(iun, correlationId)).thenReturn(Optional.of(timelineElement));
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(true);
 
         NormalizeItemsResult normalizeItemsResult = new NormalizeItemsResult();
         normalizeItemsResult.setCorrelationId(correlationId);
@@ -62,7 +67,7 @@ class AddressManagerResponseHandlerTest {
         String correlationId = "corr-456";
         String iun = "iun-456";
         Mockito.when(timelineUtils.getIunFromTimelineId(correlationId)).thenReturn(iun);
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL)).thenReturn(false);
 
         TimelineElementInternal timelineElement = Mockito.mock(TimelineElementInternal.class);
         Mockito.when(timelineElement.getCommunicationType()).thenReturn(CommunicationType.LEGAL);
@@ -89,7 +94,6 @@ class AddressManagerResponseHandlerTest {
         String correlationId = "corr-789";
         String iun = "iun-789";
         Mockito.when(timelineUtils.getIunFromTimelineId(correlationId)).thenReturn(iun);
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested(iun)).thenReturn(false);
         Mockito.when(timelineService.getTimelineElement(iun, correlationId)).thenReturn(Optional.empty());
 
         NormalizeItemsResult normalizeItemsResult = new NormalizeItemsResult();

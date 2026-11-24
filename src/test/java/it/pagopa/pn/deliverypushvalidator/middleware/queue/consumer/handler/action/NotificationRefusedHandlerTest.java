@@ -59,7 +59,7 @@ class NotificationRefusedHandlerTest {
         handler.handle(action, headers);
 
         Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore, CommunicationType.INFORMAL);
-        Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
@@ -83,7 +83,7 @@ class NotificationRefusedHandlerTest {
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
         Mockito.verify(notificationRefusedActionHandler).notificationRefusedHandler("iun_123", details.getErrors(), notBefore, CommunicationType.INFORMAL);
-        Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils, Mockito.never()).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
 }

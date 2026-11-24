@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.ReceivedLegalFactCreationRequest;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import org.junit.jupiter.api.Test;
@@ -39,41 +40,43 @@ class ReceivedLegalFactGenerationHandlerTest {
     void handleSaveNotificationReceivedLegalFactsWhenNotificationNotCancelled() {
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
 
         handler.handle(action, headers);
 
         Mockito.verify(receivedLegalFactCreationRequest).saveNotificationReceivedLegalFacts("iun_123");
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
     void handleDoesNotExecuteSaveNotificationReceivedLegalFactsWhenNotificationIsCancelled() {
-        Action action = Action.builder().iun("iun_123").build();
+        Action action = Action.builder().iun("iun_123").communicationType(CommunicationType.LEGAL).build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(true);
 
         handler.handle(action, headers);
 
         Mockito.verify(receivedLegalFactCreationRequest, Mockito.never()).saveNotificationReceivedLegalFacts("iun_123");
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
     void handleLogsAndThrowsExceptionOnError() {
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
         Mockito.doThrow(new RuntimeException("Validation error")).when(receivedLegalFactCreationRequest).saveNotificationReceivedLegalFacts("iun_123");
 
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
         Mockito.verify(receivedLegalFactCreationRequest).saveNotificationReceivedLegalFacts("iun_123");
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
 }

@@ -177,8 +177,17 @@ class TimelineUtilsTest {
 
         Mockito.when(timelineService.isNotificationCancellationRequested(Mockito.eq(iun))).thenReturn(true);
 
-        boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun);
+        boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun, CommunicationType.LEGAL);
         Assertions.assertTrue(isNotificationCancellationRequested);
+    }
+
+    @Test
+    void checkIsNotificationCancellationRequestedWithINFORMALCommunicationType() {
+        String iun = "IUN-checkIsNotificationCancellationRequested";
+        CommunicationType communicationType = CommunicationType.INFORMAL;
+
+        boolean isNotificationCancellationRequested = timelineUtils.checkIsNotificationCancellationRequested(iun, communicationType);
+        Assertions.assertFalse(isNotificationCancellationRequested);
     }
 
     @Test

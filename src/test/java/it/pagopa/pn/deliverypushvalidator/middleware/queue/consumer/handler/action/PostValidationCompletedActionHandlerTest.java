@@ -2,6 +2,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 
 import it.pagopa.pn.deliverypushvalidator.action.startworkflow.PostValidationCompletedHandler;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ class PostValidationCompletedActionHandlerTest {
 
     @Test
     void handleCallsAcceptNotificationWhenNotificationIsNotCancelled() {
-        Action action = Action.builder().iun("IUN_123").build();
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("IUN_123")).thenReturn(false);
+        Action action = Action.builder().iun("IUN_123").communicationType(CommunicationType.LEGAL).build();
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("IUN_123", CommunicationType.LEGAL)).thenReturn(false);
 
         handler.handle(action, headers);
 
@@ -46,8 +47,8 @@ class PostValidationCompletedActionHandlerTest {
 
     @Test
     void handleSkipsAcceptNotificationWhenNotificationIsCancelled() {
-        Action action = Action.builder().iun("IUN_123").build();
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("IUN_123")).thenReturn(true);
+        Action action = Action.builder().iun("IUN_123").communicationType(CommunicationType.LEGAL).build();
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("IUN_123", CommunicationType.LEGAL)).thenReturn(true);
 
         handler.handle(action, headers);
 

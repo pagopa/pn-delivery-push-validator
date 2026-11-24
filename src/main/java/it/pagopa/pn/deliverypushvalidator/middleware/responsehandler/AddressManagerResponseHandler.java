@@ -34,11 +34,6 @@ public class AddressManagerResponseHandler {
                 AddressManagerClient.CLIENT_NAME, AddressManagerClient.NORMALIZE_ADDRESS_PROCESS_NAME, response.getCorrelationId());
         final String processName = AddressManagerClient.NORMALIZE_ADDRESS_PROCESS_NAME + " response handler";
 
-        if (timelineUtils.checkIsNotificationCancellationRequested(iun)){
-            log.warn("Process {} blocked: cancellation requested for iun {}", processName, iun);
-            return;
-        }
-
         try {
             log.logStartingProcess(processName);
 
@@ -46,6 +41,11 @@ public class AddressManagerResponseHandler {
                     .orElseThrow(() -> new PnInternalException("Timeline element not found for iun " + iun + " and correlationId " + response.getCorrelationId(), ERROR_CODE_TIMELINESERVICE_TIMELINE_ELEMENT_NOT_PRESENT));
             CommunicationType communicationType = timelineElement.getCommunicationType();
             HandleEventUtils.addCommunicationTypeToMdc(communicationType);
+
+            if (timelineUtils.checkIsNotificationCancellationRequested(iun, communicationType)){
+                log.warn("Process {} blocked: cancellation requested for iun {}", processName, iun);
+                return;
+            }
 
             NormalizeItemsResultInt normalizeItemsResult = AddressManagerMapper.externalToInternal(response);
             notificationValidationActionHandler.handleValidateAndNormalizeAddressResponse(iun, normalizeItemsResult, communicationType);

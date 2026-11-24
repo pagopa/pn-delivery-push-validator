@@ -3,6 +3,7 @@ package it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.handler.act
 import it.pagopa.pn.deliverypushvalidator.action.details.DocumentCreationResponseActionDetails;
 import it.pagopa.pn.deliverypushvalidator.action.utils.TimelineUtils;
 import it.pagopa.pn.deliverypushvalidator.dto.documentcreation.DocumentCreationTypeInt;
+import it.pagopa.pn.deliverypushvalidator.dto.ext.delivery.notification.CommunicationType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.consumer.router.SupportedEventType;
 import it.pagopa.pn.deliverypushvalidator.middleware.queue.producer.abstractions.actionspool.Action;
 import it.pagopa.pn.deliverypushvalidator.middleware.responsehandler.DocumentCreationResponseHandler;
@@ -44,16 +45,17 @@ class DocumentCreationResponseEventHandlerTest {
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .recipientIndex(0)
                 .details(details)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
 
         handler.handle(action, headers);
 
         Mockito.verify(documentCreationResponseHandler).handleResponseReceived("iun_123", details);
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
@@ -64,16 +66,17 @@ class DocumentCreationResponseEventHandlerTest {
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .recipientIndex(0)
                 .details(details)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(true);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(true);
 
         handler.handle(action, headers);
 
         Mockito.verify(documentCreationResponseHandler, Mockito.never()).handleResponseReceived("iun_123", details);
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 
     @Test
@@ -84,17 +87,18 @@ class DocumentCreationResponseEventHandlerTest {
                 .build();
         Action action = Action.builder()
                 .iun("iun_123")
+                .communicationType(CommunicationType.LEGAL)
                 .recipientIndex(0)
                 .details(details)
                 .build();
 
-        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123")).thenReturn(false);
+        Mockito.when(timelineUtils.checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL)).thenReturn(false);
         Mockito.doThrow(new RuntimeException("Validation error")).when(documentCreationResponseHandler).handleResponseReceived("iun_123", details);
 
         assertThrows(RuntimeException.class, () -> handler.handle(action, headers));
 
         Mockito.verify(documentCreationResponseHandler).handleResponseReceived("iun_123", details);
 
-        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123");
+        Mockito.verify(timelineUtils).checkIsNotificationCancellationRequested("iun_123", CommunicationType.LEGAL);
     }
 }

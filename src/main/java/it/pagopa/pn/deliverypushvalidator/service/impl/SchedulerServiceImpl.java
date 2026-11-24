@@ -44,7 +44,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     ) {
         log.info("Schedule {} in schedulingDate={} - iun={}", actionType, dateToSchedule, iun);
 
-        if (!timelineUtils.checkIsNotificationCancellationRequested(iun) || checkIsDocumentForNotificationCancelled(actionDetails)) {
+        if (!timelineUtils.checkIsNotificationCancellationRequested(iun, communicationType) || checkIsDocumentForNotificationCancelled(actionDetails)) {
             Action action = Action.builder()
                     .iun(iun)
                     .recipientIndex(recIndex)

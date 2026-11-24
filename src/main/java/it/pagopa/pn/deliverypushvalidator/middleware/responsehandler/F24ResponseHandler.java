@@ -58,7 +58,7 @@ public class F24ResponseHandler {
 
             final String processName = PnF24Client.VALIDATE_F24_PROCESS_NAME + " response handler";
 
-            if (timelineUtils.checkIsNotificationCancellationRequested(iun)) {
+            if (timelineUtils.checkIsNotificationCancellationRequested(iun, communicationType)) {
                 log.warn("Process {} blocked: cancellation requested for iun {}", processName, iun);
                 return;
             }

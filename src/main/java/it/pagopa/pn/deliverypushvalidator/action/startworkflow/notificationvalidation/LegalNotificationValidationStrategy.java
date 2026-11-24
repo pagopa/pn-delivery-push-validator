@@ -218,7 +218,7 @@ public class LegalNotificationValidationStrategy extends BaseNotificationValidat
     private void verifyLookUpAddressAndNormalizeAddress(NotificationInt notificationInt) {
         log.debug("Start verifyLookUpAddressAndNormalizeAddress - iun={}", notificationInt.getIun());
 
-        if (timelineUtils.checkIsNotificationCancellationRequested(notificationInt.getIun())) {
+        if (timelineUtils.checkIsNotificationCancellationRequested(notificationInt.getIun(), notificationInt.getCommunicationType())) {
             log.warn("Process blocked: cancellation requested for iun {}", notificationInt.getIun());
             return;
         }
